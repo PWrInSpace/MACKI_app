@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "macki-app"
+version = "0.1.0"
+description = ""
+authors = ["JSiuda1 <jakkub68@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.13"
+pyserial = "^3.5"
+pyqtgraph = "^0.13.7"
+opencv-python = "^4.10.0.84"
+vmbpy = {path = "VimbaX/vmbpy-1.0.4-py3-none-any.whl"}
+pyqt6 = "^6.7.1"
+numpy = "^2.0.1"
+matplotlib = "^3.9.1"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^7.1.0"
+black = "^24.4.2"
+mypy = "^1.11.0"
+pytest = "^8.3.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
