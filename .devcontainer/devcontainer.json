@@ -2,22 +2,22 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
 	"name": "Macki app",
-	"postCreateCommand": "sh .devcontainer/post_start.sh",
 	"build": {
 		"context": "..",
 		"dockerfile": "../Dockerfile"
 	},
 	"customizations": {
 		"vscode": {
-		  "extensions": [
-			"ms-python.python",
-			"mechatroner.rainbow-csv",
-			"njpwerner.autodocstring",
-			"seanwu.vscode-qt-for-python",
-			"shardulm94.trailing-spaces",
-			"jebbs.plantuml"
-		]
+			"extensions": [
+				"ms-python.python",
+				"mechatroner.rainbow-csv",
+				"njpwerner.autodocstring",
+				"seanwu.vscode-qt-for-python",
+				"shardulm94.trailing-spaces",
+				"jebbs.plantuml"
+			]
 		}
 	},
-	"forwardPorts": [420]
+	"forwardPorts": [420],
+	"postStartCommand": "sh .devcontainer/post_start.sh",
 }

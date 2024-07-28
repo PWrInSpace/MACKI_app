@@ -9,6 +9,9 @@ ENV PATH=$POETRY_HOME/bin:$PATH
 # update packages
 RUN apt-get update
 
+# install git
+RUN apt-get install -y git
+
 # Install Poetry
 RUN apt-get install -y curl
 RUN curl -sSL https://install.python-poetry.org | python3 - 
