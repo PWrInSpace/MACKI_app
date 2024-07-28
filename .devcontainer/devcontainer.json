@@ -2,7 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
 {
 	"name": "Macki app",
-	"postStartCommand": "sh .devcontainer/post_start.sh",
+	"postCreateCommand": "sh .devcontainer/post_start.sh",
 	"build": {
 		"context": "..",
 		"dockerfile": "../Dockerfile"
@@ -15,8 +15,7 @@
 			"njpwerner.autodocstring",
 			"seanwu.vscode-qt-for-python",
 			"shardulm94.trailing-spaces",
-			"jebbs.plantuml",
-			"streetsidesoftware.code-spell-checker"
+			"jebbs.plantuml"
 		]
 		}
 	},
