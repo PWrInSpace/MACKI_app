@@ -1,7 +1,8 @@
 from vmbpy import Camera
 from PySide6.QtCore import QThread
 
-class CameraHandler:
+
+class CameraHandler(QThread):
     def __init__(self, camera: Camera) -> None:
         self._camera = camera
 
