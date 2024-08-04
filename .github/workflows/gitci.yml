@@ -1,0 +1,42 @@
+on: push
+
+jobs:
+  flake8:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+        poetry-version: ["1.6.1", "1.8"]
+        os: [ubuntu-22.04, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Set up environment
+        uses: ./.github/actions/setup
+        with:
+          python-version: ${{ matrix.python-version }}
+          poetry-version: ${{ matrix.poetry-version }}
+
+      - name: Run flake8
+        run: poetry run flake8
+
+#   mypy:
+#     strategy:
+#       fail-fast: false
+#       matrix:
+#         python-version: ["3.11", "3.12"]
+#         poetry-version: ["1.6.1", "1.8"]
+#         os: [ubuntu-22.04, windows-latest]
+
+#     runs-on: ${{ matrix.os }}
+
+#     steps:
+#       - name: Set up environment
+#         uses: ./.github/actions/setup
+#         with:
+#           python-version: ${{ matrix.python-version }}
+#           poetry-version: ${{ matrix.poetry-version }}
+
+#       - name: Run mypy
+#         run: poetry run mypy
