@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - name: Set up environment
-        uses: ./.github/actions/setup
+        uses: ./actions/setup
         with:
           python-version: ${{ matrix.python-version }}
           poetry-version: ${{ matrix.poetry-version }}
