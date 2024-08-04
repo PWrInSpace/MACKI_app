@@ -1,26 +1,23 @@
-import logging
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
 from vmbpy import VmbSystem, Camera, CameraEvent
-from src.cameras.camera import CameraHandler
+from camera_handler import FramesHandler, logger
 from enum import Enum
-
-
-logger = logging.getLogger("cameras")
 
 
 class CamerasMenagerState(Enum):
     IDLE = 0
     RUNNING = 1
     STOPPING = 2
+    UNKNOW = 99
 
 
 class CamerasMenager(QThread):
     cameras_registered = Signal()
     cameras_changed = Signal()
 
-    def __init__(self, parent: QObject | None = ...) -> None:
+    def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
-        self._cameras: dict[str, CameraHandler]  # check weakpointer
+        self._cameras: dict[str, FramesHandler]  # check weakpointer
         self._menager_state: CamerasMenagerState = CamerasMenagerState.IDLE
         self._mutex = QMutex()
 
@@ -46,7 +43,7 @@ class CamerasMenager(QThread):
         Returns:
             CamerasMenagerState: current state
         """
-        state = None
+        state = CamerasMenagerState.UNKNOW
         if self._mutex.try_lock():
             state = self._menager_state
             self._mutex.unlock()
@@ -80,7 +77,7 @@ class CamerasMenager(QThread):
             return False
 
         for camera in cameras:
-            self._cameras[camera.get_id()] = CameraHandler(camera)
+            self._cameras[camera.get_id()] = FramesHandler(camera)
 
         return True
 
@@ -88,7 +85,7 @@ class CamerasMenager(QThread):
         camera_id = camera.get_id()
 
         if camera_id not in self._cameras:
-            self._cameras[camera_id] = CameraHandler(camera)
+            self._cameras[camera_id] = FramesHandler(camera)
             self._cameras[camera_id].start()
         else:
             logger.warn(f"Camera {camera_id} is already in the list")
@@ -118,9 +115,9 @@ class CamerasMenager(QThread):
 
         match event:
             case CameraEvent.Detected:
-                self._on_camera_detected()
+                self._on_camera_detected(camera)
             case CameraEvent.Missing:
-                self._on_camera_missing()
+                self._on_camera_missing(camera)
                 pass
             case _:
                 logger.warning("Unknown camera event")
@@ -186,6 +183,8 @@ class CamerasMenager(QThread):
             return False
 
         self._change_state(CamerasMenagerState.STOPPING)
+
+        return True
 
     def run(self) -> None:
         logger.info("Cameras menager started")
