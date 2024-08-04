@@ -13,11 +13,7 @@ logger = logging.getLogger("cameras")
 class FramesHandler(QThread):
     FRAME_QUEUE_SIZE = 10
 
-    def __init__(
-        self,
-        name: str,
-        frame_queue_size: int = 10
-    ) -> None:
+    def __init__(self, name: str, frame_queue_size: int = 10) -> None:
         self._frame_queue = Queue(frame_queue_size)
         self._name = name  # reference to the camera object
         self._handlers: list[BasicHandler] = []
