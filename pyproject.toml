@@ -9,8 +9,14 @@ readme = "README.md"
 python = ">=3.11, <3.13"
 pyside6 = "^6.7.2"
 vmbpy = {path = "VimbaX/vmbpy-1.0.4-py3-none-any.whl"}
-mypy = "^1.11.1"
 
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.11.1"
+flake8 = "^7.1.1"
+black = "^24.8.0"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.3.2"
 
 [build-system]
 requires = ["poetry-core"]

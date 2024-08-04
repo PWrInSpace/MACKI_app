@@ -2,7 +2,7 @@ on: push
 
 jobs:
   flake8:
-    runs-on: [ubuntu-22.04, windows-latest]
+    runs-on: [ubuntu-latest, windows-latest]
     strategy:
       fail-fast: false
       matrix:
