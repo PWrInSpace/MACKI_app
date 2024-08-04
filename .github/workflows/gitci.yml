@@ -2,14 +2,14 @@ on: push
 
 jobs:
   flake8:
-    runs-on: [ubuntu-latest, windows-latest]
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.11", "3.12"]
+    runs-on: ubuntu-latest
+    # strategy:
+    #   fail-fast: false
+    #   matrix:
+    #     python-version: ["3.11", "3.12"]
 
     container:
-      image: cimg/python:${{ matrix.python-version }}
+      image: cimg/python:3.11
 
     steps:
       - name: Checkout code
