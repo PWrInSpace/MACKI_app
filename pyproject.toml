@@ -4,11 +4,14 @@ version = "0.1.0"
 description = ""
 authors = ["JSiuda1 <jakkub68@gmail.com>"]
 readme = "README.md"
+packages = [
+    { include = "src" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.11, <3.13"
 pyside6 = "^6.7.2"
-vmbpy = {path = "VimbaX/vmbpy-1.0.4-py3-none-any.whl"}
+numpy = "^2.0.1"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"

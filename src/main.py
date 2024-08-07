@@ -39,3 +39,15 @@
 # engine.rootObjects()[0].setProperty('backend', backend)
 
 # sys.exit(app.exec())
+
+from src.cameras.frames_handler import FramesHandler
+import logging
+from PySide6.QtCore import QThread
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    x = FramesHandler("foo")
+    x.start()
+    x.quit()
+
+    

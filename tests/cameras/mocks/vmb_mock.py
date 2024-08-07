@@ -1,16 +1,20 @@
 from typing import Callable
-from vmb_camera_mock import VmbCameraMock
+from tests.cameras.mocks.vmb_camera_mock import VmbCameraMock
 from vmbpy import CameraEvent
 
 class VmbMock:
     class __Instance:
+        CAM1_ID = "Camera1"
+        CAM2_ID = "Camera2"
+        CAM3_ID = "Camera3"
+
         def __init__(self) -> None:
             # Type to be corrected
             self._camera_change_cb: Callable[[VmbCameraMock, CameraEvent], None] = None
             self._cameras = [
-                VmbCameraMock("Camera1"),
-                VmbCameraMock("Camera2"),
-                VmbCameraMock("Camera3"),
+                VmbCameraMock(self.CAM1_ID),
+                VmbCameraMock(self.CAM2_ID),
+                VmbCameraMock(self.CAM3_ID),
             ]
 
         def __enter__(self):
@@ -23,12 +27,12 @@ class VmbMock:
             return self._cameras
 
         def register_camera_change_handler(
-            self, handler: Callable[[VmbCameraMock, CameraEvent]]
+            self, handler: Callable[[VmbCameraMock, CameraEvent], None]
         ) -> None:
             self._camera_change_cb = handler
 
         def unregister_camera_change_handler(
-            self, handler: Callable[[VmbCameraMock, CameraEvent]]
+            self, handler: Callable[[VmbCameraMock, CameraEvent], None]
         ) -> None:
             self._camera_change_cb = None
 
