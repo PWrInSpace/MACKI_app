@@ -15,12 +15,15 @@ class FramesHandler(QThread):
 
     def __init__(self, name: str, frame_queue_size: int = 10) -> None:
         super().__init__()
-
         self._frame_queue = Queue(frame_queue_size)
         self._name = name  # camera name
         self._handlers: list[BasicHandler] = []
         self._handler_mutex = QMutex()
         self._stop_thread = ThreadEvent()
+
+    def __del__(self) -> None:
+        logger.info(f"Deleting thread for cam {self._name}")
+        self.quit()
 
     def register_handler(self, handler: BasicHandler) -> bool:
         if not self._handler_mutex.tryLock(1000):

@@ -12,6 +12,8 @@ packages = [
 python = ">=3.11, <3.13"
 pyside6 = "^6.7.2"
 numpy = "^2.0.1"
+vmbpy = {path = "VmbPy"}
+pytest-mock = "^3.14.0"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"
