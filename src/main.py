@@ -44,6 +44,7 @@ import sys
 # from src.cameras.frames_handler import FramesHandler
 from src.cameras.cameras_menager import CamerasMenager
 from src.cameras.handling_elements.frame_display import FrameDisplay
+from src.cameras.handling_elements.video_writer import VideoWriter
 # import logging
 from PyQt6.QtCore import QThread
 from PyQt6.QtWidgets import QApplication, QWidget
@@ -105,15 +106,34 @@ class MainWindow(QMainWindow):
 
         self.cameras = CamerasMenager()
         self.cameras.start()
+        QThread.sleep(1)
+        ids = self.cameras.ids
+        self.frame_display = FrameDisplay(ids[0])
+        self.frame_display2 = FrameDisplay(ids[1])
+
+        self.cameras.registerHandler(ids[0], self.frame_display)
+        self.cameras.registerHandler(ids[1], self.frame_display2)
+        if "DEE" in ids[0]: 
+            self.video_writer = VideoWriter(ids[0], 20, (2000, 1000))
+            self.video_writer2 = VideoWriter(ids[1], 7, (2000, 1000))
+        else:
+            self.video_writer = VideoWriter(ids[0], 7, (2000, 1000))
+            self.video_writer2 = VideoWriter(ids[1], 20, (2000, 1000))
+    
+        self.cameras.registerHandler(ids[0], self.video_writer)
+        self.cameras.registerHandler(ids[1], self.video_writer2)
 
     def on_button_click(self):
-        self.frame_display = FrameDisplay("bar")
+        self.video_writer.start()
+        self.video_writer2.start()
         self.frame_display.start()
-        # QThread.sleep(5)
-        # self.frame_display.stop()
+        self.frame_display2.start()
 
     def close_button(self):
         self.frame_display.stop()
+        self.frame_display2.stop()
+        self.video_writer.stop()
+        self.video_writer2.stop()
 
     def closeEvent(self, event):
         self.cameras.quit()

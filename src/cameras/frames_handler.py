@@ -13,10 +13,11 @@ logger = logging.getLogger("cameras")
 class FramesHandler(QThread):
     FRAME_QUEUE_SIZE = 10
 
-    def __init__(self, name: str, frame_queue_size: int = 10) -> None:
+    def __init__(self, camera: Camera, frame_queue_size: int = 10) -> None:
         super().__init__()
         self._frame_queue = Queue(frame_queue_size)
-        self._name = name  # camera name
+        self._camera = camera
+        self._name = self._camera.get_id()  # camera name
         self._handlers: list[BasicHandler] = []
         self._handler_mutex = QMutex()
         self._stop_thread = ThreadEvent()
@@ -62,7 +63,7 @@ class FramesHandler(QThread):
                 frame_cpy = copy.deepcopy(frame)
                 # we checked that frame is not full before, so
                 # we do not have to handle is full exception
-                self._frame_queue.put_nowait(frame_cpy)
+                self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
             else:
                 logger.warning(f"Cam {self._name} is full")
 
@@ -91,29 +92,78 @@ class FramesHandler(QThread):
         return frame
 
     def _add_frame_to_handlers(self, frame: np.array) -> None:
-        if not frame:
+        if frame is None:
             logger.warn(f"Camera {self._name}, frame is None :C")
             return
 
         for handler in self._handlers:
             handler.add_frame(frame)
 
+    def set_mako(self):
+        feat = self._camera.get_feature_by_name('Height')
+        feat.set(1000)
+
+        feat = self._camera.get_feature_by_name('Width')
+        feat.set(2000)
+        
+        feat = self._camera.get_feature_by_name('OffsetX')
+        feat.set(0)
+
+        feat = self._camera.get_feature_by_name('OffsetY')
+        feat.set(0)
+
+        feature = self._camera.get_feature_by_name('AcquisitionFrameRateAbs')
+        feature.set(20) #specifies 30FPS
+        # set the other features TriggerSelector and TriggerMode
+        feature = self._camera.get_feature_by_name("TriggerSelector")
+        feature.set("FrameStart")
+        feature = self._camera.get_feature_by_name("TriggerMode")
+        feature.set("Off")
+
+    def set_alvium(self):
+        feat = self._camera.get_feature_by_name('Height')
+        feat.set(1000)
+
+        feat = self._camera.get_feature_by_name('Width')
+        feat.set(2000)
+        
+        feat = self._camera.get_feature_by_name('OffsetX')
+        feat.set(2000)
+
+        feat = self._camera.get_feature_by_name('OffsetY')
+        feat.set(1000)
+
+        feature = self._camera.get_feature_by_name('AcquisitionFrameRateEnable')
+        feature.set(True)
+
+        feature = self._camera.get_feature_by_name('AcquisitionFrameRate')
+        feature.set(7)
+
     def run(self) -> None:
         logger.info(f"Frame handler thread started for camera {self._name}")
 
         alive = True
-        while alive:
-            if self._frame_available():
-                frame = self._get_the_newest_frame()
-                logging.info(f"Frame from {self._name} is available")
-                try:
-                    self._handler_mutex.lock()
-                    self._add_frame_to_handlers(frame)
-                finally:
-                    self._handler_mutex.unlock()
+        with self._camera:
+            print(self._camera.get_model())
+            if "Mako" in self._camera.get_model():
+                self.set_mako()
+            else:
+                self.set_alvium()
+            
+            self._camera.start_streaming(self.on_frame)
+            while alive:
+                if self._frame_available():
+                    frame = self._get_the_newest_frame()
+                    try:
+                        self._handler_mutex.lock()
+                        self._add_frame_to_handlers(frame)
+                    finally:
+                        self._handler_mutex.unlock()
 
-            if self._stop_thread.happens():
-                alive = False
+                if self._stop_thread.happens():
+                    alive = False
+
+            self._camera.stop_streaming()
 
     def _clean_up(self):
         self._stop_thread.restart()

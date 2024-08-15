@@ -18,7 +18,7 @@ class VideoWriter(BasicHandler):
 
     def start(self) -> None:
         file_name = self._generate_file_name()
-        self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size)
+        self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size, False)
 
     def stop(self) -> None:
         self._writer.release()

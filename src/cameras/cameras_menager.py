@@ -3,7 +3,6 @@ from vmbpy import VmbSystem, Camera, CameraEvent
 from src.cameras.frames_handler import FramesHandler, logger
 from src.cameras.handling_elements.basic_handler import BasicHandler
 from enum import Enum
-import time
 
 
 class CamerasMenagerState(Enum):
@@ -84,7 +83,7 @@ class CamerasMenager(QThread):
 
         for camera in cameras:
             camera_id = camera.get_id()
-            self._cameras_handlers[camera_id] = FramesHandler(camera_id)
+            self._cameras_handlers[camera_id] = FramesHandler(camera)
 
         return True
 
@@ -92,7 +91,7 @@ class CamerasMenager(QThread):
         camera_id = camera.get_id()
 
         if camera_id not in self._cameras_handlers:
-            self._cameras_handlers[camera_id] = FramesHandler(camera_id)
+            self._cameras_handlers[camera_id] = FramesHandler(camera)
             self._cameras_handlers[camera_id].start()
         else:
             logger.warning(f"Camera {camera_id} is already in the list")
@@ -233,3 +232,8 @@ class CamerasMenager(QThread):
         super().wait()
 
         logger.info("Cameras menager thread stopped")
+
+
+    @property
+    def ids(self) -> list[str]:
+        return list(self._cameras_handlers.keys())

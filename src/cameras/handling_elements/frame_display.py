@@ -40,6 +40,9 @@ class FrameDisplay(BasicHandler):
 
     def add_frame(self, frame: np.ndarray) -> None:
         if self.widget.isVisible():
-            img = QImage(frame, frame.shape[1], frame.shape[0], frame.shape[1] * 3, QImage.Format_RGB888)
+            # logger.debug(f"Adding frame to {self.widget.windowTitle()}")
+            fr = cv2.resize(frame, (640, 480))
+            logger.info(f"Adding frame {fr.shape}")
+            img = QImage(fr, fr.shape[1], fr.shape[0], QImage.Format_Grayscale8)
             pix = QPixmap(img)
             self._label.setPixmap(pix)
