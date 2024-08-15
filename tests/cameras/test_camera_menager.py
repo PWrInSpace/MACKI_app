@@ -1,9 +1,9 @@
 import pytest
-from PySide6.QtCore import QThread
 from vmbpy import CameraEvent
 from src.cameras import CamerasMenager, CamerasMenagerState
 from src.cameras.frames_handler import FramesHandler
 from tests.cameras.mocks import VmbMock, VmbCameraMock, VmbInstance
+
 
 class CamerasMenagerMock(CamerasMenager):
     def __init__(self) -> None:
@@ -74,7 +74,7 @@ def test_register_available_cameras():
     instance = cameras_menager._get_vmb_instance()
     assert cameras_menager._register_available_cameras(instance) == True
 
-    cameras_id = [camera.get_id() for camera in instance.get_cameras()]
+    cameras_id = [camera.get_id() for camera in instance.get_all_cameras()]
     assert list(cameras_menager._cameras_handlers.keys()) == cameras_id
 
     frames_handlers_names = [handler._name for handler in cameras_menager._cameras_handlers.values()]

@@ -49,6 +49,8 @@ class FramesHandler(QThread):
             logger.error("Unknown handler")
             return False
 
+        handler.stop()
+
         self._handlers.remove(handler)
         self._handler_mutex.unlock()
 
@@ -103,7 +105,7 @@ class FramesHandler(QThread):
         while alive:
             if self._frame_available():
                 frame = self._get_the_newest_frame()
-
+                logging.info(f"Frame from {self._name} is available")
                 try:
                     self._handler_mutex.lock()
                     self._add_frame_to_handlers(frame)

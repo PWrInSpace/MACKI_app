@@ -1,6 +1,7 @@
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
 from vmbpy import VmbSystem, Camera, CameraEvent
 from src.cameras.frames_handler import FramesHandler, logger
+from src.cameras.handling_elements.basic_handler import BasicHandler
 from enum import Enum
 import time
 
@@ -75,7 +76,7 @@ class CamerasMenager(QThread):
         Returns:
             bool: True if at least one camera was registered, False otherwise.
         """
-        cameras: list[Camera] = vmb.get_cameras()
+        cameras: list[Camera] = vmb.get_all_cameras()
 
         if not cameras:
             logger.error("No cameras available")
@@ -189,6 +190,20 @@ class CamerasMenager(QThread):
 
         return True
 
+    def registerHandler(self, cam_id: str, basic_handler: BasicHandler) -> bool:
+        if cam_id not in self._cameras_handlers:
+            logger.error(f"Camera {cam_id} not registered")
+            return False
+
+        return self._cameras_handlers[cam_id].register_handler(basic_handler)
+
+    def unregisterHandler(self, cam_id: str, basic_handler: BasicHandler) -> bool:
+        if cam_id not in self._cameras_handlers:
+            logger.error(f"Camera {cam_id} not registered")
+            return False
+
+        return self._cameras_handlers[cam_id].unregister_handler(basic_handler)
+
     def run(self) -> None:
         logger.info("Cameras menager started")
 
@@ -211,3 +226,10 @@ class CamerasMenager(QThread):
 
         self._change_state(CamerasMenagerState.IDLE)
 
+
+    def quit(self) -> None:
+        logger.info("Wating for cameras menager thread to stop")
+        self.terminate_thread()
+        super().wait()
+
+        logger.info("Cameras menager thread stopped")

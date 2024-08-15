@@ -22,7 +22,7 @@ class VmbInstance:
     def __exit__(self, exc_type, exc_value, traceback):
         pass
 
-    def get_cameras(self) -> list[VmbCameraMock]:
+    def get_all_cameras(self) -> list[VmbCameraMock]:
         return self._cameras
 
     def register_camera_change_handler(
