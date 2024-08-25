@@ -16,3 +16,7 @@ class BasicHandler(ABC):
     @abstractmethod
     def add_frame(self, frame: np.array):
         pass
+
+    @abstractmethod
+    def is_running(self) -> bool:
+        pass

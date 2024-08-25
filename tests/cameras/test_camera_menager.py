@@ -1,7 +1,7 @@
 import pytest
 from vmbpy import CameraEvent
 from src.cameras import CamerasMenager, CamerasMenagerState
-from src.cameras.frames_handler import FramesHandler
+from cameras.camera_handler import FramesHandler
 from tests.cameras.mocks import VmbMock, VmbCameraMock, VmbInstance
 
 

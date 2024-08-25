@@ -1,2 +1,2 @@
-from src.cameras.frames_handler import FramesHandler
+from cameras.camera_handler import CameraHandler
 from src.cameras.cameras_menager import CamerasMenager, CamerasMenagerState

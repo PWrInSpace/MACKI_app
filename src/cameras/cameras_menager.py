@@ -1,7 +1,7 @@
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
 from vmbpy import VmbSystem, Camera, CameraEvent
-from src.cameras.frames_handler import FramesHandler, logger
-from src.cameras.handling_elements.basic_handler import BasicHandler
+from cameras.camera_handler import CameraHandler, logger
+from src.cameras.frame_handlers.basic_handler import BasicHandler
 from enum import Enum
 
 
@@ -13,12 +13,12 @@ class CamerasMenagerState(Enum):
 
 
 class CamerasMenager(QThread):
-    cameras_registered = Signal()
-    cameras_changed = Signal()
+    camera_registered = Signal(CameraHandler)
+    camera_missing = Signal(str)    # camera id
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
-        self._cameras_handlers: dict[str, FramesHandler] = {} # check weakpointer
+        self._cameras_handlers: dict[str, CameraHandler] = {} # check weakpointer
         self._menager_state: CamerasMenagerState = CamerasMenagerState.IDLE
         self._mutex = QMutex()
 
@@ -64,7 +64,7 @@ class CamerasMenager(QThread):
 
     def _register_available_cameras(self, vmb: VmbSystem) -> bool:
         """Registers all available cameras in the system.
-        This methode creates a FramesHandler for each camera, where the
+        This methode creates a CameraHandler for each camera, where the
         name of the camera is a camera id.
         FramesHandlers are stored in the _cameras_handlers dictionary, where the key
         is the camera id.
@@ -82,8 +82,7 @@ class CamerasMenager(QThread):
             return False
 
         for camera in cameras:
-            camera_id = camera.get_id()
-            self._cameras_handlers[camera_id] = FramesHandler(camera)
+            self._on_camera_detected(camera)
 
         return True
 
@@ -91,8 +90,8 @@ class CamerasMenager(QThread):
         camera_id = camera.get_id()
 
         if camera_id not in self._cameras_handlers:
-            self._cameras_handlers[camera_id] = FramesHandler(camera)
-            self._cameras_handlers[camera_id].start()
+            self._cameras_handlers[camera_id] = CameraHandler(camera)
+            self.camera_registered.emit(self._cameras_handlers[camera_id])
         else:
             logger.warning(f"Camera {camera_id} is already in the list")
 
@@ -102,6 +101,7 @@ class CamerasMenager(QThread):
         if camera_id in self._cameras_handlers:
             self._cameras_handlers[camera_id].quit()
             del self._cameras_handlers[camera_id]
+            self.camera_missing.emit(camera_id)
         else:
             logger.warning(f"Camera {camera_id} is not in the list!")
 
@@ -130,10 +130,10 @@ class CamerasMenager(QThread):
             case _:
                 logger.warning("Unknown camera event")
 
-    def _start_cameras(self) -> None:
-        """Starts the threads for all the cameras."""
-        for camera_handler in self._cameras_handlers.values():
-            camera_handler.start()
+    # def _start_cameras(self) -> None:
+    #     """Starts the threads for all the cameras."""
+    #     for camera_handler in self._cameras_handlers.values():
+    #         camera_handler.start()
 
     def _register_vmb_callbacks(self, vmb: VmbSystem) -> None:
         """Registers the VmbSystem callbacks.
@@ -212,16 +212,13 @@ class CamerasMenager(QThread):
         with vmb:
             self._register_available_cameras(vmb)
 
-            # TBD move to the register_available_cameras
-            self.cameras_registered.emit()
-
             self._register_vmb_callbacks(vmb)
-            self._start_cameras()
+            # self._start_cameras()
 
             self._wait_until_stop_signal()
             self._unregister_vmb_callbacks(vmb)
 
-            self._clean_up_menager()
+        self._clean_up_menager()
 
         self._change_state(CamerasMenagerState.IDLE)
 

@@ -1,6 +1,6 @@
 import cv2
 from datetime import datetime
-from src.cameras.handling_elements.basic_handler import BasicHandler
+from src.cameras.frame_handlers.basic_handler import BasicHandler
 
 
 class VideoWriter(BasicHandler):
@@ -11,10 +11,13 @@ class VideoWriter(BasicHandler):
         self._fps = fps
         self._frame_size = frame_size
 
+    def __del__(self) -> None:
+        if self._writer:
+            self._writer.release()
+
     def _generate_file_name(self) -> str:
         now = datetime.now()
         return f"{self._name}_{now.strftime('%Y-%m-%d_%H-%M-%S')}.mp4"
-
 
     def start(self) -> None:
         file_name = self._generate_file_name()
@@ -27,3 +30,6 @@ class VideoWriter(BasicHandler):
     def add_frame(self, frame: list[int]) -> None:
         if self._writer:
             self._writer.write(frame)
+
+    def is_running(self) -> bool:
+        return self._writer is not None

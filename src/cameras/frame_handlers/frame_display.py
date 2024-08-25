@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 from PySide6.QtGui import QImage, QPixmap
-from src.cameras.handling_elements.basic_handler import BasicHandler, logger
+from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
 
 
 class FrameDisplay(BasicHandler):
@@ -39,10 +39,13 @@ class FrameDisplay(BasicHandler):
         self.widget.close()
 
     def add_frame(self, frame: np.ndarray) -> None:
-        if self.widget.isVisible():
+        if self.is_running():
             # logger.debug(f"Adding frame to {self.widget.windowTitle()}")
             fr = cv2.resize(frame, (640, 480))
             logger.info(f"Adding frame {fr.shape}")
             img = QImage(fr, fr.shape[1], fr.shape[0], QImage.Format_Grayscale8)
             pix = QPixmap(img)
             self._label.setPixmap(pix)
+
+    def is_running(self) -> bool:
+        return self.widget.isVisible()
