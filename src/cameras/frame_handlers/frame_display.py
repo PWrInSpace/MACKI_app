@@ -17,7 +17,7 @@ class FrameDisplay(BasicHandler):
         self.widget.setLayout(layout)
 
     def generate_init_frame(self) -> np.array:
-        dark_img = np.zeros((480, 640, 3))
+        dark_img = np.zeros((480, 640))
 
         text = "Waiting for image"
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -26,7 +26,8 @@ class FrameDisplay(BasicHandler):
         text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
         text_x = (dark_img.shape[1] - text_size[0]) // 2
         text_y = (dark_img.shape[0] + text_size[1]) // 2
-        img = cv2.putText(dark_img, text, (200, 200), font, font_scale, (255, 0, 0), font_thickness)
+        img = cv2.putText(dark_img, text, (200, 200), font, font_scale, 255, font_thickness)
+        cv2.imwrite("dark_img.jpg", img)
         return img
 
     def start(self) -> None:

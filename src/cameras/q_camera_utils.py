@@ -1,8 +1,7 @@
-from PyQt6.QtWidgets import QLabel, QPushButton
-from PyQt6.QtCore import QObject
+from PySide6.QtWidgets import QLabel, QPushButton, QWidget, QHBoxLayout
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
-from dataclasses import dataclass
 from enum import Enum
+from dataclasses import dataclass
 
 class CameraStatus(Enum):
     MISSING = "Missing"
@@ -19,25 +18,30 @@ STATUS_TO_COLOR = {
     CameraStatus.WRITING_AND_DISPLAYING: "purple"
 }
 
+DISPLAY_BUTTON_OPEN = "Open"
+DISPLAY_BUTTON_CLOSE = "Close"
+
 @dataclass
 class CameraDefinition:
     name: str
     id: str
 
 CAMERAS = [
-    CameraDefinition("camera1", "cam1"),
-    CameraDefinition("camera2", "cam2"),
-    CameraDefinition("camera3", "cam3"),
+    CameraDefinition("Front", "cam1"),
+    CameraDefinition("Ugibugi", "cam2"),
+    CameraDefinition("Asdasdasdasdasd", "cam3"),
     CameraDefinition("camera4", "cam4"),
 ]
 
-class QCamera:
+class QCamera(QWidget):
     DEFAULT_CONFIG_FILE = "default_confg.txt"
 
     DISPLAY_HANDLER = "display"
     WRITER_HANDLER = "writer"
 
     def __init__(self, name: str, cam_id: str, config_file: str = None) -> None:
+        super().__init__()
+
         self.name = name
         self.id = cam_id
         self.config_file = config_file or self.DEFAULT_CONFIG_FILE
@@ -55,29 +59,35 @@ class QCamera:
         so it contains only the layout elements. It was created like this to
         set this elements on grid in the QCamerasMenager class.
         """
-        self._name_label = QLabel(f"{self.name}:")
-        self._status_label = QLabel()
+        self.name_label = QLabel(f"{self.name}:")
+        self.status_label = QLabel()
         self.update_status()
 
-        self._display_button = QPushButton("Open")
-        self._display_button.clicked.connect(self._on_open_button_clicked)
+        self.display_button = QPushButton("Open")
+        self.display_button.clicked.connect(self._on_open_button_clicked)
+
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.name_label)
+        self.layout.addWidget(self.status_label)
+        self.layout.addWidget(self.display_button)
+
+        self.setLayout(self.layout)
 
     def _on_open_button_clicked(self):
-        self.handlers[self.DISPLAY_HANDLER].start()
+        if self.display_button.text() == DISPLAY_BUTTON_OPEN:
+            self.handlers[self.DISPLAY_HANDLER].start()
+        else:
+            self.handlers[self.DISPLAY_HANDLER].stop()
 
-    def get_name_label(self) -> QLabel:
-        return self._name_label
+        self.update_status()
 
-    def get_status_label(self) -> QLabel:
-        return self._status_label
 
-    def get_display_button(self) -> QPushButton:
-        return self._display_button
 
     def update_status(self):
         status = self.get_str_status()
-        self._status_label.setText(status.value)
-        self._status_label.setStyleSheet(f"background-color: {STATUS_TO_COLOR[status]}")
+        self.status_label.setText(status.value)
+        self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
+
 ### END GUI ###
 
     def set_running_flag(self, running: bool):
