@@ -1,6 +1,6 @@
 import sys
 import logging
-from PySide6.QtCore import QSize, Qt
+from PySide6.QtCore import QSize, Qt, QThread
 from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
 from src.cameras.q_cameras_menager import QCamerasMenager
 
@@ -19,6 +19,9 @@ class MainWindow(QMainWindow):
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
+        self.cameras.enable_cameras()
+        # QThread.sleep(3)
+        self.cameras.start_cameras()
 
     def on_button_click(self):
         self.video_writer.start()

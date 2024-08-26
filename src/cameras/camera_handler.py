@@ -19,7 +19,7 @@ class CameraHandler(QThread):
     ) -> None:
         super().__init__()
         self._camera = camera
-        self._name = self._camera.get_id()  # camera name
+        self._id = self._camera.get_id()  # camera name
 
         self._frame_queue = Queue(self.FRAME_QUEUE_SIZE)
         self._handlers: list[BasicHandler] = []
@@ -29,13 +29,15 @@ class CameraHandler(QThread):
         self._config_file = None    # camera config file, None means no config file
 
     def __del__(self) -> None:
-        logger.info(f"Deleting thread for cam {self._name}")
+        logger.info(f"Deleting thread for cam {self._id}")
         self.quit()
 
     def register_handler(self, handler: BasicHandler) -> bool:
+        logger.info(f"Registering handler {handler} for camera {self._id}")
+
         if not self._handler_mutex.tryLock(1000):
             logger.error(
-                f"Camera {self._name}: Unable to lock mutex for handler reqistration"
+                f"Camera {self._id}: Unable to lock mutex for handler reqistration"
             )
             return False
 
@@ -47,7 +49,7 @@ class CameraHandler(QThread):
     def unregister_handler(self, handler: BasicHandler) -> bool:
         if not self._handler_mutex.tryLock(1000):
             logger.error(
-                f"Camera {self._name}: Unable to lock mutex for handler reqistration"
+                f"Camera {self._id}: Unable to lock mutex for handler reqistration"
             )
             return False
 
@@ -68,13 +70,11 @@ class CameraHandler(QThread):
 
     def _on_frame(self, camera: Camera, stream: Stream, frame: Frame):
         if frame.get_status() == FrameStatus.Complete:
-            if not self._frame_queue.full():
+            try:
                 frame_cpy = copy.deepcopy(frame)
-                # we checked that frame is not full before, so
-                # we do not have to handle is full exception
                 self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
-            else:
-                logger.warning(f"Cam {self._name} is full")
+            except Exception as e:
+                logger.warning(f"Cam {self._id} on frame exception: {str(e)}")
 
         camera.queue_frame(frame)
 
@@ -89,7 +89,7 @@ class CameraHandler(QThread):
 
         if frames_on_queue > 1:
             logger.warn(
-                f"Camera {self._name} thread is delayed"
+                f"Camera {self._id} thread is delayed"
                 f" about {frames_on_queue - 1} frames"
             )
 
@@ -102,7 +102,7 @@ class CameraHandler(QThread):
 
     def _add_frame_to_handlers(self, frame: np.array) -> None:
         if frame is None:
-            logger.warn(f"Camera {self._name}, frame is None :C")
+            logger.warn(f"Camera {self._id}, frame is None :C")
             return
 
         for handler in self._handlers:
@@ -111,7 +111,7 @@ class CameraHandler(QThread):
     def _handle_frames(self):
         try:
             if not self._handler_mutex.tryLock(1000):
-                logger.error(f"Camera {self._name}: Unable to lock mutex for frame handling")
+                logger.error(f"Camera {self._id}: Unable to lock mutex for frame handling")
                 return
 
             if not self._frame_available():
@@ -133,27 +133,25 @@ class CameraHandler(QThread):
             self._camera.start_streaming(self._on_frame)
 
     def run(self) -> None:
-        logger.info(f"Frame handler thread started for camera {self._name}")
+        logger.info(f"Frame handler thread started for camera {self._id}")
 
         self._stop_thread.restart()
         with self._camera:
             try:
-                self._load_config_file()
                 self._camera.start_streaming(self._on_frame)
 
-                while self._stop_thread.happens():
-                    self._handler_mutex.lock()
+                while not self._stop_thread.happens():
                     self._handle_frames()
-                    self._handler_mutex.unlock()
 
                     self._handle_config_file()
 
             except Exception as e:
-                logger.error(f"Error in camera {self._name}: {e}")
+                logger.error(f"Error in camera {self._id}: {e}")
 
             finally:
                 self._camera.stop_streaming()
 
+        logger.info(f"Frame handler thread stopped for camera {self._id}")
         self._clean_up()
 
     def _clean_up(self):
@@ -161,13 +159,13 @@ class CameraHandler(QThread):
             self._frame_queue.get_nowait()
 
     def quit(self) -> None:
-        logger.info(f"Wainting for frame handler to stop for camera {self._name}")
+        logger.info(f"Wainting for frame handler to stop for camera {self._id}")
         self._stop_thread.set()
         super().wait()
 
-        logger.info(f"Frame handler thread stopped for camera {self._name}")
+        logger.info(f"Frame handler thread stopped for camera {self._id}")
         self._clean_up()
 
     @property
-    def name(self) -> str:
-        return self._name
+    def id(self) -> str:
+        return self._id

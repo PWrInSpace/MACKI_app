@@ -130,10 +130,10 @@ class CamerasMenager(QThread):
             case _:
                 logger.warning("Unknown camera event")
 
-    # def _start_cameras(self) -> None:
-    #     """Starts the threads for all the cameras."""
-    #     for camera_handler in self._cameras_handlers.values():
-    #         camera_handler.start()
+    def _start_cameras(self) -> None:
+        """Starts the threads for all the cameras."""
+        for camera_handler in self._cameras_handlers.values():
+            camera_handler.start()
 
     def _register_vmb_callbacks(self, vmb: VmbSystem) -> None:
         """Registers the VmbSystem callbacks.

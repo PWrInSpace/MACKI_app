@@ -5,7 +5,6 @@ from src.cameras.camera_handler import CameraHandler, logger
 from src.cameras.q_camera_utils import (
     QCamera,
     CAMERAS,
-    STATUS_TO_COLOR
 )
 
 
@@ -27,14 +26,14 @@ class QCamerasMenager(QWidget):
     def _init_ui(self) -> None:
         layout = QVBoxLayout()
 
-        for i, camera in enumerate(self._cameras_configs.values()):
+        for camera in self._cameras_configs.values():
             layout.addWidget(camera)
 
         self.setLayout(layout)
 
     def _on_camera_registered(self, camera: CameraHandler) -> None:
-        id = camera.get_id()
-
+        id = camera.id
+        
         if id not in self._cameras_configs:
             logger.error(f"Unknown camera id {id}")
             return
@@ -42,8 +41,8 @@ class QCamerasMenager(QWidget):
         for handler in self._cameras_configs[id].handlers.values():
             camera.register_handler(handler)
 
-        camera.set_config_file(self._cameras_configs[id].config_file)
-        camera.start()
+        # camera.set_config_file(self._cameras_configs[id].config_file)
+        # camera.start()
 
         self._cameras_configs[id].set_running_flag(True)
 
@@ -57,3 +56,6 @@ class QCamerasMenager(QWidget):
 
     def enable_cameras(self):
         self._cameras_menager.start()
+
+    def start_cameras(self):
+        self._cameras_menager._start_cameras()

@@ -27,14 +27,14 @@ class CameraDefinition:
     id: str
 
 CAMERAS = [
-    CameraDefinition("Front", "cam1"),
-    CameraDefinition("Ugibugi", "cam2"),
+    # CameraDefinition("Front", "DEV_000A471F21DB"),
+    CameraDefinition("Ugibugi", "DEV_000F315DEEA8"),
     CameraDefinition("Asdasdasdasdasd", "cam3"),
     CameraDefinition("camera4", "cam4"),
 ]
 
 class QCamera(QWidget):
-    DEFAULT_CONFIG_FILE = "default_confg.txt"
+    DEFAULT_CONFIG_FILE = None
 
     DISPLAY_HANDLER = "display"
     WRITER_HANDLER = "writer"

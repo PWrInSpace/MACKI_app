@@ -1,20 +1,13 @@
 import numpy as np
 import cv2
 from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
-from PySide6.QtGui import QImage, QPixmap
 from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
+from src.cameras.frame_handlers.display_window import ImageDisplayWindow
 
 
 class FrameDisplay(BasicHandler):
     def __init__(self, name) -> None:
-        self.widget = QWidget()
-        self.widget.setWindowTitle(name)
-
-        self._label = QLabel("Frame display")
-        layout = QVBoxLayout()
-        layout.addWidget(self._label)
-        # self.widget.setFixedSize(640, 480)
-        self.widget.setLayout(layout)
+        self.window = ImageDisplayWindow(name)
 
     def generate_init_frame(self) -> np.array:
         dark_img = np.zeros((480, 640))
@@ -31,22 +24,18 @@ class FrameDisplay(BasicHandler):
         return img
 
     def start(self) -> None:
-        logger.info(f"Starting frame display for {self.widget.windowTitle()}")
-        self.widget.show()
-        self.add_frame(self.generate_init_frame())
+        logger.info(f"Starting frame display for {self.window.windowTitle()}")
+        self.window.show()
+        self.window.update_image(self.generate_init_frame())
 
     def stop(self) -> None:
-        logger.info(f"Stopping frame display for {self.widget.windowTitle()}")
-        self.widget.close()
+        logger.info(f"Stopping frame display for {self.window.windowTitle()}")
+        self.window.close()
 
     def add_frame(self, frame: np.ndarray) -> None:
         if self.is_running():
-            # logger.debug(f"Adding frame to {self.widget.windowTitle()}")
-            fr = cv2.resize(frame, (640, 480))
-            logger.info(f"Adding frame {fr.shape}")
-            img = QImage(fr, fr.shape[1], fr.shape[0], QImage.Format_Grayscale8)
-            pix = QPixmap(img)
-            self._label.setPixmap(pix)
+            self.window.update_image(frame)
+
 
     def is_running(self) -> bool:
-        return self.widget.isVisible()
+        return self.window.isVisible()
