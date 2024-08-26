@@ -36,6 +36,5 @@ class FrameDisplay(BasicHandler):
         if self.is_running():
             self.window.update_image(frame)
 
-
     def is_running(self) -> bool:
         return self.window.isVisible()
