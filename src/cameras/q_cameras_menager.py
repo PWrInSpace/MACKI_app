@@ -39,16 +39,19 @@ class QCamerasMenager(QWidget):
             return
 
         for handler in self._cameras_configs[id].handlers.values():
-            camera.register_handler(handler)
+            camera.register_frame_handler(handler)
+            # handler.started.connect(lambda: camera.on_handler_started())
+            # handler.stopped.connect(lambda: camera.on_handler_stopped())
 
-        # camera.set_config_file(self._cameras_configs[id].config_file)
-        # camera.start()
+        camera.set_config_file(self._cameras_configs[id].config_file)
+        camera.started.connect(self._cameras_configs[id].on_camera_thread_started)
+        camera.finished.connect(self._cameras_configs[id].on_camera_thread_finished)
 
-        self._cameras_configs[id].set_running_flag(True)
+        self._cameras_configs[id].set_detected_flag(True)
 
     def _on_camera_missing(self, camera_id: str) -> None:
         logger.warning(f"Camera {camera_id} missing")
-        self._cameras_configs[camera_id].set_running_flag(False)
+        self._cameras_configs[camera_id].set_detected_flag(False)
 
     def _update_cameras_status(self) -> None:
         for camera in self._cameras_configs.values():

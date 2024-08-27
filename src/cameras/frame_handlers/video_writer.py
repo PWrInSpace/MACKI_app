@@ -11,6 +11,8 @@ class VideoWriter(BasicHandler):
         self._fps = fps
         self._frame_size = frame_size
 
+        super().__init__()
+
     def __del__(self) -> None:
         if self._writer:
             self._writer.release()
@@ -22,14 +24,17 @@ class VideoWriter(BasicHandler):
     def start(self) -> None:
         file_name = self._generate_file_name()
         self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size, False)
+        super().start()
 
     def stop(self) -> None:
         self._writer.release()
         self._writer = None
+        super().stop()
 
     def add_frame(self, frame: list[int]) -> None:
         if self._writer:
             self._writer.write(frame)
 
+    @property
     def is_running(self) -> bool:
         return self._writer is not None

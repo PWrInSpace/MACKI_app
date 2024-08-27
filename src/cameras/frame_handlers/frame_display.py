@@ -8,6 +8,8 @@ from src.cameras.frame_handlers.display_window import ImageDisplayWindow
 class FrameDisplay(BasicHandler):
     def __init__(self, name) -> None:
         self.window = ImageDisplayWindow(name)
+        self.window.close_event.connect(self.stop)
+        super().__init__()
 
     def generate_init_frame(self) -> np.array:
         dark_img = np.zeros((480, 640))
@@ -25,16 +27,20 @@ class FrameDisplay(BasicHandler):
 
     def start(self) -> None:
         logger.info(f"Starting frame display for {self.window.windowTitle()}")
-        self.window.show()
-        self.window.update_image(self.generate_init_frame())
+        if not self.is_running:
+            self.window.show()
+            self.window.update_image(self.generate_init_frame())
+            super().start()
 
     def stop(self) -> None:
         logger.info(f"Stopping frame display for {self.window.windowTitle()}")
         self.window.close()
+        super().stop()
 
     def add_frame(self, frame: np.ndarray) -> None:
-        if self.is_running():
+        if self.is_running:
             self.window.update_image(frame)
 
+    @property
     def is_running(self) -> bool:
         return self.window.isVisible()

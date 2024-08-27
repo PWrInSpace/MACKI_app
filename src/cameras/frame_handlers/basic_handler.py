@@ -1,22 +1,27 @@
 import numpy as np
-from abc import ABC, abstractmethod
 import logging
+from PySide6.QtCore import QObject, Signal
 
 logger = logging.getLogger("handlers")
 
-class BasicHandler(ABC):
-    @abstractmethod
+class BasicHandler(QObject):
+    started = Signal()
+    stopped = Signal()
+
+    def __init__(self) -> None:
+        super().__init__()
+
     def start(self):
-        pass
+        print("Basic handler started emit")
+        self.started.emit()
+        print(self)
 
-    @abstractmethod
     def stop(self):
-        pass
+        self.stopped.emit()
 
-    @abstractmethod
     def add_frame(self, frame: np.array):
-        pass
+        raise NotImplementedError("add_frame method must be implemented")
 
-    @abstractmethod
+    @property
     def is_running(self) -> bool:
-        pass
+        raise NotImplementedError("is_running property must be implemented")

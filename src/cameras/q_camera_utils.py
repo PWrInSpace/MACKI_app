@@ -1,4 +1,5 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QWidget, QHBoxLayout
+from PySide6.QtCore import Slot
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
 from enum import Enum
 from dataclasses import dataclass
@@ -9,13 +10,17 @@ class CameraStatus(Enum):
     DISPLAYING = "Displaying"
     WRITING = "Writing"
     WRITING_AND_DISPLAYING = "Writing and Displaying"
+    DETECTED = "Detected"
+    UNKNOWN = "Unknown"
 
 STATUS_TO_COLOR = {
     CameraStatus.MISSING: "red",
     CameraStatus.RUNNING: "yellow",
-    CameraStatus.DISPLAYING: "blue",
+    CameraStatus.DISPLAYING: "pink",
     CameraStatus.WRITING: "green",
-    CameraStatus.WRITING_AND_DISPLAYING: "purple"
+    CameraStatus.WRITING_AND_DISPLAYING: "purple",
+    CameraStatus.DETECTED: "cyan",
+    CameraStatus.UNKNOWN: "white"
 }
 
 DISPLAY_BUTTON_OPEN = "Open"
@@ -50,6 +55,7 @@ class QCamera(QWidget):
             self.WRITER_HANDLER: VideoWriter(self.name, 10, (640, 480))
         }
 
+        self._detected = False
         self._running = False
         self._create_qui_elements()
 
@@ -81,8 +87,6 @@ class QCamera(QWidget):
 
         self.update_status()
 
-
-
     def update_status(self):
         status = self.get_str_status()
         self.status_label.setText(status.value)
@@ -90,29 +94,42 @@ class QCamera(QWidget):
 
 ### END GUI ###
 
-    def set_running_flag(self, running: bool):
-        """ This method is used to set the running flag. This class only knows states
+    def set_detected_flag(self, detected: bool):
+        """ This method is used to set the detected flag. This class only knows states
         of the handlers, not the camera itself.
         Handlers are connected to cameras and they only receive frames from them.
 
         Args:
-            running (bool): True if the camera is running, False otherwise
+            detected (bool): True if the camera is detected, False otherwise
         """
-        self._running = running
+        self._detected = detected
+
+    @Slot()
+    def on_camera_thread_started(self):
+        print("Hello")
+        self._running = True
+
+    @Slot()
+    def on_camera_thread_finished(self):
+        self._running = False
 
 
     def get_str_status(self) -> str:
-        handlers_states = {k: v.is_running() for k, v in self.handlers.items()}
+        handlers_states = {k: v.is_running for k, v in self.handlers.items()}
 
-        if handlers_states[self.DISPLAY_HANDLER] and handlers_states[self.WRITER_HANDLER]:
+        if not self._detected:
+            status =  CameraStatus.MISSING
+        elif handlers_states[self.DISPLAY_HANDLER] and handlers_states[self.WRITER_HANDLER]:
             status = CameraStatus.WRITING_AND_DISPLAYING
         elif handlers_states[self.DISPLAY_HANDLER]:
             status =  CameraStatus.DISPLAYING
         elif handlers_states[self.WRITER_HANDLER]:
             status = CameraStatus.WRITING
-        elif not self._running:
-            status =  CameraStatus.MISSING
-        else:
+        elif self._running:
             status =  CameraStatus.RUNNING
+        elif self._detected:
+            status =  CameraStatus.DETECTED
+        else:
+            status = CameraStatus.UNKNOWN
 
         return status

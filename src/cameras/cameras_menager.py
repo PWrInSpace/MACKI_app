@@ -189,20 +189,6 @@ class CamerasMenager(QThread):
 
         return True
 
-    def registerHandler(self, cam_id: str, basic_handler: BasicHandler) -> bool:
-        if cam_id not in self._cameras_handlers:
-            logger.error(f"Camera {cam_id} not registered")
-            return False
-
-        return self._cameras_handlers[cam_id].register_handler(basic_handler)
-
-    def unregisterHandler(self, cam_id: str, basic_handler: BasicHandler) -> bool:
-        if cam_id not in self._cameras_handlers:
-            logger.error(f"Camera {cam_id} not registered")
-            return False
-
-        return self._cameras_handlers[cam_id].unregister_handler(basic_handler)
-
     def run(self) -> None:
         logger.info("Cameras menager started")
 
@@ -213,7 +199,6 @@ class CamerasMenager(QThread):
             self._register_available_cameras(vmb)
 
             self._register_vmb_callbacks(vmb)
-            # self._start_cameras()
 
             self._wait_until_stop_signal()
             self._unregister_vmb_callbacks(vmb)

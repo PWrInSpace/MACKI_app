@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from queue import Queue
 from vmbpy import Camera, Frame, Stream, FrameStatus
-from PySide6.QtCore import QThread, QMutex
+from PySide6.QtCore import QThread, QMutex, Slot, Qt
 from src.cameras.frame_handlers.basic_handler import BasicHandler
 from src.utils.qt.thread_event import ThreadEvent
 
@@ -25,14 +25,13 @@ class CameraHandler(QThread):
         self._handlers: list[BasicHandler] = []
         self._handler_mutex = QMutex()
         self._stop_thread = ThreadEvent()
-        self._is_running = False
         self._config_file = None    # camera config file, None means no config file
 
     def __del__(self) -> None:
         logger.info(f"Deleting thread for cam {self._id}")
         self.quit()
 
-    def register_handler(self, handler: BasicHandler) -> bool:
+    def register_frame_handler(self, handler: BasicHandler) -> bool:
         logger.info(f"Registering handler {handler} for camera {self._id}")
 
         if not self._handler_mutex.tryLock(1000):
@@ -42,11 +41,14 @@ class CameraHandler(QThread):
             return False
 
         self._handlers.append(handler)
+        handler.started.connect(self.on_handler_started, Qt.ConnectionType.DirectConnection)
+        handler.stopped.connect(self.on_handler_stopped, Qt.ConnectionType.DirectConnection)
+
         self._handler_mutex.unlock()
 
         return True
 
-    def unregister_handler(self, handler: BasicHandler) -> bool:
+    def unregister_frame_handler(self, handler: BasicHandler) -> bool:
         if not self._handler_mutex.tryLock(1000):
             logger.error(
                 f"Camera {self._id}: Unable to lock mutex for handler reqistration"
@@ -64,6 +66,17 @@ class CameraHandler(QThread):
         self._handler_mutex.unlock()
 
         return True
+    
+    def on_handler_started(self):
+        print("Handler started")
+        if not self.isRunning():
+            self.start()
+
+    @Slot()
+    def on_handler_stopped(self):
+        print("Handler stopped")
+        if all(not handler.is_running for handler in self._handlers):
+            self.quit()
 
     def set_config_file(self, config_file: str) -> None:
         self._config_file = config_file

@@ -1,7 +1,7 @@
 import sys
 import logging
-from PySide6.QtCore import QSize, Qt, QThread
-from PySide6.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtCore import QThread
+from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
 from src.cameras.q_cameras_menager import QCamerasMenager
 
 # Subclass QMainWindow to customize your application's main window
@@ -14,20 +14,18 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         self.cameras = QCamerasMenager()
         layout.addWidget(self.cameras)
+        button = QPushButton("Start Cameras")
+        button.clicked.connect(self.on_button_click)
+        layout.addWidget(button)
 
         widget = QWidget()
         widget.setLayout(layout)
 
         self.setCentralWidget(widget)
         self.cameras.enable_cameras()
-        # QThread.sleep(3)
-        self.cameras.start_cameras()
 
     def on_button_click(self):
-        self.video_writer.start()
-        self.video_writer2.start()
-        self.frame_display.start()
-        self.frame_display2.start()
+        self.cameras.start_cameras()
 
     def close_button(self):
         self.frame_display.stop()

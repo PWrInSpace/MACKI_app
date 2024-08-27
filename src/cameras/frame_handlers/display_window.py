@@ -1,10 +1,11 @@
 import cv2
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QImage, QPixmap
+from PySide6.QtCore import QSize, QMutex, Qt, Signal
+from PySide6.QtGui import QCloseEvent, QImage, QPixmap, QPainter
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout, QBoxLayout
 
-
 class ImageDisplayWindow(QWidget):
+    close_event = Signal()
+
     def __init__(
             self,
             name: str,
@@ -22,6 +23,11 @@ class ImageDisplayWindow(QWidget):
             format (QImage.Format, optional): Image format. Defaults to QImage.Format_Grayscale8.
         """
         super().__init__()
+        self._default_size = QSize(*default_size)
+        self._minimum_size = QSize(*minimum_size)
+        self._format = format
+        self._mutex = QMutex()
+
         self.setWindowTitle(name)
 
         layout = QVBoxLayout()
@@ -33,24 +39,37 @@ class ImageDisplayWindow(QWidget):
         layout.addWidget(self._label)
         self.setLayout(layout)
 
-        self._default_size = QSize(*default_size)
-        self._minimum_size = QSize(*minimum_size)
-        self._format = format
+    def paintEvent(self, event):
+        painter = QPainter(self)
+
+        windows_size = self.size()
+
+        scaled_image = self.image.scaled(
+            windows_size,
+            Qt.AspectRatioMode.KeepAspectRatio
+        )
+
+        x = (windows_size.width() - scaled_image.width()) // 2
+        y = (windows_size.height() - scaled_image.height()) // 2
+
+        painter.drawImage(x, y, scaled_image)
+
+    def resizeEvent(self, event):
+        self.update()
 
     def update_image(self, frame) -> None:
-        resized_frame = cv2.resize(
-            frame, (self._default_size.width(), self._default_size.height())
-        )
-
-        image = QImage(
-            resized_frame,
-            resized_frame.shape[1],
-            resized_frame.shape[0],
+        self.image = QImage(
+            frame,
+            frame.shape[1],
+            frame.shape[0],
             QImage.Format_Grayscale8    # TBD
         )
-        pix = QPixmap(image)
-        self._label.setPixmap(pix)
+        self.update()
 
     def show(self):
         super().show()
         self.resize(self._default_size)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        self.close_event.emit()
+        return super().closeEvent(event)
