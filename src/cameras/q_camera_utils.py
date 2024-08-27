@@ -52,7 +52,7 @@ class QCamera(QWidget):
         self.config_file = config_file or self.DEFAULT_CONFIG_FILE
         self.handlers = {
             self.DISPLAY_HANDLER: FrameDisplay(self.name),
-            self.WRITER_HANDLER: VideoWriter(self.name, 10, (640, 480))
+            self.WRITER_HANDLER: VideoWriter(self.name, 22, (2464, 2056))
         }
 
         self._detected = False
@@ -81,9 +81,13 @@ class QCamera(QWidget):
 
     def _on_open_button_clicked(self):
         if self.display_button.text() == DISPLAY_BUTTON_OPEN:
+            self.display_button.setText(DISPLAY_BUTTON_CLOSE)
             self.handlers[self.DISPLAY_HANDLER].start()
+            self.handlers[self.WRITER_HANDLER].start()
         else:
+            self.display_button.setText(DISPLAY_BUTTON_OPEN)
             self.handlers[self.DISPLAY_HANDLER].stop()
+            self.handlers[self.WRITER_HANDLER].stop()
 
         self.update_status()
 

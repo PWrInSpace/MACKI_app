@@ -123,10 +123,8 @@ class CamerasMenager(QThread):
         match event:
             case CameraEvent.Detected:
                 self._on_camera_detected(camera)
-                self.cameras_changed.emit()
             case CameraEvent.Missing:
                 self._on_camera_missing(camera)
-                self.cameras_changed.emit()
             case _:
                 logger.warning("Unknown camera event")
 
