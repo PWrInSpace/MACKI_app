@@ -1,11 +1,18 @@
 import cv2
 import os
 from datetime import datetime
-from src.cameras.frame_handlers.basic_handler import BasicHandler
+from typing import override
+from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
 
 
 class VideoWriter(BasicHandler):
-    def __init__(self, name: str, fps: int, frame_size: tuple[int, int], out_folder: str = None) -> None:
+    def __init__(
+            self,
+            name: str,
+            fps: int,
+            frame_size: tuple[int, int],
+            out_folder: str = None
+        ) -> None:
         """ Create a video writer to save frames to a video file.
 
         Args:
@@ -53,6 +60,7 @@ class VideoWriter(BasicHandler):
 
         return path
 
+    @override
     def start(self) -> None:
         """ Start the video writer, this method creates a new video """
         file_name = self._generate_file_path()
@@ -61,12 +69,18 @@ class VideoWriter(BasicHandler):
         )
         super().start()
 
+    @override
     def stop(self) -> None:
         """ Stop the video writer, this method release the video writer """
+        if not self.is_running:
+            logger.warning("Video writer is not running")
+            return
+        
         self._writer.release()
         self._writer = None
         super().stop()
 
+    @override
     def add_frame(self, frame: list[int]) -> None:
         """ Add a frame to the video writer.
 
@@ -76,6 +90,7 @@ class VideoWriter(BasicHandler):
         if self._writer:
             self._writer.write(frame)
 
+    @override
     @property
     def is_running(self) -> bool:
         """ Check if the video writer is running. """

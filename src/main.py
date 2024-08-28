@@ -8,10 +8,9 @@ from PySide6.QtWidgets import (
     QWidget,
     QPushButton,
 )
-from src.cameras.q_cameras_menager import QCamerasMenager
+from src.app.cameras_app import QCameraApp
 
 
-# Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -19,11 +18,8 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("My App")
 
         layout = QVBoxLayout()
-        self.cameras = QCamerasMenager()
+        self.cameras = QCameraApp()
         layout.addWidget(self.cameras)
-        button = QPushButton("Start Cameras")
-        button.clicked.connect(self.on_button_click)
-        layout.addWidget(button)
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -31,17 +27,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         self.cameras.enable_cameras()
 
-    def on_button_click(self):
-        self.cameras.start_cameras()
-
-    def close_button(self):
-        self.frame_display.stop()
-        self.frame_display2.stop()
-        self.video_writer.stop()
-        self.video_writer2.stop()
-
     def closeEvent(self, event):
-        self.cameras.quit()
+        self.cameras.terminate_threads()
         event.accept()
 
 

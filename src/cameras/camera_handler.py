@@ -1,6 +1,7 @@
 import copy
 import logging
 import numpy as np
+from typing import override
 from queue import Queue
 from vmbpy import Camera, Frame, Stream, FrameStatus
 from PySide6.QtCore import QThread, QMutex, Slot, Qt
@@ -46,7 +47,6 @@ class CameraHandler(QThread):
     @Slot()
     def on_handler_stopped(self):
         """Handler stopped slot"""
-        print("Handler stopped")
         if all(not handler.is_running for handler in self._handlers):
             self.quit()
 
@@ -211,6 +211,7 @@ class CameraHandler(QThread):
         while not self._frame_queue.empty():
             self._frame_queue.get_nowait()
 
+    @override
     def run(self) -> None:
         """Thread main loop"""
         logger.info(f"Frame handler thread started for camera {self._id}")
@@ -230,6 +231,7 @@ class CameraHandler(QThread):
         self._clean_up()
         logger.info(f"Frame handler thread stopped for camera {self._id}")
 
+    @override
     def quit(self) -> None:
         """ Stops the camera handler thread
         """

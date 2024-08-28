@@ -1,8 +1,9 @@
+from typing import override
+from enum import Enum
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
 from vmbpy import VmbSystem, Camera, CameraEvent
-from cameras.camera_handler import CameraHandler, logger
-from src.cameras.frame_handlers.basic_handler import BasicHandler
-from enum import Enum
+
+from src.cameras.camera_handler import CameraHandler, logger
 from src.utils.qt.thread_event import ThreadEvent
 
 
@@ -176,6 +177,7 @@ class CamerasMenager(QThread):
         while not self._stop_signal.occurs():
             QThread.msleep(250)
 
+    @override
     def run(self) -> None:
         """The main loop of the cameras menager.
         It registers all available cameras, and starts vmb context.
@@ -199,6 +201,7 @@ class CamerasMenager(QThread):
 
         self._change_state(CamerasMenagerState.IDLE)
 
+    @override
     def quit(self) -> None:
         """Quits the cameras menager thread."""
         if self.get_state() != CamerasMenagerState.RUNNING:

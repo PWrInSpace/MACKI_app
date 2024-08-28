@@ -1,11 +1,14 @@
-import numpy as np
-import cv2
 import os
+import cv2
+import numpy as np
+from enum import Enum
+from typing import override
+
 from PySide6.QtCore import Signal, Slot
 from PySide6.QtGui import QImage
+
 from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
-from src.cameras.frame_handlers.image_display_window import ImageDisplayWindow
-from enum import Enum
+from src.utils.qt.image_display_window import ImageDisplayWindow
 
 
 class FrameDisplayFormats(Enum):
@@ -59,6 +62,7 @@ class FrameDisplay(BasicHandler):
 
         return img
 
+    @override
     def start(self) -> None:
         """ Start the handler, this method emit the started signal and show the window
         """
@@ -67,25 +71,29 @@ class FrameDisplay(BasicHandler):
             self.window.show()
             self.window.update_image(self.generate_init_frame())
             super().start()
-
+    
+    @override
     @Slot()
     def stop(self) -> None:
         """ Stop the handler, this method emit the stopped signal and close the window
         """
         logger.info(f"Stopping frame display for {self.window.windowTitle()}")
-        self.window.close()
+        self.window.hide()
         super().stop()
 
+    @override
     def add_frame(self, frame: np.ndarray) -> None:
         """ Add a frame to the handler and update the window image if it is open"""
         if self.is_running:
             self.window.update_image(frame)
 
+    @override
     @property
     def is_running(self) -> bool:
         """ Check if the handler is running """
         return self.window.isVisible()
     
+    @override
     @property
     def close_event(self) -> Signal:
         """ Get the close event signal
