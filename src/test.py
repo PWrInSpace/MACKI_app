@@ -2,8 +2,9 @@ import sys
 from PySide6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget
 from PySide6.QtCore import QSize, Qt
 
+
 class DiagonalResizeWindow(QMainWindow):
-    def __init__(self, aspect_ratio=16/9):
+    def __init__(self, aspect_ratio=16 / 9):
         super().__init__()
 
         # Set the aspect ratio (width / height)
@@ -44,11 +45,12 @@ class DiagonalResizeWindow(QMainWindow):
 
         super().resizeEvent(event)
 
+
 if __name__ == "__main__":
     app = QApplication(sys.argv)
 
     # Create and show the main window with a 16:9 aspect ratio
-    window = DiagonalResizeWindow(aspect_ratio=16/9)
+    window = DiagonalResizeWindow(aspect_ratio=16 / 9)
     window.show()
 
     sys.exit(app.exec())

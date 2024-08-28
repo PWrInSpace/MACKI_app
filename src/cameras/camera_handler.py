@@ -17,6 +17,11 @@ class CameraHandler(QThread):
         self,
         camera: Camera,
     ) -> None:
+        """Constructor
+
+        Args:
+            camera (Camera): Reference to the VmbCamera object
+        """
         super().__init__()
         self._camera = camera
         self._id = self._camera.get_id()  # camera name
@@ -24,14 +29,36 @@ class CameraHandler(QThread):
         self._frame_queue = Queue(self.FRAME_QUEUE_SIZE)
         self._handlers: list[BasicHandler] = []
         self._handler_mutex = QMutex()
-        self._stop_thread = ThreadEvent()
-        self._config_file = None    # camera config file, None means no config file
+        self._stop_signal = ThreadEvent()
+        self._config_file = None  # camera config file, None means no config file
 
     def __del__(self) -> None:
+        """Destructor"""
         logger.info(f"Deleting thread for cam {self._id}")
         self.quit()
 
+    @Slot()
+    def on_handler_started(self):
+        """Handler started slot"""
+        if not self.isRunning():
+            self.start()
+
+    @Slot()
+    def on_handler_stopped(self):
+        """Handler stopped slot"""
+        print("Handler stopped")
+        if all(not handler.is_running for handler in self._handlers):
+            self.quit()
+
     def register_frame_handler(self, handler: BasicHandler) -> bool:
+        """Register a frame handler to the camera
+
+        Args:
+            handler (BasicHandler): The handler to be registered
+
+        Returns:
+            bool: True if the handler was registered successfully, False otherwise
+        """
         logger.info(f"Registering handler {handler} for camera {self._id}")
 
         if not self._handler_mutex.tryLock(1000):
@@ -41,14 +68,29 @@ class CameraHandler(QThread):
             return False
 
         self._handlers.append(handler)
-        handler.started.connect(self.on_handler_started, Qt.ConnectionType.DirectConnection)
-        handler.stopped.connect(self.on_handler_stopped, Qt.ConnectionType.DirectConnection)
+        # Connect handler signals, to inform the camera handler thread
+        # that the handler has started or stopped and request to start/stop
+        # streaming (start/stop the camera handler thread)
+        handler.started.connect(
+            self.on_handler_started, Qt.ConnectionType.DirectConnection
+        )
+        handler.stopped.connect(
+            self.on_handler_stopped, Qt.ConnectionType.DirectConnection
+        )
 
         self._handler_mutex.unlock()
 
         return True
 
     def unregister_frame_handler(self, handler: BasicHandler) -> bool:
+        """Unregister a frame handler from the camera
+
+        Args:
+            handler (BasicHandler): The handler to be unregistered
+
+        Returns:
+            bool: True if the handler was unregistered successfully, False otherwise
+        """
         if not self._handler_mutex.tryLock(1000):
             logger.error(
                 f"Camera {self._id}: Unable to lock mutex for handler reqistration"
@@ -61,27 +103,26 @@ class CameraHandler(QThread):
             return False
 
         handler.stop()
-
         self._handlers.remove(handler)
+
         self._handler_mutex.unlock()
 
         return True
-    
-    def on_handler_started(self):
-        print("Handler started")
-        if not self.isRunning():
-            self.start()
-
-    @Slot()
-    def on_handler_stopped(self):
-        print("Handler stopped")
-        if all(not handler.is_running for handler in self._handlers):
-            self.quit()
 
     def set_config_file(self, config_file: str) -> None:
+        """Set the camera config file that will be loaded when
+        the camera handler thread starts
+        """
         self._config_file = config_file
 
     def _on_frame(self, camera: Camera, stream: Stream, frame: Frame):
+        """Frame callback function
+
+        Args:
+            camera (Camera): camera object
+            stream (Stream): stream object
+            frame (Frame): frame
+        """
         if frame.get_status() == FrameStatus.Complete:
             try:
                 frame_cpy = copy.deepcopy(frame)
@@ -92,9 +133,17 @@ class CameraHandler(QThread):
         camera.queue_frame(frame)
 
     def _frame_available(self) -> bool:
+        """Check if there is a frame available in the queue
+
+        Returns:
+            bool: True if there is a frame available, False otherwise
+        """
         return not self._frame_queue.empty()
 
     def _get_the_newest_frame(self) -> np.ndarray | None:
+        """Get the newest frame from the queue
+        This methode also removes all the other frames from the queue
+        """
         frames_on_queue = self._frame_queue.qsize()
 
         if frames_on_queue == 0:
@@ -114,6 +163,11 @@ class CameraHandler(QThread):
         return frame
 
     def _add_frame_to_handlers(self, frame: np.array) -> None:
+        """Add the frame to all the registered handlers
+
+        Args:
+            frame (np.array): The frame to be added
+        """
         if frame is None:
             logger.warn(f"Camera {self._id}, frame is None :C")
             return
@@ -122,21 +176,22 @@ class CameraHandler(QThread):
             handler.add_frame(frame)
 
     def _handle_frames(self):
+        """Handle the frames that are available in the queue"""
+        if not self._frame_available():
+            return
+
+        if not self._handler_mutex.tryLock(1000):
+            logger.error(f"Camera {self._id}: Unable to lock mutex for frame handling")
+            return
+
         try:
-            if not self._handler_mutex.tryLock(1000):
-                logger.error(f"Camera {self._id}: Unable to lock mutex for frame handling")
-                return
-
-            if not self._frame_available():
-                return
-
             frame = self._get_the_newest_frame()
             self._add_frame_to_handlers(frame)
-
         finally:
             self._handler_mutex.unlock()
 
     def _handle_config_file(self) -> None:
+        """Handle the camera config file update"""
         if self._config_file:
             self._camera.stop_streaming()
 
@@ -145,18 +200,26 @@ class CameraHandler(QThread):
 
             self._camera.start_streaming(self._on_frame)
 
-    def run(self) -> None:
-        logger.info(f"Frame handler thread started for camera {self._id}")
+    def _thread_loop(self) -> None:
+        """Thread main loop"""
+        while not self._stop_signal.occurs():
+            self._handle_frames()
+            self._handle_config_file()
 
-        self._stop_thread.restart()
+    def _clean_up(self):
+        """Clean up the camera handler thread"""
+        while not self._frame_queue.empty():
+            self._frame_queue.get_nowait()
+
+    def run(self) -> None:
+        """Thread main loop"""
+        logger.info(f"Frame handler thread started for camera {self._id}")
+        self._stop_signal.clear()
+
         with self._camera:
             try:
                 self._camera.start_streaming(self._on_frame)
-
-                while not self._stop_thread.happens():
-                    self._handle_frames()
-
-                    self._handle_config_file()
+                self._thread_loop()
 
             except Exception as e:
                 logger.error(f"Error in camera {self._id}: {e}")
@@ -164,16 +227,14 @@ class CameraHandler(QThread):
             finally:
                 self._camera.stop_streaming()
 
-        logger.info(f"Frame handler thread stopped for camera {self._id}")
         self._clean_up()
-
-    def _clean_up(self):
-        while not self._frame_queue.empty():
-            self._frame_queue.get_nowait()
+        logger.info(f"Frame handler thread stopped for camera {self._id}")
 
     def quit(self) -> None:
+        """ Stops the camera handler thread
+        """
         logger.info(f"Wainting for frame handler to stop for camera {self._id}")
-        self._stop_thread.set()
+        self._stop_signal.set()
         super().wait()
 
         logger.info(f"Frame handler thread stopped for camera {self._id}")

@@ -31,9 +31,9 @@ from vmbpy import *
 
 
 def main():
-    print('//////////////////////////////////////')
-    print('/// vmbpy Create Trace Log Example ///')
-    print('//////////////////////////////////////\n')
+    print("//////////////////////////////////////")
+    print("/// vmbpy Create Trace Log Example ///")
+    print("//////////////////////////////////////\n")
 
     # Enable logging mechanism, creating a trace log. The log file is
     # stored at the location this script was executed from.
@@ -49,9 +49,9 @@ def main():
 
 
 def manual_configuration():
-    print('//////////////////////////////////////////////')
-    print('/// vmbpy Manual Log Configuration Example ///')
-    print('//////////////////////////////////////////////\n')
+    print("//////////////////////////////////////////////")
+    print("/// vmbpy Manual Log Configuration Example ///")
+    print("//////////////////////////////////////////////\n")
 
     # By default the vmbpy logger instance will not forward its log messages to any handlers. To
     # integrate log messages a handler needs to be added to the logger instance. In this example we
@@ -73,6 +73,6 @@ def manual_configuration():
         pass
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
     # manual_configuration()

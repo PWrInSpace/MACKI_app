@@ -32,23 +32,25 @@ from vmbpy import *
 
 
 def print_preamble():
-    print('////////////////////////////////////')
-    print('/// VmbPy Event Handling Example ///')
-    print('////////////////////////////////////\n')
+    print("////////////////////////////////////")
+    print("/// VmbPy Event Handling Example ///")
+    print("////////////////////////////////////\n")
 
 
 def print_usage():
-    print('Usage:')
-    print('    python event_handling.py [camera_id]')
-    print('    python event_handling.py [/h] [-h]')
+    print("Usage:")
+    print("    python event_handling.py [camera_id]")
+    print("    python event_handling.py [/h] [-h]")
     print()
-    print('Parameters:')
-    print('    camera_id   ID of the camera to use (using first camera if not specified)')
+    print("Parameters:")
+    print(
+        "    camera_id   ID of the camera to use (using first camera if not specified)"
+    )
     print()
 
 
 def abort(reason: str, return_code: int = 1, usage: bool = False):
-    print(reason + '\n')
+    print(reason + "\n")
 
     if usage:
         print_usage()
@@ -61,7 +63,7 @@ def parse_args() -> Optional[str]:
     argc = len(args)
 
     for arg in args:
-        if arg in ('/h', '-h'):
+        if arg in ("/h", "-h"):
             print_usage()
             sys.exit(0)
 
@@ -78,12 +80,12 @@ def get_camera(camera_id: Optional[str]) -> Camera:
                 return vmb.get_camera_by_id(camera_id)
 
             except VmbCameraError:
-                abort('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
+                abort("Failed to access Camera '{}'. Abort.".format(camera_id))
 
         else:
             cams = vmb.get_all_cameras()
             if not cams:
-                abort('No Cameras accessible. Abort.')
+                abort("No Cameras accessible. Abort.")
 
             return cams[0]
 
@@ -102,7 +104,7 @@ def setup_camera(cam: Camera):
 
 
 def feature_changed_handler(feature):
-    msg = 'Feature \'{}\' changed value to \'{}\''
+    msg = "Feature '{}' changed value to '{}'"
     print(msg.format(str(feature.get_name()), str(feature.get())), flush=True)
 
 
@@ -122,11 +124,11 @@ def main():
             # Disable all events notifications that might be currently enabled
             for event in cam.EventSelector.get_available_entries():
                 cam.EventSelector.set(event)
-                cam.EventNotification.set('Off')
+                cam.EventNotification.set("Off")
 
             # Enable event notifications on 'AcquisitionStart'
-            cam.EventSelector.set('AcquisitionStart')
-            cam.EventNotification.set('On')
+            cam.EventSelector.set("AcquisitionStart")
+            cam.EventNotification.set("On")
 
             # Register callback for the EventAcquisitionStart feature
             cam.EventAcquisitionStart.register_change_handler(feature_changed_handler)
@@ -135,5 +137,5 @@ def main():
             cam.get_frame()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

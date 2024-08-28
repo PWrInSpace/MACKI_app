@@ -14,6 +14,7 @@ class CamerasMenagerMock(CamerasMenager):
         # create a new instance each time
         return self._instance
 
+
 @pytest.fixture
 def cameras_menager() -> CamerasMenagerMock:
     return CamerasMenagerMock()
@@ -25,11 +26,14 @@ def test_cameras_menager_constructor(cameras_menager: CamerasMenagerMock):
     assert cameras_menager._cameras_handlers == {}
 
 
-@pytest.mark.parametrize("state", [
-    (CamerasMenagerState.IDLE),
-    (CamerasMenagerState.RUNNING),
-    (CamerasMenagerState.STOPPING)
-])
+@pytest.mark.parametrize(
+    "state",
+    [
+        (CamerasMenagerState.IDLE),
+        (CamerasMenagerState.RUNNING),
+        (CamerasMenagerState.STOPPING),
+    ],
+)
 def test_change_state(state):
     cameras_menager = CamerasMenagerMock()
     assert cameras_menager._change_state(state) == True
@@ -44,11 +48,14 @@ def test_change_state_fail():
     assert cameras_menager.get_state() == CamerasMenagerState.IDLE
 
 
-@pytest.mark.parametrize("state", [
-    (CamerasMenagerState.IDLE),
-    (CamerasMenagerState.RUNNING),
-    (CamerasMenagerState.STOPPING)
-])
+@pytest.mark.parametrize(
+    "state",
+    [
+        (CamerasMenagerState.IDLE),
+        (CamerasMenagerState.RUNNING),
+        (CamerasMenagerState.STOPPING),
+    ],
+)
 def test_get_state(state):
     cameras_menager = CamerasMenagerMock()
     cameras_menager._change_state(state)
@@ -62,6 +69,7 @@ def test_get_state_fail():
     cameras_menager._mutex.unlock()
     # after unlock should return the current state
     assert cameras_menager.get_state() == CamerasMenagerState.IDLE
+
 
 # test to check if mock works as intented
 def test_get_vmb_instance():
@@ -77,7 +85,9 @@ def test_register_available_cameras():
     cameras_id = [camera.get_id() for camera in instance.get_all_cameras()]
     assert list(cameras_menager._cameras_handlers.keys()) == cameras_id
 
-    frames_handlers_names = [handler._name for handler in cameras_menager._cameras_handlers.values()]
+    frames_handlers_names = [
+        handler._name for handler in cameras_menager._cameras_handlers.values()
+    ]
     assert list(cameras_menager._cameras_handlers.keys()) == frames_handlers_names
 
 
@@ -172,6 +182,7 @@ def test_camera_change_handler_calls(mocker, camera_event):
             assert spy_detected.call_count == 0
             assert spy_missing.call_count == 0
 
+
 @pytest.mark.parametrize("camera_event", [(e.value) for e in CameraEvent])
 def test_camera_change_handler_signal(mocker, camera_event):
     stub = mocker.stub()
@@ -189,6 +200,7 @@ def test_camera_change_handler_signal(mocker, camera_event):
             assert stub.called
         case _:
             assert not stub.called
+
 
 def test_start_cameras() -> None:
     cameras_menager = CamerasMenagerMock()
@@ -258,15 +270,15 @@ def test_clean_up_menager():
 def test_wait_until_stop_signal():
     pass
 
+
 def test_raise_error():
     pass
 
 
-
-@pytest.mark.parametrize("initial_state, expected", [
-    (CamerasMenagerState.IDLE, False),
-    (CamerasMenagerState.RUNNING, True)
-])
+@pytest.mark.parametrize(
+    "initial_state, expected",
+    [(CamerasMenagerState.IDLE, False), (CamerasMenagerState.RUNNING, True)],
+)
 def test_terminate_thread(initial_state, expected):
     cameras_menager = CamerasMenagerMock()
     cameras_menager._change_state(initial_state)

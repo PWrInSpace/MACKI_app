@@ -10,38 +10,48 @@ try:
     # arrays that are used as `destination_buffer`s
     import numpy as np  # noqa: F401
 except ImportError:
-    print('This example requires numpy')
+    print("This example requires numpy")
     sys.exit(1)
 
 
 def print_preamble():
-    print('//////////////////////////////////////////')
-    print('/// VmbPy convert_pixel_format Example ///')
-    print('//////////////////////////////////////////\n')
+    print("//////////////////////////////////////////")
+    print("/// VmbPy convert_pixel_format Example ///")
+    print("//////////////////////////////////////////\n")
     print(flush=True)
 
 
 def abort(reason: str, return_code: int = 1):
-    print(reason + '\n')
+    print(reason + "\n")
 
     sys.exit(return_code)
 
 
 def parse_args():
-    description = '''\
+    description = """\
     VmbPy `Frame.convert_pixel_format` Example
 
     Records frames in a user selected pixel format and converts them to a different user selected
     format. Optionally this transformation can use a pre allocated `destination_buffer` to reduce
-    possible overhead from memory allocations and garbage collection.'''
+    possible overhead from memory allocations and garbage collection."""
 
-    parser = argparse.ArgumentParser(description=textwrap.dedent(description),
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('camera_id', default=None, nargs='?',
-                        help='ID of the camera to use (using first camera if not specified)')
-    parser.add_argument('-d', '--destination_buffer', action='store_true',
-                        help='If this option is given, a `destination_buffer` will be used in '
-                             'calls to `convert_pixel_format`')
+    parser = argparse.ArgumentParser(
+        description=textwrap.dedent(description),
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "camera_id",
+        default=None,
+        nargs="?",
+        help="ID of the camera to use (using first camera if not specified)",
+    )
+    parser.add_argument(
+        "-d",
+        "--destination_buffer",
+        action="store_true",
+        help="If this option is given, a `destination_buffer` will be used in "
+        "calls to `convert_pixel_format`",
+    )
     return parser.parse_args()
 
 
@@ -52,22 +62,22 @@ def get_camera(camera_id: Optional[str]) -> vmbpy.Camera:
                 return vmb.get_camera_by_id(camera_id)
 
             except vmbpy.VmbCameraError:
-                abort('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
+                abort("Failed to access Camera '{}'. Abort.".format(camera_id))
 
         else:
             cams = vmb.get_all_cameras()
             if not cams:
-                abort('No Cameras accessible. Abort.')
+                abort("No Cameras accessible. Abort.")
 
             return cams[0]
 
 
-def user_select_from_list(options: List[Any], msg: str = '') -> Any:
+def user_select_from_list(options: List[Any], msg: str = "") -> Any:
     if not msg:
-        msg = 'Please select one of the following:\n'
+        msg = "Please select one of the following:\n"
     padding_width = len(str(len(options)))
     for idx, element in enumerate(options):
-        msg += f'  [{idx:{padding_width}d}] - {str(element)}\n'
+        msg += f"  [{idx:{padding_width}d}] - {str(element)}\n"
     while True:
         user_input = input(msg)
         try:
@@ -83,8 +93,8 @@ def user_select_from_list(options: List[Any], msg: str = '') -> Any:
             selected = options[selected_index]
             break
         except IndexError:
-            print(f'Selected index {selected_index} is not valid.')
-    print(f'Selected option: {str(selected)}')
+            print(f"Selected index {selected_index} is not valid.")
+    print(f"Selected option: {str(selected)}")
     return selected
 
 
@@ -112,15 +122,18 @@ class FrameProducer:
                 self.numpy_buffer = converted_frame.as_numpy_ndarray()
             # Use same memory as self.numpy_buffer to store conversion result. Use the `data` field
             # of the numpy array as `destination_buffer` parameter
-            converted_frame = frame.convert_pixel_format(self.target_format,
-                                                         destination_buffer=self.numpy_buffer.data)
+            converted_frame = frame.convert_pixel_format(
+                self.target_format, destination_buffer=self.numpy_buffer.data
+            )
         else:
             # If no destination_buffer is given, VmbPy will allocate new memory for each conversion.
             # This might introduce additional overhead e.g. from the garbage collector
             converted_frame = frame.convert_pixel_format(self.target_format)
-        print(f'Converted frame from {frame.get_pixel_format()} '
-              f'to {converted_frame.get_pixel_format()}.\n'
-              f'Conversion result: {converted_frame}')
+        print(
+            f"Converted frame from {frame.get_pixel_format()} "
+            f"to {converted_frame.get_pixel_format()}.\n"
+            f"Conversion result: {converted_frame}"
+        )
         # Requeue the original frame for future frame transmissions
         stream.queue_frame(frame)
 
@@ -141,22 +154,25 @@ class FrameProducer:
             with self.cam:
                 self.setup_camera()
                 pixel_formats = self.cam.get_pixel_formats()
-                record_format = user_select_from_list(pixel_formats,
-                                                      'Select PixelFormat that should be used '
-                                                      'to record frames:\n')
+                record_format = user_select_from_list(
+                    pixel_formats,
+                    "Select PixelFormat that should be used " "to record frames:\n",
+                )
                 self.cam.set_pixel_format(record_format)
                 convertible_formats = record_format.get_convertible_formats()
-                self.target_format = user_select_from_list(convertible_formats,
-                                                           'Select PixelFormat that the recorded '
-                                                           'frames should be converted to:\n')
+                self.target_format = user_select_from_list(
+                    convertible_formats,
+                    "Select PixelFormat that the recorded "
+                    "frames should be converted to:\n",
+                )
                 try:
                     self.cam.start_streaming(self)
-                    input('Press <enter> to stop Frame acquisition.')
+                    input("Press <enter> to stop Frame acquisition.")
                 finally:
                     self.cam.stop_streaming()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print_preamble()
     args = parse_args()
 

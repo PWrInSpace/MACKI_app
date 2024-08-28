@@ -1,46 +1,96 @@
 import numpy as np
 import cv2
-from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
+import os
+from PySide6.QtCore import Signal, Slot
+from PySide6.QtGui import QImage
 from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
-from src.cameras.frame_handlers.display_window import ImageDisplayWindow
+from src.cameras.frame_handlers.image_display_window import ImageDisplayWindow
+from enum import Enum
+
+
+class FrameDisplayFormats(Enum):
+    GRAY = QImage.Format.Format_Grayscale8
+    RGB = QImage.Format.Format_RGB888
+
+    def to_cv2_format(self) -> int:
+        match self:
+            case FrameDisplayFormats.GRAY:
+                return cv2.IMREAD_GRAYSCALE
+            case FrameDisplayFormats.RGB:
+                return cv2.IMREAD_COLOR
+            case _:
+                raise ValueError("Invalid format") 
 
 
 class FrameDisplay(BasicHandler):
-    def __init__(self, name) -> None:
-        self.window = ImageDisplayWindow(name)
+    def __init__(
+        self,
+        name,
+        default_image_path: str = "",
+        default_frame_size: tuple[int, int] = (600, 600),
+        minimum_frame_size: tuple[int, int] = (200, 200),
+        image_format: FrameDisplayFormats = FrameDisplayFormats.GRAY,
+    ) -> None:
+        self.window = ImageDisplayWindow(
+            name, default_frame_size, minimum_frame_size, image_format.value
+        )
         self.window.close_event.connect(self.stop)
+
+        self._image_format = image_format
+        self._default_image_path = default_image_path
+
         super().__init__()
 
     def generate_init_frame(self) -> np.array:
-        dark_img = np.zeros((480, 640))
+        """ Generate an initial frame to be displayed when the handler starts
 
-        text = "Waiting for image"
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        font_scale = 3
-        font_thickness = 10
-        text_size, _ = cv2.getTextSize(text, font, font_scale, font_thickness)
-        text_x = (dark_img.shape[1] - text_size[0]) // 2
-        text_y = (dark_img.shape[0] + text_size[1]) // 2
-        img = cv2.putText(dark_img, text, (200, 200), font, font_scale, 255, font_thickness)
-        cv2.imwrite("dark_img.jpg", img)
+        Returns:
+            np.array: The initial frame
+        """
+        if os.path.isfile(self._default_image_path):
+            cv2_format = self._image_format.to_cv2_format()
+            img = cv2.imread(self._default_image_path, cv2_format)
+            
+            # Convert the image to from BGR to RGB if the format is RGB
+            if cv2_format == cv2.IMREAD_COLOR:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        else:
+            img = np.zeros((600, 600), np.uint8)
+
         return img
 
     def start(self) -> None:
+        """ Start the handler, this method emit the started signal and show the window
+        """
         logger.info(f"Starting frame display for {self.window.windowTitle()}")
         if not self.is_running:
             self.window.show()
             self.window.update_image(self.generate_init_frame())
             super().start()
 
+    @Slot()
     def stop(self) -> None:
+        """ Stop the handler, this method emit the stopped signal and close the window
+        """
         logger.info(f"Stopping frame display for {self.window.windowTitle()}")
         self.window.close()
         super().stop()
 
     def add_frame(self, frame: np.ndarray) -> None:
+        """ Add a frame to the handler and update the window image if it is open"""
         if self.is_running:
             self.window.update_image(frame)
 
     @property
     def is_running(self) -> bool:
+        """ Check if the handler is running """
         return self.window.isVisible()
+    
+    @property
+    def close_event(self) -> Signal:
+        """ Get the close event signal
+
+        Returns:
+            Signal: The close event signal
+        """
+        return self.window.close_event

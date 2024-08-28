@@ -24,6 +24,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+
 import sys
 from typing import Optional
 
@@ -31,23 +32,25 @@ from vmbpy import *
 
 
 def print_preamble():
-    print('/////////////////////////////////////')
-    print('/// VmbPy List Chunk Data Example ///')
-    print('/////////////////////////////////////\n')
+    print("/////////////////////////////////////")
+    print("/// VmbPy List Chunk Data Example ///")
+    print("/////////////////////////////////////\n")
 
 
 def print_usage():
-    print('Usage:')
-    print('    python list_chunk_data.py [camera_id]')
-    print('    python list_chunk_data.py [/h] [-h]')
+    print("Usage:")
+    print("    python list_chunk_data.py [camera_id]")
+    print("    python list_chunk_data.py [/h] [-h]")
     print()
-    print('Parameters:')
-    print('    camera_id   ID of the camera to use (using first camera if not specified)')
+    print("Parameters:")
+    print(
+        "    camera_id   ID of the camera to use (using first camera if not specified)"
+    )
     print()
 
 
 def abort(reason: str, return_code: int = 1, usage: bool = False):
-    print(reason + '\n')
+    print(reason + "\n")
 
     if usage:
         print_usage()
@@ -60,7 +63,7 @@ def parse_args() -> Optional[str]:
     argc = len(args)
 
     for arg in args:
-        if arg in ('/h', '-h'):
+        if arg in ("/h", "-h"):
             print_usage()
             sys.exit(0)
 
@@ -77,12 +80,12 @@ def get_camera(camera_id: Optional[str]) -> Camera:
                 return vmb.get_camera_by_id(camera_id)
 
             except VmbCameraError:
-                abort('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
+                abort("Failed to access Camera '{}'. Abort.".format(camera_id))
 
         else:
             cams = vmb.get_all_cameras()
             if not cams:
-                abort('No Cameras accessible. Abort.')
+                abort("No Cameras accessible. Abort.")
 
             return cams[0]
 
@@ -95,7 +98,7 @@ class ChunkExample:
     def run(self):
         with self.cam:
             self.setup_camera()
-            print('Press <enter> to stop Frame acquisition.')
+            print("Press <enter> to stop Frame acquisition.")
             try:
                 self.cam.start_streaming(handler=self.frame_callback, buffer_count=10)
                 input()
@@ -117,39 +120,43 @@ class ChunkExample:
             try:
                 # Turn on a selection of Chunk features
                 self.cam.ChunkModeActive.set(False)
-                for selector in ('Timestamp', 'Width', 'Height', 'ExposureTime'):
+                for selector in ("Timestamp", "Width", "Height", "ExposureTime"):
                     try:
                         self.cam.ChunkSelector.set(selector)
                         self.cam.ChunkEnable.set(True)
                         self.enabled_chunk_selectors.append(selector)
                     except VmbFeatureError:
-                        print('The device does not support chunk feature "{}". It was not enabled.'
-                              ''.format(selector))
+                        print(
+                            'The device does not support chunk feature "{}". It was not enabled.'
+                            "".format(selector)
+                        )
                 self.cam.ChunkModeActive.set(True)
             except (AttributeError, VmbFeatureError):
-                abort('Failed to enable Chunk Mode for camera \'{}\'. Abort.'
-                      ''.format(self.cam.get_id()))
+                abort(
+                    "Failed to enable Chunk Mode for camera '{}'. Abort."
+                    "".format(self.cam.get_id())
+                )
 
     def frame_callback(self, cam: Camera, stream: Stream, frame: Frame):
-        print('{} acquired {}'.format(cam, frame), flush=True)
+        print("{} acquired {}".format(cam, frame), flush=True)
         if frame.contains_chunk_data():
             frame.access_chunk_data(self.chunk_callback)
         else:
-            print('No Chunk Data present', flush=True)
+            print("No Chunk Data present", flush=True)
         cam.queue_frame(frame)
 
     def chunk_callback(self, features: FeatureContainer):
         # Print information provided by chunk features that were enabled for this example. More
         # features are available (e.g. via features.get_all_features())
         if self.enabled_chunk_selectors:
-            msg = 'Chunk Data:'
+            msg = "Chunk Data:"
             for selector in self.enabled_chunk_selectors:
-                chunk_feature_name = 'Chunk' + selector
+                chunk_feature_name = "Chunk" + selector
                 # Access to chunk data is only possible via the passed FeatureContainer instance
                 chunk_feature = features.get_feature_by_name(chunk_feature_name)
-                msg += ' {}={}'.format(chunk_feature_name, chunk_feature.get())
+                msg += " {}={}".format(chunk_feature_name, chunk_feature.get())
         else:
-            msg = 'No chunk selectors were enabled. No chunk data to show.'
+            msg = "No chunk selectors were enabled. No chunk data to show."
         print(msg, flush=True)
 
 
@@ -163,5 +170,5 @@ def main():
         chunk_example.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

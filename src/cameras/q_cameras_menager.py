@@ -10,6 +10,7 @@ from src.cameras.q_camera_utils import (
 
 class QCamerasMenager(QWidget):
     STATUS_UPDATE_INTERVAL_MS = 100
+
     def __init__(self) -> None:
         super().__init__()
 
@@ -33,15 +34,13 @@ class QCamerasMenager(QWidget):
 
     def _on_camera_registered(self, camera: CameraHandler) -> None:
         id = camera.id
-        
+
         if id not in self._cameras_configs:
             logger.error(f"Unknown camera id {id}")
             return
 
         for handler in self._cameras_configs[id].handlers.values():
             camera.register_frame_handler(handler)
-            # handler.started.connect(lambda: camera.on_handler_started())
-            # handler.stopped.connect(lambda: camera.on_handler_stopped())
 
         camera.set_config_file(self._cameras_configs[id].config_file)
         camera.started.connect(self._cameras_configs[id].on_camera_thread_started)

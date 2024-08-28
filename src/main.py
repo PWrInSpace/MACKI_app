@@ -1,8 +1,15 @@
 import sys
 import logging
 from PySide6.QtCore import QThread
-from PySide6.QtWidgets import QApplication, QMainWindow, QVBoxLayout, QWidget, QPushButton
+from PySide6.QtWidgets import (
+    QApplication,
+    QMainWindow,
+    QVBoxLayout,
+    QWidget,
+    QPushButton,
+)
 from src.cameras.q_cameras_menager import QCamerasMenager
+
 
 # Subclass QMainWindow to customize your application's main window
 class MainWindow(QMainWindow):
@@ -37,6 +44,7 @@ class MainWindow(QMainWindow):
         self.cameras.quit()
         event.accept()
 
+
 logging.basicConfig(level=logging.DEBUG)
 
 app = QApplication(sys.argv)
@@ -44,6 +52,3 @@ app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
 app.exec()
-
-
-

@@ -1,8 +1,10 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QWidget, QHBoxLayout
 from PySide6.QtCore import Slot
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
+from src.cameras.frame_handlers.frame_display import FrameDisplayFormats
 from enum import Enum
 from dataclasses import dataclass
+
 
 class CameraStatus(Enum):
     MISSING = "Missing"
@@ -13,6 +15,7 @@ class CameraStatus(Enum):
     DETECTED = "Detected"
     UNKNOWN = "Unknown"
 
+
 STATUS_TO_COLOR = {
     CameraStatus.MISSING: "red",
     CameraStatus.RUNNING: "yellow",
@@ -20,16 +23,18 @@ STATUS_TO_COLOR = {
     CameraStatus.WRITING: "green",
     CameraStatus.WRITING_AND_DISPLAYING: "purple",
     CameraStatus.DETECTED: "cyan",
-    CameraStatus.UNKNOWN: "white"
+    CameraStatus.UNKNOWN: "white",
 }
 
 DISPLAY_BUTTON_OPEN = "Open"
 DISPLAY_BUTTON_CLOSE = "Close"
 
+
 @dataclass
 class CameraDefinition:
     name: str
     id: str
+
 
 CAMERAS = [
     # CameraDefinition("Front", "DEV_000A471F21DB"),
@@ -37,6 +42,7 @@ CAMERAS = [
     CameraDefinition("Asdasdasdasdasd", "cam3"),
     CameraDefinition("camera4", "cam4"),
 ]
+
 
 class QCamera(QWidget):
     DEFAULT_CONFIG_FILE = None
@@ -51,17 +57,17 @@ class QCamera(QWidget):
         self.id = cam_id
         self.config_file = config_file or self.DEFAULT_CONFIG_FILE
         self.handlers = {
-            self.DISPLAY_HANDLER: FrameDisplay(self.name),
-            self.WRITER_HANDLER: VideoWriter(self.name, 22, (2464, 2056))
+            self.DISPLAY_HANDLER: FrameDisplay(self.name, "MACKI_patch.png"),
+            self.WRITER_HANDLER: VideoWriter(self.name, 22, (2464, 2056), "videos"),
         }
 
         self._detected = False
         self._running = False
         self._create_qui_elements()
 
-### GUI ###
+    ### GUI ###
     def _create_qui_elements(self):
-        """ Create GUI elements for the camera, this class is not a widget,
+        """Create GUI elements for the camera, this class is not a widget,
         so it contains only the layout elements. It was created like this to
         set this elements on grid in the QCamerasMenager class.
         """
@@ -96,10 +102,10 @@ class QCamera(QWidget):
         self.status_label.setText(status.value)
         self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
 
-### END GUI ###
+    ### END GUI ###
 
     def set_detected_flag(self, detected: bool):
-        """ This method is used to set the detected flag. This class only knows states
+        """This method is used to set the detected flag. This class only knows states
         of the handlers, not the camera itself.
         Handlers are connected to cameras and they only receive frames from them.
 
@@ -117,22 +123,24 @@ class QCamera(QWidget):
     def on_camera_thread_finished(self):
         self._running = False
 
-
     def get_str_status(self) -> str:
         handlers_states = {k: v.is_running for k, v in self.handlers.items()}
 
         if not self._detected:
-            status =  CameraStatus.MISSING
-        elif handlers_states[self.DISPLAY_HANDLER] and handlers_states[self.WRITER_HANDLER]:
+            status = CameraStatus.MISSING
+        elif (
+            handlers_states[self.DISPLAY_HANDLER]
+            and handlers_states[self.WRITER_HANDLER]
+        ):
             status = CameraStatus.WRITING_AND_DISPLAYING
         elif handlers_states[self.DISPLAY_HANDLER]:
-            status =  CameraStatus.DISPLAYING
+            status = CameraStatus.DISPLAYING
         elif handlers_states[self.WRITER_HANDLER]:
             status = CameraStatus.WRITING
         elif self._running:
-            status =  CameraStatus.RUNNING
+            status = CameraStatus.RUNNING
         elif self._detected:
-            status =  CameraStatus.DETECTED
+            status = CameraStatus.DETECTED
         else:
             status = CameraStatus.UNKNOWN
 

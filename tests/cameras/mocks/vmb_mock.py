@@ -2,6 +2,7 @@ from typing import Callable
 from tests.cameras.mocks.vmb_camera_mock import VmbCameraMock
 from vmbpy import CameraEvent
 
+
 class VmbInstance:
     CAM1_ID = "Camera1"
     CAM2_ID = "Camera2"
@@ -35,9 +36,7 @@ class VmbInstance:
     ) -> None:
         self._camera_change_cb = None
 
-    def emit_camera_change(
-        self, camera: VmbCameraMock, event: CameraEvent
-    ) -> None:
+    def emit_camera_change(self, camera: VmbCameraMock, event: CameraEvent) -> None:
         if self._camera_change_cb:
             self._camera_change_cb(camera, event)
 
@@ -48,10 +47,9 @@ class VmbMock:
 
     @staticmethod
     def get_instance() -> VmbInstance:
-        """ Get the instance of the VmbMock, with 3 cameras.
+        """Get the instance of the VmbMock, with 3 cameras.
 
         Returns:
             __Instance: The instance of the VmbMock.
         """
         return VmbMock.__instance
-
