@@ -23,6 +23,14 @@ class QCameraWidget(QCamera):
         handlers: list[BasicHandler],
         camera_config_file:str = None
     ) -> None:
+        """ Constructor
+
+        Args:
+            name (str): camera name
+            id (str): camera id
+            handlers (list[BasicHandler]): list of handlers
+            camera_config_file (str, optional): camera config file. Defaults to None.
+        """
         # The handlers will be loaded later, so we pass None
         super().__init__(name, id, None, camera_config_file)
         
@@ -32,6 +40,16 @@ class QCameraWidget(QCamera):
         self.update_status()
 
     def _load_handlers(self, handlers: list[BasicHandler]):
+        """ Load the handlers
+
+        Args:
+            handlers (list[BasicHandler]): list of handlers
+
+        Raises:
+            ValueError: Unknown handler type
+            ValueError: No display handler found
+            ValueError: No writer handler found
+        """
         self._handlers = {
             self.HANDLER_DISPLAY: None,
             self.HANDLER_WRITER: None,
@@ -51,11 +69,14 @@ class QCameraWidget(QCamera):
             raise ValueError("No writer handler found")
 
     def _connect_to_frame_display_signals(self):
+        """ Connect to the frame display signals
+        """
         self._handlers[self.HANDLER_DISPLAY].close_event.connect(
             self._on_frame_display_close_event
         )
 
     def _on_frame_display_close_event(self):
+        """ Handle the frame display close event """
         self.display_button.setText(DISPLAY_BUTTON_OPEN)
         self.update_status()
 
@@ -93,6 +114,8 @@ class QCameraWidget(QCamera):
         self.update_status()
 
     def _on_open_button_clicked(self):
+        """ Open or close the display window.
+        """
         if self.display_button.text() == DISPLAY_BUTTON_OPEN:
             self.display_button.setText(DISPLAY_BUTTON_CLOSE)
             self.handlers[self.HANDLER_DISPLAY].start()
@@ -107,6 +130,13 @@ class QCameraWidget(QCamera):
         status = self.get_str_status()
         self.status_label.setText(status.value)
         self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
+
+        if status == CameraStatus.MISSING:
+            self.display_button.setEnabled(False)
+            self.write_button.setEnabled(False)
+        else:
+            self.display_button.setEnabled(True)
+            self.write_button.setEnabled(True)
 
     def get_str_status(self) -> str:
         handlers_states = {k: v.is_running for k, v in self.handlers.items()}

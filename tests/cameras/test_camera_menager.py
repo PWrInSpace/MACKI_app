@@ -1,7 +1,7 @@
 import pytest
 from vmbpy import CameraEvent
 from src.cameras import CamerasMenager, CamerasMenagerState
-from cameras.camera_handler import FramesHandler
+from src.cameras.camera_handler import CameraHandler
 from tests.cameras.mocks import VmbMock, VmbCameraMock, VmbInstance
 
 
@@ -114,10 +114,10 @@ def test_on_camera_detected_existing():
 
     name = "camera_foo"
     camera = VmbCameraMock(name)
-    cameras_menager._cameras_handlers[name] = FramesHandler(name)
+    cameras_menager._cameras_handlers[name] = CameraHandler(name)
     cameras_menager._on_camera_detected(camera)
 
-    # should not create a new FramesHandler
+    # should not create a new CameraHandler
     assert len(cameras_menager._cameras_handlers) == 1
 
 
