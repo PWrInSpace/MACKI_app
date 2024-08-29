@@ -2,7 +2,7 @@ import pytest
 from vmbpy import CameraEvent
 from src.cameras import CamerasMenager, CamerasMenagerState
 from src.cameras.camera_handler import CameraHandler
-from tests.cameras.mocks import VmbMock, VmbCameraMock, VmbInstance
+from tests.cameras.mocks import VmbCameraMock, VmbInstance
 
 
 class CamerasMenagerMock(CamerasMenager):
@@ -36,14 +36,14 @@ def test_cameras_menager_constructor(cameras_menager: CamerasMenagerMock):
 )
 def test_change_state(state):
     cameras_menager = CamerasMenagerMock()
-    assert cameras_menager._change_state(state) == True
+    assert cameras_menager._change_state(state) is True
     assert cameras_menager._menager_state == state
 
 
 def test_change_state_fail():
     cameras_menager = CamerasMenagerMock()
     cameras_menager._mutex.lock()
-    assert cameras_menager._change_state(CamerasMenagerState.RUNNING) == False
+    assert cameras_menager._change_state(CamerasMenagerState.RUNNING) is False
     cameras_menager._mutex.unlock()
     assert cameras_menager.get_state() == CamerasMenagerState.IDLE
 
@@ -80,7 +80,7 @@ def test_get_vmb_instance():
 def test_register_available_cameras():
     cameras_menager = CamerasMenagerMock()
     instance = cameras_menager._get_vmb_instance()
-    assert cameras_menager._register_available_cameras(instance) == True
+    assert cameras_menager._register_available_cameras(instance) is True
 
     cameras_id = [camera.get_id() for camera in instance.get_all_cameras()]
     assert list(cameras_menager._cameras_handlers.keys()) == cameras_id
@@ -95,7 +95,7 @@ def test_register_available_cameras_fail():
     cameras_menager = CamerasMenagerMock()
     instance = cameras_menager._get_vmb_instance()
     instance._cameras = []
-    assert cameras_menager._register_available_cameras(instance) == False
+    assert cameras_menager._register_available_cameras(instance) is False
     assert cameras_menager._cameras_handlers == {}
 
 
@@ -264,7 +264,7 @@ def test_clean_up_menager():
     assert len(cameras_menager._cameras_handlers) == 0
 
     # check that frame handlers are not running
-    assert all([h.isRunning() == False for h in handlers_ref.values()])
+    assert all([h.isRunning() is False for h in handlers_ref.values()])
 
 
 def test_wait_until_stop_signal():

@@ -41,15 +41,15 @@ class VmbInstance:
             self._camera_change_cb(camera, event)
 
 
-class VmbMock:
+# class VmbMock:
 
-    __instance = VmbInstance()
+#     __instance = VmbInstance()
 
-    @staticmethod
-    def get_instance() -> VmbInstance:
-        """Get the instance of the VmbMock, with 3 cameras.
+#     @staticmethod
+#     def get_instance() -> VmbInstance:
+#         """Get the instance of the VmbMock, with 3 cameras.
 
-        Returns:
-            __Instance: The instance of the VmbMock.
-        """
-        return VmbMock.__instance
+#         Returns:
+#             __Instance: The instance of the VmbMock.
+#         """
+#         return VmbMock.__instance

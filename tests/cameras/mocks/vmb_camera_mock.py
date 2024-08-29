@@ -1,6 +1,3 @@
-from enum import Enum
-
-
 class VmbCameraMock:
     def __init__(self, camera_id: str) -> None:
         self._camera_id = camera_id
