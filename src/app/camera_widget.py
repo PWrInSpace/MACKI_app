@@ -125,18 +125,24 @@ class QCameraWidget(QCamera):
 
         self.update_status()
 
-    @override
-    def update_status(self):
-        status = self.get_str_status()
-        self.status_label.setText(status.value)
-        self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
-
+    def _update_gui(self, status: CameraStatus):
+        """ Update the GUI elements
+        """
         if status == CameraStatus.MISSING:
             self.display_button.setEnabled(False)
             self.write_button.setEnabled(False)
         else:
             self.display_button.setEnabled(True)
             self.write_button.setEnabled(True)
+
+    @override
+    def update_status(self):
+        status = self.get_str_status()
+        self.status_label.setText(status.value)
+        self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
+
+        self._update_gui(status)
+        
 
     def get_str_status(self) -> str:
         handlers_states = {k: v.is_running for k, v in self.handlers.items()}
