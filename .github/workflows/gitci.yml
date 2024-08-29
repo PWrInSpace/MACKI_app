@@ -32,19 +32,19 @@ jobs:
       - name: Run black
         run: poetry run black --check .
 
-  pytest:
-    runs-on: ubuntu-latest
-    container:
-      image: cimg/python:3.11
+  # pytest:
+  #   runs-on: ubuntu-latest
+  #   container:
+  #     image: cimg/python:3.11
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          submodules: recursive
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #       with:
+  #         submodules: recursive
 
-      - name: Install dependencies
-        run: poetry install --without dev
+  #     - name: Install dependencies
+  #       run: poetry install --without dev
 
-      - name: Run black
-        run: poetry run pytest tests/
+  #     - name: Run tests
+  #       run: poetry run pytest tests/

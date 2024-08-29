@@ -37,7 +37,6 @@ class CameraHandler(QThread):
 
     def __del__(self) -> None:
         """Destructor"""
-        logger.info(f"Deleting thread for cam {self._id}")
         self.quit()
 
     @Slot()

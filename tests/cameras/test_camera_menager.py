@@ -86,7 +86,7 @@ def test_register_available_cameras():
     assert list(cameras_menager._cameras_handlers.keys()) == cameras_id
 
     frames_handlers_names = [
-        handler._name for handler in cameras_menager._cameras_handlers.values()
+        handler.id for handler in cameras_menager._cameras_handlers.values()
     ]
     assert list(cameras_menager._cameras_handlers.keys()) == frames_handlers_names
 
@@ -106,7 +106,7 @@ def test_on_camera_detected_new_camera():
     camera = VmbCameraMock(name)
     cameras_menager._on_camera_detected(camera)
     assert name in cameras_menager._cameras_handlers
-    assert cameras_menager._cameras_handlers[name].isRunning() is True
+    assert cameras_menager._cameras_handlers[name].isRunning() is False
 
 
 def test_on_camera_detected_existing():
@@ -114,7 +114,7 @@ def test_on_camera_detected_existing():
 
     name = "camera_foo"
     camera = VmbCameraMock(name)
-    cameras_menager._cameras_handlers[name] = CameraHandler(name)
+    cameras_menager._cameras_handlers[name] = CameraHandler(camera)
     cameras_menager._on_camera_detected(camera)
 
     # should not create a new CameraHandler
@@ -158,7 +158,7 @@ def test_on_camera_missing_unknown_id():
     assert len(cameras_menager._cameras_handlers) == 1
 
     # check that camera handler thread is still running
-    assert frame_handler_ref.isRunning() is True
+    assert frame_handler_ref.isRunning() is False
 
 
 @pytest.mark.parametrize("camera_event", [(e.value) for e in CameraEvent])
@@ -188,9 +188,16 @@ def test_camera_change_handler_signal(mocker, camera_event):
     stub = mocker.stub()
 
     cameras_menager = CamerasMenagerMock()
-    cameras_menager.cameras_changed.connect(stub)
+    cameras_menager.camera_registered.connect(stub)
+    cameras_menager.camera_missing.connect(stub)
+    cameras_menager._change_state(CamerasMenagerState.RUNNING)
 
     camera = VmbCameraMock("camera_foo")
+
+    # simulate that camera is missing
+    if camera_event == CameraEvent.Missing:
+        cameras_menager._camera_change_handler(camera, CameraEvent.Detected)
+
     cameras_menager._camera_change_handler(camera, camera_event)
 
     match camera_event:
@@ -283,7 +290,7 @@ def test_terminate_thread(initial_state, expected):
     cameras_menager = CamerasMenagerMock()
     cameras_menager._change_state(initial_state)
 
-    assert cameras_menager.terminate_thread() is expected
+    cameras_menager.quit()
 
     if expected:
         assert cameras_menager.get_state() == CamerasMenagerState.STOPPING

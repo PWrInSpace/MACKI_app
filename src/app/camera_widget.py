@@ -102,8 +102,8 @@ class QCameraWidget(QCamera):
         self.setLayout(self.layout)
 
     def _on_write_button_clicked(self):
-        """ Action to be performed when the write button is clicked.
-            Start or stop the writer handler.
+        """Action to be performed when the write button is clicked.
+        Start or stop the writer handler.
         """
         if self.write_button.text() == "Write":
             self.write_button.setText("Stop")
@@ -136,8 +136,7 @@ class QCameraWidget(QCamera):
 
     @override
     def update_status(self):
-        """ Update the status of the camera widget.
-        """
+        """Update the status of the camera widget."""
         status = self.get_str_status()
         self.status_label.setText(status.value)
         self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
@@ -145,7 +144,7 @@ class QCameraWidget(QCamera):
         self._update_gui(status)
 
     def get_str_status(self) -> str:
-        """ Get the status of the camera widget.
+        """Get the status of the camera widget.
 
         Returns:
             str: The status of the camera widget.
@@ -175,7 +174,7 @@ class QCameraWidget(QCamera):
     @override
     @property
     def handlers(self) -> dict[int, BasicFrameHandler]:
-        """ Get the handlers.
+        """Get the handlers.
 
         Returns:
             dict[int, BasicFrameHandler]: The handlers.

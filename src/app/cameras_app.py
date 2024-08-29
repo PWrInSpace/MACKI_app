@@ -21,6 +21,7 @@ class QCameraApp(QCamerasMenager):
     Camera app - main widget, handling all cameras and
     widgets for displaying and writing frames.
     """
+
     def __init__(self):
         cameras = [
             QCameraWidget(
