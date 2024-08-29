@@ -1,6 +1,5 @@
-from PySide6.QtWidgets import QLabel, QPushButton, QWidget, QHBoxLayout
-from PySide6.QtCore import Slot
-from src.cameras.frame_handlers import BasicHandler, FrameDisplay, VideoWriter
+from PySide6.QtWidgets import QLabel, QPushButton, QHBoxLayout
+from src.cameras.frame_handlers import BasicFrameHandler, FrameDisplay, VideoWriter
 from src.app.camera_widget_utils import CameraStatus, STATUS_TO_COLOR
 from src.cameras.q_camera import QCamera
 from typing import override
@@ -10,8 +9,8 @@ DISPLAY_BUTTON_CLOSE = "Close"
 
 
 class QCameraWidget(QCamera):
-    """ Widget created for the MACKI app project.
-    """
+    """Widget created for the MACKI app project."""
+
     HANDLER_DISPLAY = 0
     HANDLER_WRITER = 1
     HANDLER_UNKNOWN = 99
@@ -20,30 +19,30 @@ class QCameraWidget(QCamera):
         self,
         name: str,
         id: str,
-        handlers: list[BasicHandler],
-        camera_config_file:str = None
+        handlers: list[BasicFrameHandler],
+        camera_config_file: str = None,
     ) -> None:
-        """ Constructor
+        """Constructor
 
         Args:
             name (str): camera name
             id (str): camera id
-            handlers (list[BasicHandler]): list of handlers
+            handlers (list[BasicFrameHandler]): list of handlers
             camera_config_file (str, optional): camera config file. Defaults to None.
         """
         # The handlers will be loaded later, so we pass None
         super().__init__(name, id, None, camera_config_file)
-        
+
         self._load_handlers(handlers)
         self._connect_to_frame_display_signals()
-        
+
         self.update_status()
 
-    def _load_handlers(self, handlers: list[BasicHandler]):
-        """ Load the handlers
+    def _load_handlers(self, handlers: list[BasicFrameHandler]):
+        """Load the handlers
 
         Args:
-            handlers (list[BasicHandler]): list of handlers
+            handlers (list[BasicFrameHandler]): list of handlers
 
         Raises:
             ValueError: Unknown handler type
@@ -69,14 +68,13 @@ class QCameraWidget(QCamera):
             raise ValueError("No writer handler found")
 
     def _connect_to_frame_display_signals(self):
-        """ Connect to the frame display signals
-        """
+        """Connect to the frame display signals"""
         self._handlers[self.HANDLER_DISPLAY].close_event.connect(
             self._on_frame_display_close_event
         )
 
     def _on_frame_display_close_event(self):
-        """ Handle the frame display close event """
+        """Handle the frame display close event"""
         self.display_button.setText(DISPLAY_BUTTON_OPEN)
         self.update_status()
 
@@ -104,6 +102,9 @@ class QCameraWidget(QCamera):
         self.setLayout(self.layout)
 
     def _on_write_button_clicked(self):
+        """ Action to be performed when the write button is clicked.
+            Start or stop the writer handler.
+        """
         if self.write_button.text() == "Write":
             self.write_button.setText("Stop")
             self.handlers[self.HANDLER_WRITER].start()
@@ -114,8 +115,7 @@ class QCameraWidget(QCamera):
         self.update_status()
 
     def _on_open_button_clicked(self):
-        """ Open or close the display window.
-        """
+        """Open or close the display window."""
         if self.display_button.text() == DISPLAY_BUTTON_OPEN:
             self.display_button.setText(DISPLAY_BUTTON_CLOSE)
             self.handlers[self.HANDLER_DISPLAY].start()
@@ -126,8 +126,7 @@ class QCameraWidget(QCamera):
         self.update_status()
 
     def _update_gui(self, status: CameraStatus):
-        """ Update the GUI elements
-        """
+        """Update the GUI elements"""
         if status == CameraStatus.MISSING:
             self.display_button.setEnabled(False)
             self.write_button.setEnabled(False)
@@ -137,20 +136,28 @@ class QCameraWidget(QCamera):
 
     @override
     def update_status(self):
+        """ Update the status of the camera widget.
+        """
         status = self.get_str_status()
         self.status_label.setText(status.value)
         self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
 
         self._update_gui(status)
-        
 
     def get_str_status(self) -> str:
+        """ Get the status of the camera widget.
+
+        Returns:
+            str: The status of the camera widget.
+        """
         handlers_states = {k: v.is_running for k, v in self.handlers.items()}
 
         if not self._detected:
             status = CameraStatus.MISSING
-        elif handlers_states[self.HANDLER_DISPLAY] and\
-             handlers_states[self.HANDLER_WRITER]:
+        elif (
+            handlers_states[self.HANDLER_DISPLAY]
+            and handlers_states[self.HANDLER_WRITER]
+        ):
             status = CameraStatus.WRITING_AND_DISPLAYING
         elif handlers_states[self.HANDLER_DISPLAY]:
             status = CameraStatus.DISPLAYING
@@ -164,8 +171,13 @@ class QCameraWidget(QCamera):
             status = CameraStatus.UNKNOWN
 
         return status
-    
+
     @override
     @property
-    def handlers(self) -> dict[int, BasicHandler]:
+    def handlers(self) -> dict[int, BasicFrameHandler]:
+        """ Get the handlers.
+
+        Returns:
+            dict[int, BasicFrameHandler]: The handlers.
+        """
         return self._handlers

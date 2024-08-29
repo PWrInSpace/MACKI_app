@@ -1,7 +1,10 @@
 from enum import Enum
 from dataclasses import dataclass
 
+
 class CameraStatus(Enum):
+    """ QCameraWidget status
+    """
     MISSING = "Missing"
     RUNNING = "Running"
     DISPLAYING = "Displaying"
@@ -27,6 +30,8 @@ DISPLAY_BUTTON_CLOSE = "Close"
 
 @dataclass
 class CameraConfig:
+    """ Camera configuration dataclass
+    """
     name: str
     id: str
     handlers: str

@@ -1,12 +1,12 @@
 import copy
 import logging
 import numpy as np
+import numpy.typing as npt
 from typing import override
 from queue import Queue
 from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType
 from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
-from PySide6.QtWidgets import QMessageBox
-from src.cameras.frame_handlers.basic_handler import BasicHandler
+from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler
 from src.utils.qt.thread_event import ThreadEvent
 
 logger = logging.getLogger("cameras")
@@ -30,7 +30,7 @@ class CameraHandler(QThread):
         self._id = self._camera.get_id()  # camera name
 
         self._frame_queue = Queue(self.FRAME_QUEUE_SIZE)
-        self._handlers: list[BasicHandler] = []
+        self._handlers: list[BasicFrameHandler] = []
         self._handler_mutex = QMutex()
         self._stop_signal = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
@@ -52,11 +52,11 @@ class CameraHandler(QThread):
         if all(not handler.is_running for handler in self._handlers):
             self.quit()
 
-    def register_frame_handler(self, handler: BasicHandler) -> bool:
+    def register_frame_handler(self, handler: BasicFrameHandler) -> bool:
         """Register a frame handler to the camera
 
         Args:
-            handler (BasicHandler): The handler to be registered
+            handler (BasicFrameHandler): The handler to be registered
 
         Returns:
             bool: True if the handler was registered successfully, False otherwise
@@ -84,11 +84,11 @@ class CameraHandler(QThread):
 
         return True
 
-    def unregister_frame_handler(self, handler: BasicHandler) -> bool:
+    def unregister_frame_handler(self, handler: BasicFrameHandler) -> bool:
         """Unregister a frame handler from the camera
 
         Args:
-            handler (BasicHandler): The handler to be unregistered
+            handler (BasicFrameHandler): The handler to be unregistered
 
         Returns:
             bool: True if the handler was unregistered successfully, False otherwise
@@ -164,11 +164,11 @@ class CameraHandler(QThread):
 
         return frame
 
-    def _add_frame_to_handlers(self, frame: np.array) -> None:
+    def _add_frame_to_handlers(self, frame: npt.ArrayLike) -> None:
         """Add the frame to all the registered handlers
 
         Args:
-            frame (np.array): The frame to be added
+            frame (npt.ArrayLike): The frame to be added
         """
         if frame is None:
             logger.warn(f"Camera {self._id}, frame is None :C")
@@ -197,7 +197,7 @@ class CameraHandler(QThread):
         if self._config_file:
             self._camera.stop_streaming()
 
-            self._camera.load_settings(self._config_file, PersistType.NoLUT)     
+            self._camera.load_settings(self._config_file, PersistType.NoLUT)
             self._config_file = None
 
             self._camera.start_streaming(self._on_frame)
@@ -245,8 +245,7 @@ class CameraHandler(QThread):
 
     @override
     def quit(self) -> None:
-        """ Stops the camera handler thread
-        """
+        """Stops the camera handler thread"""
         logger.info(f"Wainting for frame handler to stop for camera {self._id}")
         self._stop_signal.set()
         super().wait()

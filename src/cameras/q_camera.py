@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QLabel, QPushButton, QWidget, QHBoxLayout
+from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Slot
-from src.cameras.frame_handlers import BasicHandler
+from src.cameras.frame_handlers import BasicFrameHandler
 
 
 class QCamera(QWidget):
@@ -12,8 +12,8 @@ class QCamera(QWidget):
         self,
         name: str,
         id: str,
-        handlers: list[BasicHandler],
-        camera_config_file:str = None
+        handlers: list[BasicFrameHandler],
+        camera_config_file: str = None,
     ) -> None:
         super().__init__()
 
@@ -28,7 +28,7 @@ class QCamera(QWidget):
         self._create_qui_elements()
 
     def _create_qui_elements(self):
-        """ Create the GUI elements for the camera widget.
+        """Create the GUI elements for the camera widget.
         Which allows the user to control the camera handlers.
 
         Raises:
@@ -36,7 +36,6 @@ class QCamera(QWidget):
         """
         raise NotImplementedError("This method should be implemented in a subclass")
 
-    ### END GUI ###
     def update_status(self):
         """Update the status of the cameras on the widget.
         This method should be implemented in a subclass.
@@ -70,9 +69,9 @@ class QCamera(QWidget):
         return self._id
 
     @property
-    def handlers(self) -> list[BasicHandler]:
+    def handlers(self) -> list[BasicFrameHandler]:
         return self._handlers
-    
+
     @property
     def config_file(self) -> str:
         return self._config_file

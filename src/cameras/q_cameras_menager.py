@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QMessageBox
+from PySide6.QtWidgets import QWidget, QVBoxLayout
 from PySide6.QtCore import QTimer
 from src.cameras.cameras_menager import CamerasMenager
 from src.cameras.camera_handler import CameraHandler, logger
@@ -54,7 +54,9 @@ class QCamerasMenager(QWidget):
 
         camera.set_config_file(self._cameras_backend_dict[id].config_file)
         camera.started.connect(self._cameras_backend_dict[id].on_camera_thread_started)
-        camera.finished.connect(self._cameras_backend_dict[id].on_camera_thread_finished)
+        camera.finished.connect(
+            self._cameras_backend_dict[id].on_camera_thread_finished
+        )
 
         self._cameras_backend_dict[id].set_detected_flag(True)
 
@@ -71,4 +73,3 @@ class QCamerasMenager(QWidget):
 
     def start_cameras(self):
         self._cameras_menager._start_cameras()
-

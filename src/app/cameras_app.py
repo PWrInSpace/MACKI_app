@@ -15,7 +15,12 @@ VIDEO_FPS = 10
 VIDE_RESOLUTION = (1936, 1216)
 VIDEO_DIR = "videos"
 
+
 class QCameraApp(QCamerasMenager):
+    """
+    Camera app - main widget, handling all cameras and
+    widgets for displaying and writing frames.
+    """
     def __init__(self):
         cameras = [
             QCameraWidget(
@@ -27,14 +32,9 @@ class QCameraApp(QCamerasMenager):
                         MACKI_LOGO_PATH,
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
-                        FRAME_FORMAT
+                        FRAME_FORMAT,
                     ),
-                    VideoWriter(
-                        "Ugibugi",
-                        VIDEO_FPS,
-                        VIDE_RESOLUTION,
-                        VIDEO_DIR
-                    )
+                    VideoWriter("Ugibugi", VIDEO_FPS, VIDE_RESOLUTION, VIDEO_DIR),
                 ],
                 camera_config_file=ALVIUM_CONFIG_FILE,
             ),
@@ -47,14 +47,9 @@ class QCameraApp(QCamerasMenager):
                         MACKI_LOGO_PATH,
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
-                        FRAME_FORMAT
+                        FRAME_FORMAT,
                     ),
-                    VideoWriter(
-                        "Camera 2",
-                        VIDEO_FPS,
-                        VIDE_RESOLUTION,
-                        VIDEO_DIR
-                    )
+                    VideoWriter("Camera 2", VIDEO_FPS, VIDE_RESOLUTION, VIDEO_DIR),
                 ],
                 camera_config_file=ALVIUM_CONFIG_FILE,
             ),

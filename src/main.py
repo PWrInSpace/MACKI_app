@@ -1,12 +1,10 @@
 import sys
 import logging
-from PySide6.QtCore import QThread
 from PySide6.QtWidgets import (
     QApplication,
     QMainWindow,
     QVBoxLayout,
     QWidget,
-    QPushButton,
 )
 from src.app.cameras_app import QCameraApp
 
