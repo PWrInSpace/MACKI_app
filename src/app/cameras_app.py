@@ -4,7 +4,7 @@ from src.cameras.frame_handlers import FrameDisplay, VideoWriter
 from src.cameras.frame_handlers import FrameDisplayFormats
 
 # TEMPORARY
-ALVIUM_CONFIG_FILE = None
+ALVIUM_CONFIG_FILE = "mako.xml"
 
 MACKI_LOGO_PATH = "MACKI_patch.png"
 DEFAULT_FRAME_SIZE = (500, 500)

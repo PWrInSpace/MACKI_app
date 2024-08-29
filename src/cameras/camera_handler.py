@@ -3,7 +3,7 @@ import logging
 import numpy as np
 from typing import override
 from queue import Queue
-from vmbpy import Camera, Frame, Stream, FrameStatus
+from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType
 from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
 from PySide6.QtWidgets import QMessageBox
 from src.cameras.frame_handlers.basic_handler import BasicHandler
@@ -197,7 +197,7 @@ class CameraHandler(QThread):
         if self._config_file:
             self._camera.stop_streaming()
 
-            self._camera.load_settings(self._config_file)
+            self._camera.load_settings(self._config_file, PersistType.NoLUT)     
             self._config_file = None
 
             self._camera.start_streaming(self._on_frame)
