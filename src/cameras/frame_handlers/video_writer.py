@@ -1,5 +1,7 @@
 import cv2
 import os
+import numpy as np
+import numpy.typing as npt
 from datetime import datetime
 from typing import override
 from src.cameras.frame_handlers.basic_handler import BasicHandler, logger
@@ -63,10 +65,14 @@ class VideoWriter(BasicHandler):
     @override
     def start(self) -> None:
         """ Start the video writer, this method creates a new video """
+
         file_name = self._generate_file_path()
         self._writer = cv2.VideoWriter(
             file_name, self._fourcc, self._fps, self._frame_size, False
         )
+
+        logger.info(f"Starting video writer for {self._name}, file: {file_name}")
+
         super().start()
 
     @override
@@ -76,19 +82,35 @@ class VideoWriter(BasicHandler):
             logger.warning("Video writer is not running")
             return
         
+        logger.info(f"Stopping video writer for {self._name}")
+        
         self._writer.release()
         self._writer = None
+
         super().stop()
 
     @override
-    def add_frame(self, frame: list[int]) -> None:
+    def add_frame(self, frame: np.array) -> None:
         """ Add a frame to the video writer.
 
         Args:
-            frame (list[int]): The frame to be added to the video.
+            frame (np.array): The frame to be added to the video.
         """
-        if self._writer:
-            self._writer.write(frame)
+        if not self._writer:
+            return
+        
+        frame_width = frame.shape[1]
+        frame_height = frame.shape[0]
+
+        if (frame_width != self._frame_size[0]) or\
+           (frame_height != self._frame_size[1]):
+            self.stop()
+            raise RuntimeError(
+                f"Frame size ({frame.shape[1]}, {frame.shape[0]})"
+                f"does not match video frame size {self._frame_size}"
+            )
+            
+        self._writer.write(frame)
 
     @override
     @property

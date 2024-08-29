@@ -4,7 +4,8 @@ import numpy as np
 from typing import override
 from queue import Queue
 from vmbpy import Camera, Frame, Stream, FrameStatus
-from PySide6.QtCore import QThread, QMutex, Slot, Qt
+from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
+from PySide6.QtWidgets import QMessageBox
 from src.cameras.frame_handlers.basic_handler import BasicHandler
 from src.utils.qt.thread_event import ThreadEvent
 
@@ -13,6 +14,7 @@ logger = logging.getLogger("cameras")
 
 class CameraHandler(QThread):
     FRAME_QUEUE_SIZE = 10
+    error = Signal(str)
 
     def __init__(
         self,
@@ -200,6 +202,16 @@ class CameraHandler(QThread):
 
             self._camera.start_streaming(self._on_frame)
 
+    def _handle_exception(self, e: Exception) -> None:
+        """Handle the exception
+
+        Args:
+            e (Exception): The exception to be handled
+        """
+        message = f"Error in camera {self._id}: {e}"
+        logger.error(message)
+        self.error.emit(message)
+
     def _thread_loop(self) -> None:
         """Thread main loop"""
         while not self._stop_signal.occurs():
@@ -223,7 +235,7 @@ class CameraHandler(QThread):
                 self._thread_loop()
 
             except Exception as e:
-                logger.error(f"Error in camera {self._id}: {e}")
+                self._handle_exception(e)
 
             finally:
                 self._camera.stop_streaming()

@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QMessageBox
 from PySide6.QtCore import QTimer
 from src.cameras.cameras_menager import CamerasMenager
 from src.cameras.camera_handler import CameraHandler, logger
@@ -49,7 +49,7 @@ class QCamerasMenager(QWidget):
             logger.error(f"Unknown camera id {id}")
             return
 
-        for handler in self._cameras_backend_dict[id].handlers:
+        for handler in self._cameras_backend_dict[id].handlers.values():
             camera.register_frame_handler(handler)
 
         camera.set_config_file(self._cameras_backend_dict[id].config_file)
@@ -71,3 +71,4 @@ class QCamerasMenager(QWidget):
 
     def start_cameras(self):
         self._cameras_menager._start_cameras()
+

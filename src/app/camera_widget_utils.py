@@ -12,13 +12,13 @@ class CameraStatus(Enum):
 
 
 STATUS_TO_COLOR = {
-    CameraStatus.MISSING: "red",
-    CameraStatus.RUNNING: "yellow",
-    CameraStatus.DISPLAYING: "pink",
-    CameraStatus.WRITING: "green",
-    CameraStatus.WRITING_AND_DISPLAYING: "purple",
-    CameraStatus.DETECTED: "cyan",
-    CameraStatus.UNKNOWN: "white",
+    CameraStatus.MISSING: "#FF204E",
+    CameraStatus.RUNNING: "#A3D8FF",
+    CameraStatus.DISPLAYING: "#15F5BA",
+    CameraStatus.WRITING: "#AF47D2",
+    CameraStatus.WRITING_AND_DISPLAYING: "#B8B5FF",
+    CameraStatus.DETECTED: "#9BEC00",
+    CameraStatus.UNKNOWN: "#F6FA70",
 }
 
 DISPLAY_BUTTON_OPEN = "Open"

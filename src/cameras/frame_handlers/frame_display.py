@@ -78,7 +78,7 @@ class FrameDisplay(BasicHandler):
         """ Stop the handler, this method emit the stopped signal and close the window
         """
         logger.info(f"Stopping frame display for {self.window.windowTitle()}")
-        self.window.hide()
+        self.window.close()
         super().stop()
 
     @override

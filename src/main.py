@@ -32,7 +32,8 @@ class MainWindow(QMainWindow):
         event.accept()
 
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
+
 
 app = QApplication(sys.argv)
 

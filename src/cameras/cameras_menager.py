@@ -1,6 +1,7 @@
 from typing import override
 from enum import Enum
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
+from PySide6.QtWidgets import QMessageBox
 from vmbpy import VmbSystem, Camera, CameraEvent
 
 from src.cameras.camera_handler import CameraHandler, logger
@@ -101,6 +102,8 @@ class CamerasMenager(QThread):
 
         if camera_id not in self._cameras_handlers:
             self._cameras_handlers[camera_id] = CameraHandler(camera)
+            self._cameras_handlers[camera_id].error.connect(self._handle_error)
+
             self.camera_registered.emit(self._cameras_handlers[camera_id])
         else:
             logger.warning(f"Camera {camera_id} is already in the list")
@@ -177,6 +180,18 @@ class CamerasMenager(QThread):
         while not self._stop_signal.occurs():
             QThread.msleep(250)
 
+    def _handle_error(self, message: str) -> None:
+        """Handles the error message.
+
+        Args:
+            message (str): The error message.
+        """
+        error_dialog = QMessageBox()
+        error_dialog.setWindowTitle("Error")
+        error_dialog.setText(message)
+        error_dialog.setIcon(QMessageBox.Icon.Critical)
+        error_dialog.exec()
+
     @override
     def run(self) -> None:
         """The main loop of the cameras menager.
@@ -195,9 +210,9 @@ class CamerasMenager(QThread):
             self._register_vmb_callbacks(vmb)
 
             self._wait_until_stop_signal()
-            self._unregister_vmb_callbacks(vmb)
 
-        self._clean_up_menager()
+            self._clean_up_menager()
+            self._unregister_vmb_callbacks(vmb)
 
         self._change_state(CamerasMenagerState.IDLE)
 
@@ -209,7 +224,9 @@ class CamerasMenager(QThread):
             return False
 
         self._change_state(CamerasMenagerState.STOPPING)
+        logger.info("Sending stop signal to cameras menager thread")
         self._stop_signal.set()
+        logger.info("Waiting for cameras menager thread to stop")
         super().wait()
 
         logger.info("Cameras menager thread stopped")

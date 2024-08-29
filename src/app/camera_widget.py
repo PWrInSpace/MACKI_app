@@ -71,12 +71,26 @@ class QCameraWidget(QCamera):
         self.display_button = QPushButton("Open")
         self.display_button.clicked.connect(self._on_open_button_clicked)
 
+        self.write_button = QPushButton("Write")
+        self.write_button.clicked.connect(self._on_write_button_clicked)
+
         self.layout = QHBoxLayout()
         self.layout.addWidget(self.name_label)
         self.layout.addWidget(self.status_label)
         self.layout.addWidget(self.display_button)
+        self.layout.addWidget(self.write_button)
 
         self.setLayout(self.layout)
+
+    def _on_write_button_clicked(self):
+        if self.write_button.text() == "Write":
+            self.write_button.setText("Stop")
+            self.handlers[self.HANDLER_WRITER].start()
+        else:
+            self.write_button.setText("Write")
+            self.handlers[self.HANDLER_WRITER].stop()
+
+        self.update_status()
 
     def _on_open_button_clicked(self):
         if self.display_button.text() == DISPLAY_BUTTON_OPEN:
@@ -99,14 +113,12 @@ class QCameraWidget(QCamera):
 
         if not self._detected:
             status = CameraStatus.MISSING
-        elif (
-            handlers_states[self.DISPLAY_HANDLER]
-            and handlers_states[self.WRITER_HANDLER]
-        ):
+        elif handlers_states[self.HANDLER_DISPLAY] and\
+             handlers_states[self.HANDLER_WRITER]:
             status = CameraStatus.WRITING_AND_DISPLAYING
-        elif handlers_states[self.DISPLAY_HANDLER]:
+        elif handlers_states[self.HANDLER_DISPLAY]:
             status = CameraStatus.DISPLAYING
-        elif handlers_states[self.WRITER_HANDLER]:
+        elif handlers_states[self.HANDLER_WRITER]:
             status = CameraStatus.WRITING
         elif self._running:
             status = CameraStatus.RUNNING
