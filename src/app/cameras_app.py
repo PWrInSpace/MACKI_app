@@ -1,3 +1,4 @@
+import os
 from src.app.camera_widget import QCameraWidget
 from src.cameras.q_cameras_menager import QCamerasMenager
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
@@ -6,7 +7,7 @@ from src.cameras.frame_handlers import FrameDisplayFormats
 # TEMPORARY
 ALVIUM_CONFIG_FILE = "mako.xml"
 
-MACKI_LOGO_PATH = "MACKI_patch.png"
+MACKI_LOGO_PATH = os.path.join("resources", "MACKI_patch.png")
 DEFAULT_FRAME_SIZE = (500, 500)
 MINI_FRAME_SIZE = (300, 300)
 FRAME_FORMAT = FrameDisplayFormats.GRAY
