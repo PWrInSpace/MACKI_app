@@ -24,10 +24,6 @@ STATUS_TO_COLOR = {
     CameraStatus.UNKNOWN: "#F6FA70",
 }
 
-DISPLAY_BUTTON_OPEN = "Open"
-DISPLAY_BUTTON_CLOSE = "Close"
-
-
 @dataclass
 class CameraConfig:
     """Camera configuration dataclass"""

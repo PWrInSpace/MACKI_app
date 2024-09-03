@@ -8,31 +8,31 @@ from src.cameras.camera_handler import CameraHandler, logger
 from src.utils.qt.thread_event import ThreadEvent
 
 
-class CamerasMenagerState(Enum):
+class CamerasManagerState(Enum):
     """Camera menager states"""
 
     IDLE = 0
     RUNNING = 1
     STOPPING = 2
-    UNKNOW = 99
+    UNKNOWN = 99
 
 
-class CamerasMenager(QThread):
+class CamerasManager(QThread):
     camera_registered = Signal(CameraHandler)
     camera_missing = Signal(str)  # camera id
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._cameras_handlers: dict[str, CameraHandler] = {}  # check weakpointer
-        self._menager_state: CamerasMenagerState = CamerasMenagerState.IDLE
+        self._menager_state: CamerasManagerState = CamerasManagerState.IDLE
         self._mutex = QMutex()
         self._stop_signal = ThreadEvent()
 
-    def _change_state(self, state: CamerasMenagerState) -> bool:
+    def _change_state(self, state: CamerasManagerState) -> bool:
         """Changes the state of the cameras menager.
 
         Args:
-            state (CamerasMenagerState): The new state.
+            state (CamerasManagerState): The new state.
         """
         if self._mutex.try_lock() is False:
             logger.warning("Unable to change state")
@@ -44,13 +44,13 @@ class CamerasMenager(QThread):
 
         return True
 
-    def get_state(self) -> CamerasMenagerState:
+    def get_state(self) -> CamerasManagerState:
         """Getter for camera menager state
 
         Returns:
-            CamerasMenagerState: current state
+            CamerasManagerState: current state
         """
-        state = CamerasMenagerState.UNKNOW
+        state = CamerasManagerState.UNKNOWN
         if self._mutex.try_lock():
             state = self._menager_state
             self._mutex.unlock()
@@ -108,6 +108,8 @@ class CamerasMenager(QThread):
         else:
             logger.warning(f"Camera {camera_id} is already in the list")
 
+        print(self._cameras_handlers)
+
     def _on_camera_missing(self, camera: Camera) -> None:
         """Handles the camera missing event.
 
@@ -135,7 +137,7 @@ class CamerasMenager(QThread):
             camera_id (str): The id of the camera that changed.
         """
         logger.info(f"Camera {camera.get_id()} changed")
-        if self.get_state() != CamerasMenagerState.RUNNING:
+        if self.get_state() != CamerasManagerState.RUNNING:
             logger.warning("Camera change received in state other than running")
 
         match event:
@@ -203,7 +205,7 @@ class CamerasMenager(QThread):
         logger.info("Cameras menager started")
 
         self._stop_signal.clear()
-        self._change_state(CamerasMenagerState.RUNNING)
+        self._change_state(CamerasManagerState.RUNNING)
         vmb = self._get_vmb_instance()
 
         with vmb:
@@ -216,16 +218,16 @@ class CamerasMenager(QThread):
             self._clean_up_menager()
             self._unregister_vmb_callbacks(vmb)
 
-        self._change_state(CamerasMenagerState.IDLE)
+        self._change_state(CamerasManagerState.IDLE)
 
     @override
     def quit(self) -> None:
         """Quits the cameras menager thread."""
-        if self.get_state() != CamerasMenagerState.RUNNING:
+        if self.get_state() != CamerasManagerState.RUNNING:
             logger.warning("Thread is not running")
             return False
 
-        self._change_state(CamerasMenagerState.STOPPING)
+        self._change_state(CamerasManagerState.STOPPING)
         logger.info("Sending stop signal to cameras menager thread")
         self._stop_signal.set()
         logger.info("Waiting for cameras menager thread to stop")

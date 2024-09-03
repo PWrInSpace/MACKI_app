@@ -13,7 +13,7 @@ logger = logging.getLogger("cameras")
 
 
 class CameraHandler(QThread):
-    FRAME_QUEUE_SIZE = 10
+    FRAME_QUEUE_SIZE = 1
     error = Signal(str)
 
     def __init__(
@@ -121,11 +121,13 @@ class CameraHandler(QThread):
             frame (Frame): frame
         """
         if frame.get_status() == FrameStatus.Complete:
-            try:
-                frame_cpy = copy.deepcopy(frame)
-                self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
-            except Exception as e:
-                logger.warning(f"Cam {self._id} on frame exception: {str(e)}")
+            frame_cpy = copy.deepcopy(frame)
+
+            if self._frame_queue.full():
+                self._frame_queue.get_nowait()
+                logger.warning(f"Camera {self._id} lost one frame")
+
+            self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
 
         camera.queue_frame(frame)
 
@@ -146,16 +148,16 @@ class CameraHandler(QThread):
         if frames_on_queue == 0:
             return None
 
-        if frames_on_queue > 1:
-            logger.warn(
-                f"Camera {self._id} thread is delayed"
-                f" about {frames_on_queue - 1} frames"
-            )
+        # if frames_on_queue > 1:
+        #     logger.warn(
+        #         f"Camera {self._id} thread is delayed"
+        #     )
 
-        while frames_on_queue > 0:
-            # we checked empty before, no need to handle exception
-            frame = self._frame_queue.get_nowait()
-            frames_on_queue -= 1
+        # while frames_on_queue > 0:
+        #     # we checked empty before, no need to handle exception
+        #     frame = self._frame_queue.get_nowait()
+        #     frames_on_queue -= 1
+        frame = self._frame_queue.get_nowait()
 
         return frame
 

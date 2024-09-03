@@ -6,6 +6,8 @@ from typing import override
 
 DISPLAY_BUTTON_OPEN = "Open"
 DISPLAY_BUTTON_CLOSE = "Close"
+WRITE_BUTTON_START = "Write"
+WRITE_BUTTON_STOP = "Stop"
 
 
 class QCameraWidget(QCamera):
@@ -88,10 +90,10 @@ class QCameraWidget(QCamera):
         self.name_label = QLabel(f"{self.name}:")
         self.status_label = QLabel()
 
-        self.display_button = QPushButton("Open")
+        self.display_button = QPushButton(DISPLAY_BUTTON_OPEN)
         self.display_button.clicked.connect(self._on_open_button_clicked)
 
-        self.write_button = QPushButton("Write")
+        self.write_button = QPushButton(WRITE_BUTTON_START)
         self.write_button.clicked.connect(self._on_write_button_clicked)
 
         self.layout = QHBoxLayout()
@@ -106,11 +108,11 @@ class QCameraWidget(QCamera):
         """Action to be performed when the write button is clicked.
         Start or stop the writer handler.
         """
-        if self.write_button.text() == "Write":
-            self.write_button.setText("Stop")
+        if self.write_button.text() == WRITE_BUTTON_START:
+            self.write_button.setText(WRITE_BUTTON_STOP)
             self.handlers[self.HANDLER_WRITER].start()
         else:
-            self.write_button.setText("Write")
+            self.write_button.setText(WRITE_BUTTON_START)
             self.handlers[self.HANDLER_WRITER].stop()
 
         self.update_status()

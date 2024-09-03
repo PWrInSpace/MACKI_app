@@ -1,6 +1,6 @@
 import os
 from src.app.camera_widget import QCameraWidget
-from src.cameras.q_cameras_menager import QCamerasMenager
+from src.cameras.q_cameras_menager import QCamerasManager
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
 from src.cameras.frame_handlers import FrameDisplayFormats
 
@@ -21,7 +21,7 @@ VIDEO_RESOLUTION = (1936, 1216)
 VIDEO_DIR = "videos"
 
 
-class QCameraApp(QCamerasMenager):
+class QCameraApp(QCamerasManager):
     """
     Camera app - main widget, handling all cameras and
     widgets for displaying and writing frames.
