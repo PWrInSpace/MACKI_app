@@ -1,11 +1,11 @@
 import pytest
 from vmbpy import CameraEvent
-from src.cameras import CamerasMenager, CamerasMenagerState
+from src.cameras import CamerasManager, CamerasManagerState
 from src.cameras.camera_handler import CameraHandler
 from tests.cameras.mocks import VmbCameraMock, VmbInstance
 
 
-class CamerasMenagerMock(CamerasMenager):
+class CamerasMenagerMock(CamerasManager):
     def __init__(self) -> None:
         super().__init__()
         self._instance = VmbInstance()
@@ -22,16 +22,16 @@ def cameras_menager() -> CamerasMenagerMock:
 
 def test_cameras_menager_constructor(cameras_menager: CamerasMenagerMock):
     # check default values
-    assert cameras_menager.get_state() == CamerasMenagerState.IDLE
+    assert cameras_menager.get_state() == CamerasManagerState.IDLE
     assert cameras_menager._cameras_handlers == {}
 
 
 @pytest.mark.parametrize(
     "state",
     [
-        (CamerasMenagerState.IDLE),
-        (CamerasMenagerState.RUNNING),
-        (CamerasMenagerState.STOPPING),
+        (CamerasManagerState.IDLE),
+        (CamerasManagerState.RUNNING),
+        (CamerasManagerState.STOPPING),
     ],
 )
 def test_change_state(state):
@@ -43,17 +43,17 @@ def test_change_state(state):
 def test_change_state_fail():
     cameras_menager = CamerasMenagerMock()
     cameras_menager._mutex.lock()
-    assert cameras_menager._change_state(CamerasMenagerState.RUNNING) is False
+    assert cameras_menager._change_state(CamerasManagerState.RUNNING) is False
     cameras_menager._mutex.unlock()
-    assert cameras_menager.get_state() == CamerasMenagerState.IDLE
+    assert cameras_menager.get_state() == CamerasManagerState.IDLE
 
 
 @pytest.mark.parametrize(
     "state",
     [
-        (CamerasMenagerState.IDLE),
-        (CamerasMenagerState.RUNNING),
-        (CamerasMenagerState.STOPPING),
+        (CamerasManagerState.IDLE),
+        (CamerasManagerState.RUNNING),
+        (CamerasManagerState.STOPPING),
     ],
 )
 def test_get_state(state):
@@ -65,10 +65,10 @@ def test_get_state(state):
 def test_get_state_fail():
     cameras_menager = CamerasMenagerMock()
     cameras_menager._mutex.lock()
-    assert cameras_menager.get_state() == CamerasMenagerState.UNKNOW
+    assert cameras_menager.get_state() == CamerasManagerState.UNKNOWN
     cameras_menager._mutex.unlock()
     # after unlock should return the current state
-    assert cameras_menager.get_state() == CamerasMenagerState.IDLE
+    assert cameras_menager.get_state() == CamerasManagerState.IDLE
 
 
 # test to check if mock works as intented
@@ -190,7 +190,7 @@ def test_camera_change_handler_signal(mocker, camera_event):
     cameras_menager = CamerasMenagerMock()
     cameras_menager.camera_registered.connect(stub)
     cameras_menager.camera_missing.connect(stub)
-    cameras_menager._change_state(CamerasMenagerState.RUNNING)
+    cameras_menager._change_state(CamerasManagerState.RUNNING)
 
     camera = VmbCameraMock("camera_foo")
 
@@ -284,7 +284,7 @@ def test_raise_error():
 
 @pytest.mark.parametrize(
     "initial_state, expected",
-    [(CamerasMenagerState.IDLE, False), (CamerasMenagerState.RUNNING, True)],
+    [(CamerasManagerState.IDLE, False), (CamerasManagerState.RUNNING, True)],
 )
 def test_terminate_thread(initial_state, expected):
     cameras_menager = CamerasMenagerMock()
@@ -293,7 +293,7 @@ def test_terminate_thread(initial_state, expected):
     cameras_menager.quit()
 
     if expected:
-        assert cameras_menager.get_state() == CamerasMenagerState.STOPPING
+        assert cameras_menager.get_state() == CamerasManagerState.STOPPING
     else:
         assert cameras_menager.get_state() == initial_state
 

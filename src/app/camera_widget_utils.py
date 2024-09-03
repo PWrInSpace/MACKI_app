@@ -24,6 +24,7 @@ STATUS_TO_COLOR = {
     CameraStatus.UNKNOWN: "#F6FA70",
 }
 
+
 @dataclass
 class CameraConfig:
     """Camera configuration dataclass"""

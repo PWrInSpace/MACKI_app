@@ -55,7 +55,7 @@ class VideoWriter(BasicFrameHandler):
             path = name
 
         if os.path.isfile(path):
-            without_extension = os.path.splitext('.')[0]
+            without_extension = os.path.splitext(".")[0]
             random_string = str(uuid.uuid4())
             path = f"{without_extension}_{random_string}.mp4"
 
