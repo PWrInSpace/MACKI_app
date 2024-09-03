@@ -36,6 +36,7 @@ class QCameraWidget(QCamera):
         self._load_handlers(handlers)
         self._connect_to_frame_display_signals()
 
+        self._previous_status = CameraStatus.UNKNOWN
         self.update_status()
 
     def _load_handlers(self, handlers: list[BasicFrameHandler]):
@@ -128,6 +129,7 @@ class QCameraWidget(QCamera):
     def _update_gui(self, status: CameraStatus):
         """Update the GUI elements"""
         if status == CameraStatus.MISSING:
+            self.display_button.setText(DISPLAY_BUTTON_OPEN)
             self.display_button.setEnabled(False)
             self.write_button.setEnabled(False)
         else:
@@ -138,10 +140,13 @@ class QCameraWidget(QCamera):
     def update_status(self):
         """Update the status of the camera widget."""
         status = self.get_str_status()
-        self.status_label.setText(status.value)
-        self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
 
-        self._update_gui(status)
+        if status != self._previous_status:
+            self.status_label.setText(status.value)
+            self.status_label.setStyleSheet(f"color: {STATUS_TO_COLOR[status]}")
+            self._update_gui(status)
+
+            self._previous_status = status
 
     def get_str_status(self) -> str:
         """Get the status of the camera widget.

@@ -35,10 +35,6 @@ class CameraHandler(QThread):
         self._stop_signal = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
 
-    def __del__(self) -> None:
-        """Destructor"""
-        self.quit()
-
     @Slot()
     def on_handler_started(self):
         """Handler started slot"""
@@ -222,6 +218,8 @@ class CameraHandler(QThread):
         while not self._frame_queue.empty():
             self._frame_queue.get_nowait()
 
+        logger.info(f"Frame handler thread stopped for camera {self._id}")
+
     @override
     def run(self) -> None:
         """Thread main loop"""
@@ -240,17 +238,17 @@ class CameraHandler(QThread):
                 self._camera.stop_streaming()
 
         self._clean_up()
-        logger.info(f"Frame handler thread stopped for camera {self._id}")
 
     @override
     def quit(self) -> None:
         """Stops the camera handler thread"""
-        logger.info(f"Wainting for frame handler to stop for camera {self._id}")
+        logger.info(f"Waiting for frame handler to stop for camera {self._id}")
+
+        if self._stop_signal.occurs():
+            return
+
         self._stop_signal.set()
         super().wait()
-
-        logger.info(f"Frame handler thread stopped for camera {self._id}")
-        self._clean_up()
 
     @property
     def id(self) -> str:

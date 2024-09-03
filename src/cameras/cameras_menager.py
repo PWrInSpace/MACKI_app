@@ -118,8 +118,10 @@ class CamerasMenager(QThread):
 
         if camera_id in self._cameras_handlers:
             self._cameras_handlers[camera_id].quit()
+
             del self._cameras_handlers[camera_id]
             self.camera_missing.emit(camera_id)
+            logger.info(f"Camera {camera_id} removed from the list")
         else:
             logger.warning(f"Camera {camera_id} is not in the list!")
 
