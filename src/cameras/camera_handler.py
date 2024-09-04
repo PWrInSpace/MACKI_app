@@ -5,11 +5,15 @@ import numpy.typing as npt
 from typing import override
 from queue import Queue
 from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType
-from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
+from PySide6.QtCore import QThread, Qt, QMutex, Slot, Signal
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler
 from src.utils.qt.thread_event import ThreadEvent
 
 logger = logging.getLogger("cameras")
+
+
+def xddd(camera: Camera, stream: Stream, frame: Frame):
+    pass
 
 
 class CameraHandler(QThread):
@@ -34,6 +38,9 @@ class CameraHandler(QThread):
         self._handler_mutex = QMutex()
         self._stop_signal = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
+
+    def __del__(self):
+        print("____________________________________________CameraHandler DEL")
 
     @Slot()
     def on_handler_started(self):
@@ -125,7 +132,7 @@ class CameraHandler(QThread):
 
             if self._frame_queue.full():
                 self._frame_queue.get_nowait()
-                logger.warning(f"Camera {self._id} lost one frame")
+                # logger.warning(f"Camera {self._id} lost one frame")
 
             self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
 
@@ -234,11 +241,14 @@ class CameraHandler(QThread):
                 self._thread_loop()
 
             except Exception as e:
+                print("*************************EXCEPTION")
                 self._handle_exception(e)
 
             finally:
+                print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>AAAAA")
                 self._camera.stop_streaming()
 
+        print("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCLEANUP")
         self._clean_up()
 
     @override

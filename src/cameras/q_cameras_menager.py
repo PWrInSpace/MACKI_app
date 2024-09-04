@@ -60,6 +60,8 @@ class QCamerasManager(QWidget):
 
         self._cameras_backend_dict[id].set_detected_flag(True)
 
+        # self.start_cameras()
+
     def _on_camera_missing(self, camera_id: str) -> None:
         logger.warning(f"Camera {camera_id} missing")
         self._cameras_backend_dict[camera_id].set_detected_flag(False)

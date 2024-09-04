@@ -1,3 +1,4 @@
+import sys
 from typing import override
 from enum import Enum
 from PySide6.QtCore import QObject, QThread, Signal, QMutex
@@ -120,8 +121,9 @@ class CamerasManager(QThread):
 
         if camera_id in self._cameras_handlers:
             self._cameras_handlers[camera_id].quit()
-
+            print("Removing camera from list")
             del self._cameras_handlers[camera_id]
+
             self.camera_missing.emit(camera_id)
             logger.info(f"Camera {camera_id} removed from the list")
         else:
