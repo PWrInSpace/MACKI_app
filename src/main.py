@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 from src.app.cameras_app import QCameraApp
+from src.app.com.macus_widget import MacusWidget
 
 
 class MainWindow(QMainWindow):
@@ -17,7 +18,9 @@ class MainWindow(QMainWindow):
 
         layout = QVBoxLayout()
         self.cameras = QCameraApp()
-        layout.addWidget(self.cameras)
+        # layout.addWidget(self.cameras)
+        self.macus_widget = MacusWidget()
+        layout.addWidget(self.macus_widget)
 
         widget = QWidget()
         widget.setLayout(layout)

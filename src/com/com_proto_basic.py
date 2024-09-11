@@ -1,32 +1,26 @@
-from abc import ABC, abstractmethod
 
 
-class ComProtoBasic(ABC):
-    @abstractmethod
+class ComProtoBasic:
     def connect(self):
         """Connect to the device"""
-        pass
+        raise NotImplementedError("Method not implemented")
 
-    @abstractmethod
     def disconnect(self):
         """Disconnect from the device"""
-        pass
+        raise NotImplementedError("Method not implemented")
 
-    @abstractmethod
     def write(self, data: str):
         """Write data to the device
 
         Args:
             data (str): data to write
         """
-        pass
+        raise NotImplementedError("Method not implemented")
 
-    @abstractmethod
     def read(self):
         """Read data from the device"""
-        pass
+        raise NotImplementedError("Method not implemented")
 
-    @abstractmethod
     def is_connected(self):
         """Check if the device is connected"""
-        pass
+        raise NotImplementedError("Method not implemented")

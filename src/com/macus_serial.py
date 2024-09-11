@@ -1,5 +1,7 @@
 from typing import override
 import serial
+import serial.tools.list_ports
+
 from serial.serialutil import PortNotOpenError, SerialException
 
 from src.com.com_proto_basic import ComProtoBasic
@@ -106,6 +108,14 @@ class MacusSerial(ComProtoBasic):
             bool: True if the device is connected, False otherwise
         """
         return self._serial.is_open
+
+    def get_available_ports(self) -> list[str]:
+        """This method lists the available COM ports
+
+        Returns:
+            list[str]: The list of available COM ports
+        """
+        return serial.tools.list_ports.comports()
 
     # def read_response(self) -> str:
     #     """ This method reads the response from the device

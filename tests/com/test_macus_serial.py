@@ -1,5 +1,6 @@
 import serial
 import pytest
+from contextlib import nullcontext as does_not_rise
 
 from src.com.macus_serial import MacusSerial
 
@@ -159,6 +160,18 @@ def test_is_connected(macus: MacusSerial):
 
     macus.disconnect()
     assert macus.is_connected() is False
+
+
+def test_get_available_ports_call(macus):
+    with does_not_rise():
+        macus.get_available_ports()
+
+
+def test_get_available_ports_ret_value(macus, mocker):
+    mocker.patch("serial.tools.list_ports.comports", return_value=[COM_PORT])
+
+    ports = macus.get_available_ports()
+    assert ports == [COM_PORT]
 
 
 def test_write_command(macus: MacusSerial, mocker):
