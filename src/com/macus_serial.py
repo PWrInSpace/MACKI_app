@@ -15,7 +15,7 @@ class MacusSerial(ComProtoBasic):
     NACK = "NACK"
 
     def __init__(self, com_port: str = None) -> None:
-        """ This method initializes the MacusSerial class
+        """This method initializes the MacusSerial class
 
         Args:
             com_port (str, optional): com port to connect to. Defaults to None.
@@ -29,7 +29,7 @@ class MacusSerial(ComProtoBasic):
 
     @override
     def connect(self, com_port: str = None) -> None:
-        """ This method connects to the serial port
+        """This method connects to the serial port
 
         Args:
             com_port (str, optional): com port to connect to. Defaults to None.
@@ -49,19 +49,19 @@ class MacusSerial(ComProtoBasic):
 
     @override
     def disconnect(self) -> None:
-        """ This method disconnects from the serial port
+        """This method disconnects from the serial port
 
         Raises:
             PortNotOpenError: Serial port is not open
         """
         if not self._serial.is_open:
-            raise PortNotOpenError("Serial port is not open")
+            raise PortNotOpenError()
 
         self._serial.close()
 
     @override
     def write(self, data: str) -> None:
-        """ This method writes data to the serial port
+        """This method writes data to the serial port
 
         Args:
             data (str): The data to write
@@ -70,7 +70,7 @@ class MacusSerial(ComProtoBasic):
             PortNotOpenError: Serial port is not open
         """
         if not self._serial.is_open:
-            raise PortNotOpenError("Serial port is not open")
+            raise PortNotOpenError()
 
         if not data.endswith(self.EOF):
             data += self.EOF
@@ -79,7 +79,7 @@ class MacusSerial(ComProtoBasic):
 
     @override
     def read(self, read_timeout_s: float = 0.1) -> str:
-        """ This method reads data from the serial port
+        """This method reads data from the serial port
 
         Args:
             read_timeout_s (float, optional): read timeout. Defaults to 0.1.
@@ -91,7 +91,7 @@ class MacusSerial(ComProtoBasic):
             str: The data read from the serial port
         """
         if not self._serial.is_open:
-            raise PortNotOpenError("Serial port is not open")
+            raise PortNotOpenError()
 
         self._serial.timeout = read_timeout_s
         response = self._serial.read_until(self.EOF.encode())
@@ -100,32 +100,32 @@ class MacusSerial(ComProtoBasic):
 
     @override
     def is_connected(self) -> bool:
-        """ This method checks if the device is connected
+        """This method checks if the device is connected
 
         Returns:
             bool: True if the device is connected, False otherwise
         """
         return self._serial.is_open
 
-    def read_response(self) -> str:
-        """ This method reads the response from the device
+    # def read_response(self) -> str:
+    #     """ This method reads the response from the device
 
-        Returns:
-            str: The response from the device
-        """
-        response = self.read()
+    #     Returns:
+    #         str: The response from the device
+    #     """
+    #     response = self.read()
 
-        if self.ACK in response:
-            response = response.replace(self.ACK, "")
-        elif self.NACK in response:
-            raise SerialException(f"NACK received: {response}")
-        else:
-            raise SerialException(f"Invalid response: {response}")
+    #     if self.ACK in response:
+    #         response = response.replace(self.ACK, "")
+    #     elif self.NACK in response:
+    #         raise SerialException(f"NACK received: {response}")
+    #     else:
+    #         raise SerialException(f"Invalid response: {response}")
 
-        return response
+    #     return response
 
     def write_command(self, command_name: str, *argv) -> str:
-        """ This method writes a command to the serial port and reads the response
+        """This method writes a command to the serial port and reads the response
 
         Args:
             command_name (str): The command to write
@@ -139,5 +139,3 @@ class MacusSerial(ComProtoBasic):
             command += f" {arg}"
 
         self.write(command)
-
-        return self.read_response()

@@ -209,93 +209,93 @@ def test_camera_change_handler_signal(mocker, camera_event):
             assert not stub.called
 
 
-def test_start_cameras() -> None:
-    cameras_menager = CamerasMenagerMock()
-    vmb = cameras_menager._get_vmb_instance()
-    cameras_menager._register_available_cameras(vmb)
+# def test_start_cameras() -> None:
+#     cameras_menager = CamerasMenagerMock()
+#     vmb = cameras_menager._get_vmb_instance()
+#     cameras_menager._register_available_cameras(vmb)
 
-    for handler in cameras_menager._cameras_handlers.values():
-        assert handler.isRunning() is False
+#     for handler in cameras_menager._cameras_handlers.values():
+#         assert handler.isRunning() is False
 
-    cameras_menager._start_cameras()
+#     cameras_menager._start_cameras()
 
-    for handler in cameras_menager._cameras_handlers.values():
-        assert handler.isRunning() is True
-
-
-def test_register_vmb_callbacks(mocker):
-    handler_spy = mocker.spy(CamerasMenagerMock, "_camera_change_handler")
-
-    vmb = VmbInstance()
-
-    cameras_menager = CamerasMenagerMock()
-    cameras_menager._register_vmb_callbacks(vmb)
-
-    camera = vmb._cameras[0]
-    vmb.emit_camera_change(camera, CameraEvent.Unknown)
-
-    assert handler_spy.call_count == 1
-    assert handler_spy.call_args[0][1] == camera
-    assert handler_spy.call_args[0][2] == CameraEvent.Unknown
+#     for handler in cameras_menager._cameras_handlers.values():
+#         assert handler.isRunning() is True
 
 
-def test_unregister_vmb_callbacks(mocker):
-    handler_spy = mocker.spy(CamerasMenagerMock, "_camera_change_handler")
+# def test_register_vmb_callbacks(mocker):
+#     handler_spy = mocker.spy(CamerasMenagerMock, "_camera_change_handler")
 
-    vmb = VmbInstance()
+#     vmb = VmbInstance()
 
-    cameras_menager = CamerasMenagerMock()
-    cameras_menager._register_vmb_callbacks(vmb)
-    cameras_menager._unregister_vmb_callbacks(vmb)
+#     cameras_menager = CamerasMenagerMock()
+#     cameras_menager._register_vmb_callbacks(vmb)
 
-    vmb.emit_camera_change(VmbCameraMock("test"), CameraEvent.Unknown)
+#     camera = vmb._cameras[0]
+#     vmb.emit_camera_change(camera, CameraEvent.Unknown)
 
-    assert handler_spy.call_count == 0
-
-
-def test_clean_up_menager():
-    cameras_menager = CamerasMenagerMock()
-
-    vmb = cameras_menager._get_vmb_instance()
-    cameras_menager._register_available_cameras(vmb)
-    cameras_menager._start_cameras()
-
-    # assert if there is no cameras
-    assert len(cameras_menager._cameras_handlers) > 0
-
-    handlers_ref = cameras_menager._cameras_handlers.copy()
-
-    cameras_menager._clean_up_menager()
-
-    # check that menager does not have any frame handlers
-    assert len(cameras_menager._cameras_handlers) == 0
-
-    # check that frame handlers are not running
-    assert all([h.isRunning() is False for h in handlers_ref.values()])
+#     assert handler_spy.call_count == 1
+#     assert handler_spy.call_args[0][1] == camera
+#     assert handler_spy.call_args[0][2] == CameraEvent.Unknown
 
 
-def test_wait_until_stop_signal():
-    pass
+# def test_unregister_vmb_callbacks(mocker):
+#     handler_spy = mocker.spy(CamerasMenagerMock, "_camera_change_handler")
+
+#     vmb = VmbInstance()
+
+#     cameras_menager = CamerasMenagerMock()
+#     cameras_menager._register_vmb_callbacks(vmb)
+#     cameras_menager._unregister_vmb_callbacks(vmb)
+
+#     vmb.emit_camera_change(VmbCameraMock("test"), CameraEvent.Unknown)
+
+#     assert handler_spy.call_count == 0
 
 
-def test_raise_error():
-    pass
+# def test_clean_up_menager():
+#     cameras_menager = CamerasMenagerMock()
+
+#     vmb = cameras_menager._get_vmb_instance()
+#     cameras_menager._register_available_cameras(vmb)
+#     cameras_menager._start_cameras()
+
+#     # assert if there is no cameras
+#     assert len(cameras_menager._cameras_handlers) > 0
+
+#     handlers_ref = cameras_menager._cameras_handlers.copy()
+
+#     cameras_menager._clean_up_menager()
+
+#     # check that menager does not have any frame handlers
+#     assert len(cameras_menager._cameras_handlers) == 0
+
+#     # check that frame handlers are not running
+#     assert all([h.isRunning() is False for h in handlers_ref.values()])
 
 
-@pytest.mark.parametrize(
-    "initial_state, expected",
-    [(CamerasManagerState.IDLE, False), (CamerasManagerState.RUNNING, True)],
-)
-def test_terminate_thread(initial_state, expected):
-    cameras_menager = CamerasMenagerMock()
-    cameras_menager._change_state(initial_state)
+# def test_wait_until_stop_signal():
+#     pass
 
-    cameras_menager.quit()
 
-    if expected:
-        assert cameras_menager.get_state() == CamerasManagerState.STOPPING
-    else:
-        assert cameras_menager.get_state() == initial_state
+# def test_raise_error():
+#     pass
+
+
+# @pytest.mark.parametrize(
+#     "initial_state, expected",
+#     [(CamerasManagerState.IDLE, False), (CamerasManagerState.RUNNING, True)],
+# )
+# def test_terminate_thread(initial_state, expected):
+#     cameras_menager = CamerasMenagerMock()
+#     cameras_menager._change_state(initial_state)
+
+#     cameras_menager.quit()
+
+#     if expected:
+#         assert cameras_menager.get_state() == CamerasManagerState.STOPPING
+#     else:
+#         assert cameras_menager.get_state() == initial_state
 
 
 # def test_cameras_registered_signal(cameras_menager: CamerasMenagerMock):

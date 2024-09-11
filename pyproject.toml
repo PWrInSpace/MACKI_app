@@ -16,6 +16,7 @@ vmbpy = {path = "VmbPy"}
 pytest-mock = "^3.14.0"
 pyqt6 = "^6.7.1"
 opencv-python = "^4.10.0.84"
+pyserial = "^3.5"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"
