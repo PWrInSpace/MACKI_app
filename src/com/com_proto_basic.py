@@ -1,5 +1,3 @@
-
-
 class ComProtoBasic:
     def connect(self):
         """Connect to the device"""

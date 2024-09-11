@@ -2,6 +2,7 @@ import sys
 from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QWidget
 from PySide6.QtCore import Qt
 
+
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -10,7 +11,9 @@ class MainWindow(QWidget):
         self.text_edit = QTextEdit(self)
 
         # Add some example text
-        self.text_edit.setPlainText("This is a QTextEdit widget with scrolling enabled.\n" * 30)
+        self.text_edit.setPlainText(
+            "This is a QTextEdit widget with scrolling enabled.\n" * 30
+        )
         self.text_edit
 
         # Create a layout and add the QTextEdit widget to it
@@ -19,10 +22,12 @@ class MainWindow(QWidget):
 
         # Set the layout on the main window
         self.setLayout(layout)
-        self.setWindowTitle('QTextEdit with Scrollbars - PySide6')
+        self.setWindowTitle("QTextEdit with Scrollbars - PySide6")
 
         # Show scrollbars when content exceeds the visible area (this is the default behavior)
-        self.text_edit.setLineWrapMode(QTextEdit.NoWrap)  # Disable word wrapping for horizontal scrolling
+        self.text_edit.setLineWrapMode(
+            QTextEdit.NoWrap
+        )  # Disable word wrapping for horizontal scrolling
         self.text_edit.setTextColor(Qt.red)
         self.text_edit.append("New line added.\n")
         self.text_edit.setTextColor(Qt.blue)
@@ -40,6 +45,7 @@ class MainWindow(QWidget):
         # Ensure the scrollbar is at the bottom
         scrollbar = self.text_edit.verticalScrollBar()
         scrollbar.setValue(scrollbar.minimum())
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

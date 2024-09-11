@@ -25,7 +25,7 @@ class MacusWidget(QWidget):
     disconencted = Signal()
 
     def __init__(self, macus: MacusSerial) -> None:
-        """ This method initializes the MacusWidget class
+        """This method initializes the MacusWidget class
 
         Args:
             macus (MacusSerial): MacusSerial instance
@@ -39,7 +39,7 @@ class MacusWidget(QWidget):
         self._init_ui()
 
     def _create_settings_box(self) -> QGroupBox:
-        """ This method creates the settings box
+        """This method creates the settings box
 
         Returns:
             QGroupBox: settings box
@@ -76,7 +76,7 @@ class MacusWidget(QWidget):
         return settings_box
 
     def _create_text_box(self) -> QGroupBox:
-        """ This method creates the text box
+        """This method creates the text box
 
         Returns:
             QGroupBox: text box
@@ -96,8 +96,7 @@ class MacusWidget(QWidget):
         return box
 
     def _init_ui(self):
-        """ This method initializes the user interface
-        """
+        """This method initializes the user interface"""
         self.settings_box = self._create_settings_box()
         self.text_box = self._create_text_box()
 
@@ -108,15 +107,14 @@ class MacusWidget(QWidget):
         self.setLayout(grid_layout)
 
     def _on_port_combo_clicked(self):
-        """ This method is called when the port combo is clicked
-        """
+        """This method is called when the port combo is clicked"""
         self._port_combo.clear()
         self._port_combo.addItems(self._macus.get_available_ports())
 
     def _on_connect_button_clicked(self):
-        """ This method is called when the connect button is clicked
-            FIXME: This implementation can lead to invalid button text,
-            when the connection is lost outside of this widget
+        """This method is called when the connect button is clicked
+        FIXME: This implementation can lead to invalid button text,
+        when the connection is lost outside of this widget
         """
         if self._macus.is_connected():
             self._macus.disconnect()
@@ -129,7 +127,7 @@ class MacusWidget(QWidget):
             self.connected.emit()
 
     def _add_message_to_text_box(self, data: str, message_prefix: str = "") -> None:
-        """ This method adds a message to the text box
+        """This method adds a message to the text box
 
         Args:
             data (str): The data to add
@@ -148,7 +146,7 @@ class MacusWidget(QWidget):
         self._text_edit.insertPlainText(message_prefix + data)
 
     def _add_tx_message_to_text_box(self, message: str) -> None:
-        """ This method adds a TX message to the text box
+        """This method adds a TX message to the text box
 
         Args:
             message (str): The message to add
@@ -156,7 +154,7 @@ class MacusWidget(QWidget):
         self._add_message_to_text_box(message, self.TX_PREFIX)
 
     def _add_rx_message_to_text_box(self, message: str) -> None:
-        """ This method adds a RX message to the text box
+        """This method adds a RX message to the text box
 
         Args:
             message (str): The message to add

@@ -20,7 +20,7 @@ class MacusSerial(ComProtoBasic):
         self,
         com_port: str = None,
         on_rx_callback: Callable[[str], None] = None,
-        on_tx_callback: Callable[[str], None] = None
+        on_tx_callback: Callable[[str], None] = None,
     ) -> None:
         """This method initializes the MacusSerial class
 

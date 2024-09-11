@@ -27,18 +27,25 @@ def macus_widget() -> MacusWidget:
 
 def test_macus_widget_init(qapp, macus_widget: MacusWidget):
     assert isinstance(macus_widget._macus, MacusSerial)
-    assert macus_widget._macus._on_rx_callback == macus_widget._add_rx_message_to_text_box
-    assert macus_widget._macus._on_tx_callback == macus_widget._add_tx_message_to_text_box
+    assert (
+        macus_widget._macus._on_rx_callback == macus_widget._add_rx_message_to_text_box
+    )
+    assert (
+        macus_widget._macus._on_tx_callback == macus_widget._add_tx_message_to_text_box
+    )
 
 
 # check _on_port_combo_clicked
 def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
     available_ports = ["COM1", "COM2"]
-    mocker.patch.object(macus_widget._macus, "get_available_ports", return_value=available_ports)
+    mocker.patch.object(
+        macus_widget._macus, "get_available_ports", return_value=available_ports
+    )
     QTest.mouseClick(macus_widget._port_combo, Qt.LeftButton)
 
     combo_items = [
-        macus_widget._port_combo.itemText(i) for i in range(macus_widget._port_combo.count())
+        macus_widget._port_combo.itemText(i)
+        for i in range(macus_widget._port_combo.count())
     ]
 
     assert combo_items == available_ports
@@ -55,7 +62,7 @@ def test_connect_button_connected(macus_widget: MacusWidget, mocker):
     QTest.mouseClick(macus_widget._connect_button, Qt.LeftButton)
 
     assert macus_widget._connect_button.text() == macus_widget.BUTTON_DISCONNECT
-    connect_mock.assert_called_once_with("COM1")    # port is not set
+    connect_mock.assert_called_once_with("COM1")  # port is not set
     connected_stub.assert_called_once()
 
 
@@ -71,14 +78,19 @@ def test_connect_button_disconnected(macus_widget: MacusWidget, mocker):
     disconnect_mock.assert_called_once()
 
 
-@pytest.mark.parametrize("message, prefix, expected_color", [
-    ("test\n",                      "",     Qt.white),
-    (MacusSerial.ACK + "test",      "aaa",  Qt.green),
-    (MacusSerial.NACK + "test",     "ccc",  Qt.red),
-    ("tdd" + MacusSerial.ACK + "a", "",   Qt.white),
-    ("asdasad" + MacusSerial.NACK,  "",   Qt.white),
-])
-def test_add_message_to_text_box(message, prefix, expected_color, macus_widget: MacusWidget):
+@pytest.mark.parametrize(
+    "message, prefix, expected_color",
+    [
+        ("test\n", "", Qt.white),
+        (MacusSerial.ACK + "test", "aaa", Qt.green),
+        (MacusSerial.NACK + "test", "ccc", Qt.red),
+        ("tdd" + MacusSerial.ACK + "a", "", Qt.white),
+        ("asdasad" + MacusSerial.NACK, "", Qt.white),
+    ],
+)
+def test_add_message_to_text_box(
+    message, prefix, expected_color, macus_widget: MacusWidget
+):
     macus_widget._add_message_to_text_box(message, prefix)
 
     if not message.endswith("\n"):
