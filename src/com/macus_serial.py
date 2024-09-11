@@ -1,4 +1,4 @@
-from typing import override
+from typing import override, Callable
 import serial
 import serial.tools.list_ports
 
@@ -16,18 +16,25 @@ class MacusSerial(ComProtoBasic):
     ACK = "ACK"
     NACK = "NACK"
 
-    def __init__(self, com_port: str = None) -> None:
+    def __init__(
+        self,
+        com_port: str = None,
+        on_rx_callback: Callable[[str], None] = None,
+        on_tx_callback: Callable[[str], None] = None
+    ) -> None:
         """This method initializes the MacusSerial class
 
         Args:
             com_port (str, optional): com port to connect to. Defaults to None.
         """
-        super().__init__()
         self._serial = serial.Serial()
         self._serial.port = com_port
         self._serial.baudrate = self.BAUDRATE
         self._serial.timeout = self.READ_TIMEOUT_S
         self._serial.write_timeout = self.WRITE_TIMEOUT_S
+
+        self._on_rx_callback = on_rx_callback
+        self._on_tx_callback = on_tx_callback
 
     @override
     def connect(self, com_port: str = None) -> None:
@@ -74,10 +81,14 @@ class MacusSerial(ComProtoBasic):
         if not self._serial.is_open:
             raise PortNotOpenError()
 
+        tx_data = data
         if not data.endswith(self.EOF):
-            data += self.EOF
+            tx_data += self.EOF
 
-        self._serial.write(data.encode())
+        self._serial.write(tx_data.encode())
+
+        if self._on_tx_callback:
+            self._on_tx_callback(data)
 
     @override
     def read(self, read_timeout_s: float = 0.1) -> str:
@@ -96,9 +107,13 @@ class MacusSerial(ComProtoBasic):
             raise PortNotOpenError()
 
         self._serial.timeout = read_timeout_s
-        response = self._serial.read_until(self.EOF.encode())
+        raw_response = self._serial.read_until(self.EOF.encode())
+        response = raw_response.decode().strip()
 
-        return response.decode().strip()
+        if self._on_rx_callback:
+            self._on_rx_callback(response)
+
+        return response
 
     @override
     def is_connected(self) -> bool:
@@ -116,6 +131,22 @@ class MacusSerial(ComProtoBasic):
             list[str]: The list of available COM ports
         """
         return serial.tools.list_ports.comports()
+
+    def set_rx_callback(self, callback: Callable[[str], None]) -> None:
+        """This method sets the callback for received data
+
+        Args:
+            callback (Callable[[str], None]): The callback function
+        """
+        self._on_rx_callback = callback
+
+    def set_tx_callback(self, callback: Callable[[str], None]) -> None:
+        """This method sets the callback for transmitted data
+
+        Args:
+            callback (Callable[[str], None]): The callback function
+        """
+        self._on_tx_callback = callback
 
     # def read_response(self) -> str:
     #     """ This method reads the response from the device

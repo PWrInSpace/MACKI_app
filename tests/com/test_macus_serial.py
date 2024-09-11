@@ -37,6 +37,8 @@ def test_init_without_port(macus: MacusSerial):
     assert macus._serial.baudrate == MacusSerial.BAUDRATE
     assert macus._serial.timeout == MacusSerial.READ_TIMEOUT_S
     assert macus._serial.write_timeout == MacusSerial.WRITE_TIMEOUT_S
+    assert macus._on_rx_callback is None
+    assert macus._on_tx_callback is None
 
 
 def test_init_with_port(macus: MacusSerial):
@@ -45,6 +47,23 @@ def test_init_with_port(macus: MacusSerial):
     assert macus._serial.baudrate == MacusSerial.BAUDRATE
     assert macus._serial.timeout == MacusSerial.READ_TIMEOUT_S
     assert macus._serial.write_timeout == MacusSerial.WRITE_TIMEOUT_S
+    assert macus._on_rx_callback is None
+    assert macus._on_tx_callback is None
+
+
+def test_init_with_port_and_callbacks(macus: MacusSerial):
+    def callback(data: str):
+        pass
+
+    macus = MacusSerial(COM_PORT, callback, callback)
+
+    assert isinstance(macus._serial, serial.Serial)
+    assert macus._serial.port == COM_PORT
+    assert macus._serial.baudrate == MacusSerial.BAUDRATE
+    assert macus._serial.timeout == MacusSerial.READ_TIMEOUT_S
+    assert macus._serial.write_timeout == MacusSerial.WRITE_TIMEOUT_S
+    assert macus._on_rx_callback == callback
+    assert macus._on_tx_callback == callback
 
 
 def test_connect_pass(macus: MacusSerial):
@@ -172,6 +191,47 @@ def test_get_available_ports_ret_value(macus, mocker):
 
     ports = macus.get_available_ports()
     assert ports == [COM_PORT]
+
+
+def test_set_rx_callback(macus: MacusSerial):
+    def callback(data: str):
+        pass
+
+    macus.set_rx_callback(callback)
+
+    assert macus._on_rx_callback == callback
+
+
+def test_set_tx_callback(macus: MacusSerial):
+    def callback(data: str):
+        pass
+
+    macus.set_tx_callback(callback)
+
+    assert macus._on_tx_callback == callback
+
+
+def test_write_with_callback(macus: MacusSerial, mocker):
+    stub = mocker.stub()
+
+    macus.set_tx_callback(stub)
+
+    macus.connect()
+    macus.write("test")
+
+    stub.assert_called_with("test")
+
+
+def test_read_with_callback(macus: MacusSerial, mocker):
+    mocker.patch.object(macus._serial, "read_until", return_value=b"a\n\r")
+    stub = mocker.stub()
+
+    macus.set_rx_callback(stub)
+
+    macus.connect()
+    macus.read()
+
+    stub.assert_called_with("a")
 
 
 def test_write_command(macus: MacusSerial, mocker):
