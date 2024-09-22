@@ -34,8 +34,7 @@ class MacusWidget(QWidget):
         """
         super().__init__()
 
-        self._state = MacusWidgetState.DISCONNECTED
-
+        self._state = MacusWidgetState.UNKNOWN
         self._serial = MacusSerial()
         self._serial.set_rx_callback(self._add_rx_message_to_text_box)
         self._serial.set_tx_callback(self._add_tx_message_to_text_box)
@@ -45,6 +44,8 @@ class MacusWidget(QWidget):
         self._status_timer.start(1000)
 
         self._init_ui()
+
+        self._change_state(MacusWidgetState.DISCONNECTED)
 
     def _create_settings_box(self) -> QGroupBox:
         """This method creates the settings box
@@ -67,16 +68,27 @@ class MacusWidget(QWidget):
         horizontal_line.setFrameShape(QLabel.HLine)
         horizontal_line.setFrameShadow(QLabel.Sunken)
 
+        state_prefix = QLabel("State: ")
+        self._state_label = QLabel()
+        self._state_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+
         self._connect_button = QPushButton(self.BUTTON_CONNECT)
         self._connect_button.clicked.connect(self._on_connect_button_clicked)
 
+        horizontal_line2 = QLabel()
+        horizontal_line2.setFrameShape(QLabel.HLine)
+        horizontal_line2.setFrameShadow(QLabel.Sunken)
+
         grid_layout = QGridLayout()
-        grid_layout.addWidget(port_label, 0, 0)
-        grid_layout.addWidget(self._port_combo, 1, 0)
-        grid_layout.addWidget(baudrate_label, 2, 0)
-        grid_layout.addWidget(self._baudrate_combo, 3, 0)
-        grid_layout.addWidget(horizontal_line, 4, 0)
-        grid_layout.addWidget(self._connect_button, 5, 0)
+        grid_layout.addWidget(port_label, 0, 0, 1, 2)
+        grid_layout.addWidget(self._port_combo, 1, 0, 1, 2)
+        grid_layout.addWidget(baudrate_label, 2, 0, 1, 2)
+        grid_layout.addWidget(self._baudrate_combo, 3, 0, 1, 2)
+        # grid_layout.addWidget(horizontal_line, 4, 0, 1, 2)
+        grid_layout.addWidget(self._connect_button, 5, 0, 1, 2)
+        grid_layout.addWidget(horizontal_line2, 6, 0, 1, 2)
+        grid_layout.addWidget(state_prefix, 7, 0, 1, 1)
+        grid_layout.addWidget(self._state_label, 7, 1, 1, 1)
 
         settings_box = QGroupBox("Settings")
         settings_box.setLayout(grid_layout)
@@ -181,13 +193,17 @@ class MacusWidget(QWidget):
         match state:
             case MacusWidgetState.DISCONNECTED:
                 self._connect_button.setText(self.BUTTON_CONNECT)
+                self._state_label.setStyleSheet("color: red;")
+                self._state_label.setText("DISCONNECTED")
                 self.disconencted.emit()
             case MacusWidgetState.CONNECTED:
                 self._connect_button.setText(self.BUTTON_DISCONNECT)
+                self._state_label.setStyleSheet("color: #9BEC00;")
+                self._state_label.setText("CONNECTED")
                 self.connected.emit()
             case MacusWidgetState.MISSING:
-                self._text_edit.setTextColor(Qt.red)
-                self._text_edit.insertPlainText("MISSING\n")
+                self._state_label.setStyleSheet("color: yellow;")
+                self._state_label.setText("MISSING")
                 self.missing.emit()
 
     def _timer_routine(self):
@@ -217,13 +233,15 @@ class MacusWidget(QWidget):
 
         if missing_port in ports:
             try:
-                self._serial.disconnect()
+                if self._serial.is_connected():
+                    self._serial.disconnect()
+
                 self._serial.connect(missing_port)
                 self._change_state(MacusWidgetState.CONNECTED)
             except Exception as exc:
-                # can't reconnect to the missing port
-                self._change_state(MacusWidgetState.DISCONNECTED)
-                raise RuntimeError(f"Can't reconnect to the missing port: {exc}")
+                # workaround: on error try again, sometimes the serial raises
+                # an error even if the port is available, the second try should works
+                logger.warning(f"Can't reconnect to the missing port: {exc}")
 
     @property
     def serial(self) -> MacusSerial:

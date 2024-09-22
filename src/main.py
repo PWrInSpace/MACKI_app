@@ -23,8 +23,8 @@ class MainWindow(QMainWindow):
         # layout.addWidget(self.cameras)
 
         self.macus_widget = MacusWidget()
-        self.macus_widget.settings_box.setFixedWidth(200)
-        self.macus_widget.setFixedSize(600, 200)
+        self.macus_widget.settings_box.setFixedWidth(240)
+        self.macus_widget.setFixedSize(700, 240)
         layout.addWidget(self.macus_widget)
 
         widget = QWidget()

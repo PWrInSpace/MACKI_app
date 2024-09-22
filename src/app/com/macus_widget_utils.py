@@ -7,3 +7,4 @@ class MacusWidgetState(Enum):
     DISCONNECTED = 0
     CONNECTED = 1
     MISSING = 2
+    UNKNOWN = 99
