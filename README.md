@@ -29,7 +29,7 @@ M.A.C.K.I., or Microgravity Actuated Capturing Kinetic Instrument, is a project 
 
 4. **Install the dependencies:**
     ```sh
-    pip install -r requirements.txt
+    pip install -e .
     ```
 
 5. **Run the application:**
