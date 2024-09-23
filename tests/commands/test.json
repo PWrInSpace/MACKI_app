@@ -1,0 +1,60 @@
+{
+    "group_name": "test",
+    "max_columns_nb": 4,
+    "commands": [
+        {
+            "cmd_type": "QSerialCmd",
+            "name": "test_cmd_1",
+            "args": [
+                {
+                    "arg_type": "QArgInt",
+                    "name": "cmd1_arg1",
+                    "default_value": 0,
+                    "min_value": 0,
+                    "max_value": 10,
+                    "unit": "g",
+                    "description": "First argument"
+                },
+                {
+                    "arg_type": "QArgEnum",
+                    "name": "cmd1_arg2",
+                    "enum": {
+                        "test": 0,
+                        "test2": 1,
+                        "test3": 2
+                    },
+                    "default_name": "test2",
+                    "description": "Second argument"
+                }
+            ]
+        },
+        {
+            "cmd_type": "QSerialCmd",
+            "name": "test_cmd_2",
+            "args": [
+            {
+                "arg_type": "QArgInt",
+                "name": "cmd2_arg1",
+                "default_value": 0,
+                "min_value": 0,
+                "max_value": 10,
+                "unit": "g",
+                "description": "First argument"
+            },
+            {
+                "arg_type": "QArgFloat",
+                "name": "cmd2_arg2",
+                "default_value": 0,
+                "min_value": 0,
+                "max_value": 10,
+                "unit": "g",
+                "description": "Second argument"
+            }
+            ]
+        },
+        {
+            "cmd_type": "QProcedureCmd",
+            "name": "test_cmd_3"
+        }
+        ]
+    }

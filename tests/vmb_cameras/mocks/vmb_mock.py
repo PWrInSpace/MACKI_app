@@ -1,5 +1,5 @@
 from typing import Callable
-from tests.cameras.mocks.vmb_camera_mock import VmbCameraMock
+from tests.vmb_cameras.mocks.vmb_camera_mock import VmbCameraMock
 from vmbpy import CameraEvent
 
 
