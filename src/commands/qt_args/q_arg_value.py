@@ -4,6 +4,8 @@ from PySide6.QtWidgets import QVBoxLayout, QAbstractSpinBox
 
 
 class QArgValue(QArgBasic):
+    ALLOWED_TYPES = (type(None))
+
     def __init__(
         self,
         name: str,
@@ -52,16 +54,20 @@ class QArgValue(QArgBasic):
 
         super().__init__(name, description)
 
-    def _check_type(self, value: int | float) -> None:
+    def _check_type(self, value: int | float | None) -> bool:
         """Check if value is of the correct type
 
         Args:
-            value (int): value to be checked
+            value (int | float | None): value to check
+
+        Raises:
+            ValueError: Value is not of the correct type
 
         Returns:
-            bool: True if value is of the correct type, False otherwise
+            bool: True if value is of the correct type
         """
-        raise NotImplementedError("Methode not implemented")
+        if not isinstance(value, self.ALLOWED_TYPES):
+            raise ValueError(f"Value {value} is not of type {self.ALLOWED_TYPES}")
 
     def _create_spin_box(self) -> QAbstractSpinBox:
         """Create spin box widget, that will be used to set the argument gui

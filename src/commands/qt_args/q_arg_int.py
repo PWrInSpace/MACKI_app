@@ -26,21 +26,6 @@ class QArgInt(QArgValue):
         """
         super().__init__(name, default_value, min_value, max_value, unit, description)
 
-    def _check_type(self, value: int | None) -> bool:
-        """Check if value is of the correct type
-
-        Args:
-            value (int | None): value to check
-
-        Raises:
-            ValueError: Value is not of the correct type
-
-        Returns:
-            bool: True if value is of the correct type
-        """
-        if not isinstance(value, self.ALLOWED_TYPES):
-            raise ValueError(f"Value {value} is not of type {self.ALLOWED_TYPES}")
-
     def _create_spin_box(self) -> QAbstractSpinBox:
         """Create a new QSpinBox that is used to create the widget
 

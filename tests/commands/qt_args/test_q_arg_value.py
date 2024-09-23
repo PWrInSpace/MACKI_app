@@ -27,9 +27,14 @@ def arg_value():
     )
 
 
-def test_init_fail():
-    with pytest.raises(NotImplementedError):
+def test_init_fail_invalid_type():
+    with pytest.raises(ValueError):
         QArgValue(ARG_NAME, DEFAULT_VALUE, MIN_VALUE, MAX_VALUE, UNIT, DESCRIPTION)
+
+
+def test_init_fail_spinbox_not_implemented():
+    with pytest.raises(NotImplementedError):
+        QArgValue(ARG_NAME, None, None, None, UNIT, DESCRIPTION)
 
 
 @pytest.mark.parametrize(
