@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QVBoxLayout, QAbstractSpinBox
 
 
 class QArgValue(QArgBasic):
-    ALLOWED_TYPES = (type(None))
+    ALLOWED_TYPES = type(None)
 
     def __init__(
         self,
