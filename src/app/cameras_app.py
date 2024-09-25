@@ -30,34 +30,34 @@ class QCameraApp(QCamerasManager):
     def __init__(self):
         cameras = [
             QCameraWidget(
-                name="CAM1",
-                id="DEV_000F315DEEA8",
+                name="Alvium 1",
+                id="DEV_000A4727B2BF",
                 handlers=[
                     FrameDisplay(
-                        "CAM1",
+                        "Alvium 1",
                         MACKI_LOGO_PATH,
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
                     ),
-                    VideoWriter("CAM1", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
+                    VideoWriter("Alvium 1", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
                 ],
-                camera_config_file=MAKO_CONFIG_FILE,
+                camera_config_file=ALVIUM_CONFIG_FILE,
             ),
             QCameraWidget(
-                name="CAM2",
-                id="DEV_000F315DEEAA",
+                name="Alvium 2",
+                id="DEV_000A472B9D47",
                 handlers=[
                     FrameDisplay(
-                        "CAM2",
+                        "Alvium 2",
                         MACKI_LOGO_PATH,
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
                     ),
-                    VideoWriter("CAM2", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
+                    VideoWriter("Alvium 2", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
                 ],
-                camera_config_file=MAKO_CONFIG_FILE,
+                camera_config_file=ALVIUM_CONFIG_FILE,
             ),
             QCameraWidget(
                 name="CAM3",
