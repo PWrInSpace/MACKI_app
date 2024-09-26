@@ -20,18 +20,18 @@ def qapp():
 
 @pytest.fixture
 def macus_widget() -> MacusWidget:
-    macus_serial = MacusSerial()
+    # macus_serial = MacusSerial()
 
-    return MacusWidget(macus_serial)
+    return MacusWidget()
 
 
-def test_macus_widget_init(qapp, macus_widget: MacusWidget):
-    assert isinstance(macus_widget._macus, MacusSerial)
+def test_macus_widget_init(macus_widget: MacusWidget):
+    assert isinstance(macus_widget._serial, MacusSerial)
     assert (
-        macus_widget._macus._on_rx_callback == macus_widget._add_rx_message_to_text_box
+        macus_widget._serial._on_rx_callback == macus_widget._add_rx_message_to_text_box
     )
     assert (
-        macus_widget._macus._on_tx_callback == macus_widget._add_tx_message_to_text_box
+        macus_widget._serial._on_tx_callback == macus_widget._add_tx_message_to_text_box
     )
 
 
@@ -39,7 +39,7 @@ def test_macus_widget_init(qapp, macus_widget: MacusWidget):
 def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
     available_ports = ["COM1", "COM2"]
     mocker.patch.object(
-        macus_widget._macus, "get_available_ports", return_value=available_ports
+        macus_widget._serial, "get_available_ports", return_value=available_ports
     )
     QTest.mouseClick(macus_widget._port_combo, Qt.LeftButton)
 
@@ -55,7 +55,7 @@ def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
 def test_connect_button_connected(macus_widget: MacusWidget, mocker):
     # Connect
     mocker.patch.object(macus_widget._port_combo, "currentText", return_value="COM1")
-    connect_mock = mocker.patch.object(macus_widget._macus, "connect")
+    connect_mock = mocker.patch.object(macus_widget._serial, "connect")
     connected_stub = mocker.stub()
     macus_widget.connected.connect(connected_stub)
 
@@ -69,8 +69,8 @@ def test_connect_button_connected(macus_widget: MacusWidget, mocker):
 # Disconnect, right now _on_button_clicked function only check the status of serial,
 # so we do not need to click the button to connect first, we only mock serial status
 def test_connect_button_disconnected(macus_widget: MacusWidget, mocker):
-    mocker.patch.object(macus_widget._macus, "is_connected", return_value=True)
-    disconnect_mock = mocker.patch.object(macus_widget._macus, "disconnect")
+    mocker.patch.object(macus_widget._serial, "is_connected", return_value=True)
+    disconnect_mock = mocker.patch.object(macus_widget._serial, "disconnect")
 
     QTest.mouseClick(macus_widget._connect_button, Qt.LeftButton)
 

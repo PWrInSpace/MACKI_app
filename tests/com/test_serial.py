@@ -268,3 +268,7 @@ def test_write_command_with_args(serial_port: SerialPort, mocker):
 
     serial_port.write_command(command, "arg1", "arg2")
     write_spy.assert_called_with(f"{command} arg1 arg2")
+
+
+def test_port_property(serial_port: SerialPort):
+    assert serial_port.port == COM_PORT

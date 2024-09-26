@@ -1,3 +1,4 @@
+import logging
 from typing import override, Callable
 import serial
 import serial.tools.list_ports
@@ -5,6 +6,8 @@ import serial.tools.list_ports
 from serial.serialutil import PortNotOpenError, SerialException
 
 from src.com.com_proto_basic import ComProtoBasic
+
+logger = logging.getLogger(__name__)
 
 
 class SerialPort(ComProtoBasic):
@@ -26,6 +29,10 @@ class SerialPort(ComProtoBasic):
 
         Args:
             com_port (str, optional): com port to connect to. Defaults to None.
+            on_rx_callback (Callable[[str], None], optional): callback for received data.
+            Defaults to None.
+            on_tx_callback (Callable[[str], None], optional): callback for transmitted data.
+            Defaults to None
         """
         self._serial = serial.Serial()
         self._serial.port = com_port
@@ -78,7 +85,7 @@ class SerialPort(ComProtoBasic):
         Raises:
             PortNotOpenError: Serial port is not open
         """
-        if not self._serial.is_open:
+        if not self.is_connected():
             raise PortNotOpenError()
 
         tx_data = data
@@ -103,7 +110,7 @@ class SerialPort(ComProtoBasic):
         Returns:
             str: The data read from the serial port
         """
-        if not self._serial.is_open:
+        if not self.is_connected():
             raise PortNotOpenError()
 
         self._serial.timeout = read_timeout_s
@@ -124,7 +131,8 @@ class SerialPort(ComProtoBasic):
         """
         return self._serial.is_open
 
-    def get_available_ports(self) -> list[str]:
+    @staticmethod
+    def get_available_ports() -> list[str]:
         """This method lists the available COM ports
 
         Returns:

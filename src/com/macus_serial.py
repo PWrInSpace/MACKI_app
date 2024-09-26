@@ -131,7 +131,7 @@ class MacusSerial(ComProtoBasic):
             list[str]: The list of available COM ports
         """
         ports = serial.tools.list_ports.comports()
-        return [port.device for port in ports]
+        return [port for port in ports]
 
     def set_rx_callback(self, callback: Callable[[str], None]) -> None:
         """This method sets the callback for received data
