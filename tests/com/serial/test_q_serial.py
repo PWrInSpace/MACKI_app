@@ -46,10 +46,7 @@ def qserial(pyserial_mock, mocker) -> SerialPort:
 
 def test_init(pyserial_mock):
     serial_port = QSerial(
-        PORT,
-        BAUDRATE,
-        on_rx_callback=rx_callback,
-        on_tx_callback=tx_callback
+        PORT, BAUDRATE, on_rx_callback=rx_callback, on_tx_callback=tx_callback
     )
 
     assert isinstance(serial_port, SerialPort)

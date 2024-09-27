@@ -1,13 +1,18 @@
-import pytest
 from contextlib import nullcontext as does_not_rise
-import serial
 
+import serial
+import serial.serialutil
+from serial.tools.list_ports_common import ListPortInfo
+
+import pytest
 from PySide6.QtCore import QReadWriteLock, QThread
 from PySide6.QtCore import Qt
-import serial.serialutil
-from src.com.serial.qserial_state import QSerialStateControlThread, QSerialState
-# from app.com.qserial_state import QSerialState, SerialStateControlThread
+
 from src.com.serial import SerialPort
+from src.com.serial.qserial_state import QSerialStateControlThread, QSerialState
+from tests.com.serial.serial_mock import SerialMock
+
+SLEEP_TIME_MS = 20
 
 
 @pytest.fixture
@@ -56,7 +61,9 @@ def test_get_state_pass(state_control, mocker):
 
 
 def test_get_state_unable_to_lock(state_control, mocker):
-    mocker.patch.object(state_control._state_mutex, "tryLockForRead", return_value=False)
+    mocker.patch.object(
+        state_control._state_mutex, "tryLockForRead", return_value=False
+    )
 
     assert state_control.get_state() == QSerialState.UNKNOWN
 
@@ -105,7 +112,9 @@ def test_change_state_unable_to_lock(state_control, mocker):
     state_control.missed.connect(stub)
 
     # patch the mutex to return False
-    mocker.patch.object(state_control._state_mutex, "tryLockForWrite", return_value=False)
+    mocker.patch.object(
+        state_control._state_mutex, "tryLockForWrite", return_value=False
+    )
 
     state_control.change_state(QSerialState.MISSING)
     assert state_control._state == QSerialState.DISCONNECTED
@@ -136,15 +145,27 @@ def test_check_disconnect_condition(state_control, mocker):
 
 def test_check_missing_condition_true(state_control, mocker):
     # we have to patch the pyserial port to return COM1
+    available_ports = [
+        ListPortInfo("COM2", True),
+        ListPortInfo("COM3", True),
+    ]
     mocker.patch.object(state_control._serial._serial, "_port", "COM1")
-    mocker.patch.object(state_control._serial, "get_available_ports", return_value=["COM2", "COM3"])
+    mocker.patch.object(
+        state_control._serial, "get_available_ports", return_value=available_ports
+    )
 
     assert state_control._check_missing_condition() is True
 
 
 def test_check_missing_condition_false(state_control, mocker):
+    available_ports = [
+        ListPortInfo("COM1", True),
+        ListPortInfo("COM2", True),
+    ]
     mocker.patch.object(state_control._serial._serial, "_port", "COM1")
-    mocker.patch.object(state_control._serial, "get_available_ports", return_value=["COM1", "COM2"])
+    mocker.patch.object(
+        state_control._serial, "get_available_ports", return_value=available_ports
+    )
 
     assert state_control._check_missing_condition() is False
 
@@ -162,7 +183,9 @@ def test_connected_state_routine_disconnect(state_control, mocker):
 def test_connected_state_routine_missing(state_control, mocker):
     spy = mocker.spy(state_control, "change_state")
 
-    mocker.patch.object(state_control, "_check_disconnect_condition", return_value=False)
+    mocker.patch.object(
+        state_control, "_check_disconnect_condition", return_value=False
+    )
     mocker.patch.object(state_control, "_check_missing_condition", return_value=True)
 
     state_control._connected_state_routine()
@@ -206,16 +229,31 @@ def test_missing_state_routine_still_missing(state_control, mocker):
     mocker.patch.object(state_control, "_check_missing_condition", return_value=True)
 
     state_control._missing_state_routine()
+    assert state_control._reconnecting_attempts == 0
     spy.assert_not_called()
 
 
 def test_missing_state_routine_reconnect(state_control, mocker):
-    spy = mocker.spy(state_control, "_reconnect_to_missing_port")
+    mocker.patch.object(state_control, "_reconnect_to_missing_port")
 
     mocker.patch.object(state_control, "_check_missing_condition", return_value=False)
 
     state_control._missing_state_routine()
-    spy.assert_called_once()
+    assert state_control._reconnecting_attempts == 0
+
+
+def test_missing_state_routine_reconnect_raises(state_control, mocker):
+    mocker.patch.object(state_control, "_check_missing_condition", return_value=False)
+    mocker.patch.object(
+        state_control,
+        "_reconnect_to_missing_port",
+        side_effect=serial.serialutil.PortNotOpenError,
+    )
+
+    with does_not_rise():
+        state_control._missing_state_routine()
+
+    assert state_control._reconnecting_attempts == 1
 
 
 def test_missing_state_reconnect_exception(state_control, mocker):
@@ -223,7 +261,7 @@ def test_missing_state_reconnect_exception(state_control, mocker):
     mocker.patch.object(
         state_control,
         "_reconnect_to_missing_port",
-        side_effect=serial.serialutil.PortNotOpenError
+        side_effect=serial.serialutil.PortNotOpenError,
     )
 
     with does_not_rise():
@@ -249,7 +287,7 @@ def test_thread_connected_state(state_control, mocker):
 
     state_control.change_state(QSerialState.CONNECTED)
     state_control.start()
-    QThread.msleep(20)
+    QThread.msleep(SLEEP_TIME_MS)
 
     mocker.patch.object(state_control._thread_stop, "occurs", return_value=True)
     spy_connected.assert_called()
@@ -267,7 +305,7 @@ def test_thread_disconnected_state(state_control, mocker):
     spy_disconnect = mocker.spy(state_control, "_disconnected_state_routine")
 
     state_control.start()
-    QThread.msleep(10)
+    QThread.msleep(SLEEP_TIME_MS)
 
     mocker.patch.object(state_control._thread_stop, "occurs", return_value=True)
     spy_disconnect.assert_called()
@@ -286,7 +324,7 @@ def test_thread_missing_state(state_control, mocker):
 
     state_control.change_state(QSerialState.MISSING)
     state_control.start()
-    QThread.msleep(10)
+    QThread.msleep(SLEEP_TIME_MS)
 
     mocker.patch.object(state_control._thread_stop, "occurs", return_value=True)
     spy_missing.assert_called()
@@ -296,17 +334,17 @@ def test_thread_missing_state(state_control, mocker):
     state_control.wait()
 
 
-def test_terminate(state_control, mocker):
+def test_terminate(state_control):
     state_control.terminate()
 
     assert state_control._thread_stop.occurs() is True
 
 
-def test_terminate_stop_thread(state_control, mocker):
+def test_terminate_stop_thread(state_control):
     state_control.start()
     state_control.terminate()
 
-    QThread.msleep(50)
+    QThread.msleep(SLEEP_TIME_MS)
 
     assert state_control.isRunning() is False
 
@@ -316,20 +354,59 @@ def test_reactions_on_serial_changes(state_control, mocker):
     stub_missing = mocker.stub()
     stub_disconnect = mocker.stub()
 
+    # direct connection to avoid the event loop
     state_control.connected.connect(stub_connected, Qt.DirectConnection)
-    state_control.missed.connect(stub_missing)
-    state_control.disconnected.connect(stub_disconnect)
+    state_control.missed.connect(stub_missing, Qt.DirectConnection)
+    state_control.disconnected.connect(stub_disconnect, Qt.DirectConnection)
 
+    serial_mock = SerialMock()
+    state_control._serial = serial_mock
     state_control.start()
-    QThread.msleep(10)
 
-    mocker.patch.object(state_control, "_check_missing_condition", return_value=False)
-    mocker.patch.object(state_control._serial._serial, "is_open", return_value=True)
+    serial_mock.set_open(True)
 
-    QThread.msleep(10)
-
+    QThread.msleep(SLEEP_TIME_MS)
     assert state_control.get_state() == QSerialState.CONNECTED
     assert stub_connected.call_count == 1
+    assert stub_missing.call_count == 0
+    assert stub_disconnect.call_count == 0
+
+    # Disconnect
+    serial_mock.set_open(False)
+
+    QThread.msleep(SLEEP_TIME_MS * 2)
+    assert state_control.get_state() == QSerialState.DISCONNECTED
+    assert stub_connected.call_count == 1
+    assert stub_missing.call_count == 0
+    assert stub_disconnect.call_count == 1
+
+    # Connect again
+    serial_mock.set_open(True)
+
+    QThread.msleep(SLEEP_TIME_MS)
+    assert state_control.get_state() == QSerialState.CONNECTED
+    assert stub_connected.call_count == 2
+    assert stub_missing.call_count == 0
+    assert stub_disconnect.call_count == 1
+
+    # change the state to missing
+    serial_mock.set_available_ports(False)
+
+    QThread.msleep(SLEEP_TIME_MS)
+
+    assert state_control.get_state() == QSerialState.MISSING
+    assert stub_connected.call_count == 2
+    assert stub_missing.call_count == 1
+    assert stub_disconnect.call_count == 1
+
+    # Close the port
+    serial_mock.set_open(False)
+
+    QThread.msleep(SLEEP_TIME_MS)
+    assert state_control.get_state() == QSerialState.DISCONNECTED
+    assert stub_connected.call_count == 2
+    assert stub_missing.call_count == 1
+    assert stub_disconnect.call_count == 2
 
     state_control.terminate()
     state_control.wait()

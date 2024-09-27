@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from PySide6.QtCore import Qt, Signal, QTimer
+from PySide6.QtCore import Qt, QTimer
 from src.com.serial import QSerial, QSerialStateControlThread
 from src.utils.qt.better_combo_box import BetterComboBox
 
@@ -26,8 +26,7 @@ class MacusWidget(QWidget):
     PORTS_TIMER_INTERVAL_MS = 1000
 
     def __init__(self) -> None:
-        """This method initializes the MacusWidget class
-        """
+        """This method initializes the MacusWidget class"""
         super().__init__()
 
         self._com_serial = QSerial(baudrate=self.BAUDRATES[0])
@@ -125,8 +124,10 @@ class MacusWidget(QWidget):
     def _update_availabel_ports(self):
         """This method is called when the port combo is clicked"""
         current_port = self._port_combo.currentText()
+        available_ports = [port.name for port in self._com_serial.get_available_ports()]
+
         self._port_combo.clear()
-        self._port_combo.addItems(self._com_serial.get_available_ports())
+        self._port_combo.addItems(available_ports)
         self._port_combo.setCurrentText(current_port)
 
     def _on_connect_button_clicked(self):

@@ -1,5 +1,7 @@
 import pytest
 
+from serial.tools.list_ports_common import ListPortInfo
+
 from PySide6.QtCore import Qt, QThread
 from PySide6.QtTest import QTest
 
@@ -8,25 +10,34 @@ from src.com.serial import QSerial, QSerialStateControlThread
 
 
 @pytest.fixture
-def macus_widget() -> MacusWidget:
+def macus_widget(mocker):
     widget = MacusWidget()
-    return widget
+    yield widget
+
+    # patch disconnect to avoid exception
+    mocker.patch.object(widget._com_serial, "disconnect")
+    widget.quit()
 
 
 def test_macus_widget_init(macus_widget: MacusWidget):
     assert isinstance(macus_widget._com_serial, QSerial)
     assert macus_widget._com_serial_state.isRunning() is True
     assert (
-        macus_widget._com_serial._on_rx_callback == macus_widget._add_rx_message_to_text_box
+        macus_widget._com_serial._on_rx_callback
+        == macus_widget._add_rx_message_to_text_box
     )
     assert (
-        macus_widget._com_serial._on_tx_callback == macus_widget._add_tx_message_to_text_box
+        macus_widget._com_serial._on_tx_callback
+        == macus_widget._add_tx_message_to_text_box
     )
 
 
 # check _on_port_combo_clicked
 def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
-    available_ports = ["COM1", "COM2"]
+    available_ports = [
+        ListPortInfo("COM1", True),
+        ListPortInfo("COM2", True),
+    ]
     mocker.patch.object(
         macus_widget._com_serial, "get_available_ports", return_value=available_ports
     )
@@ -37,7 +48,7 @@ def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
         for i in range(macus_widget._port_combo.count())
     ]
 
-    assert combo_items == available_ports
+    assert combo_items == [port.name for port in available_ports]
 
 
 # check _on_connect_button_clicked
@@ -107,7 +118,9 @@ def test_add_rx_message_to_text_box(macus_widget: MacusWidget):
 
 def test_timer_routine_popup_not_visible(macus_widget, mocker):
     spy = mocker.spy(macus_widget, "_update_availabel_ports")
-    mocker.patch.object(macus_widget._port_combo, "is_pop_up_visible", return_value=False)
+    mocker.patch.object(
+        macus_widget._port_combo, "is_pop_up_visible", return_value=False
+    )
 
     macus_widget._timer_routine()
 
@@ -116,7 +129,9 @@ def test_timer_routine_popup_not_visible(macus_widget, mocker):
 
 def test_timer_routine_popup_visible(macus_widget, mocker):
     spy = mocker.spy(macus_widget, "_update_availabel_ports")
-    mocker.patch.object(macus_widget._port_combo, "is_pop_up_visible", return_value=True)
+    mocker.patch.object(
+        macus_widget._port_combo, "is_pop_up_visible", return_value=True
+    )
 
     macus_widget._timer_routine()
 

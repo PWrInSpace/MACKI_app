@@ -60,9 +60,7 @@ def test_init_with_port_and_callbacks(pyserial_mock):
     def callback(data: str):
         pass
 
-    serial_port = SerialPort(
-        COM_PORT, on_rx_callback=callback, on_tx_callback=callback
-    )
+    serial_port = SerialPort(COM_PORT, on_rx_callback=callback, on_tx_callback=callback)
 
     assert isinstance(serial_port._serial, pyserial.Serial)
     assert serial_port._serial.port == COM_PORT
@@ -155,7 +153,9 @@ def test_read_not_open(serial_port: SerialPort):
 
 def test_read(serial_port: SerialPort, mocker):
     returned_message = b"ACK: HELLO" + SerialPort.EOF.encode()
-    mocker.patch.object(serial_port._serial, "read_until", return_value=returned_message)
+    mocker.patch.object(
+        serial_port._serial, "read_until", return_value=returned_message
+    )
     read_spy = mocker.spy(serial_port._serial, "read_until")
 
     serial_port.connect()

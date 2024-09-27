@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from src.app.cameras_app import QCameraApp
 from src.app.com.macus_widget import MacusWidget
-from src.com.macus_serial import MacusSerial
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self.cameras.terminate_threads()
+        self.macus_widget.quit()
         event.accept()
 
 

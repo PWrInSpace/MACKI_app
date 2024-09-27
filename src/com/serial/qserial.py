@@ -22,12 +22,12 @@ class QSerial(SerialPort):
             on_tx_callback (Callable[[str], None], optional): callback for transmitted data.
             Defaults to None
         """
-        super().__init__(com_port, baudrate,  on_rx_callback, on_tx_callback)
+        super().__init__(com_port, baudrate, on_rx_callback, on_tx_callback)
         self._serial_mutex = QMutex()
 
     @override
     def write(self, data: str) -> None:
-        """ This method writes to the serial port.
+        """This method writes to the serial port.
 
         .. note::
             The method is thread-safe.
@@ -48,7 +48,7 @@ class QSerial(SerialPort):
 
     @override
     def read(self, read_timeout_s: float = 0.1) -> str:
-        """ This method reads from the serial port.
+        """This method reads from the serial port.
 
         .. note::
             The method is thread-safe.
