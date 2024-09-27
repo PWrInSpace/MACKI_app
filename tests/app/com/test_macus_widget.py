@@ -1,37 +1,26 @@
-import sys
 import pytest
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread
 from PySide6.QtTest import QTest
-from PySide6.QtWidgets import QApplication
 
 from src.app.com.macus_widget import MacusWidget
-from src.com.macus_serial import MacusSerial
-
-
-@pytest.fixture
-def qapp():
-    app = QApplication.instance()  # Check if an instance already exists
-    if app is None:
-        app = QApplication(sys.argv)
-    yield app
-    app.quit()
+from src.com.serial import QSerial, QSerialStateControlThread
 
 
 @pytest.fixture
 def macus_widget() -> MacusWidget:
-    # macus_serial = MacusSerial()
-
-    return MacusWidget()
+    widget = MacusWidget()
+    return widget
 
 
 def test_macus_widget_init(macus_widget: MacusWidget):
-    assert isinstance(macus_widget._serial, MacusSerial)
+    assert isinstance(macus_widget._com_serial, QSerial)
+    assert macus_widget._com_serial_state.isRunning() is True
     assert (
-        macus_widget._serial._on_rx_callback == macus_widget._add_rx_message_to_text_box
+        macus_widget._com_serial._on_rx_callback == macus_widget._add_rx_message_to_text_box
     )
     assert (
-        macus_widget._serial._on_tx_callback == macus_widget._add_tx_message_to_text_box
+        macus_widget._com_serial._on_tx_callback == macus_widget._add_tx_message_to_text_box
     )
 
 
@@ -39,7 +28,7 @@ def test_macus_widget_init(macus_widget: MacusWidget):
 def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
     available_ports = ["COM1", "COM2"]
     mocker.patch.object(
-        macus_widget._serial, "get_available_ports", return_value=available_ports
+        macus_widget._com_serial, "get_available_ports", return_value=available_ports
     )
     QTest.mouseClick(macus_widget._port_combo, Qt.LeftButton)
 
@@ -53,24 +42,23 @@ def test_porto_combo_clicked(macus_widget: MacusWidget, mocker):
 
 # check _on_connect_button_clicked
 def test_connect_button_connected(macus_widget: MacusWidget, mocker):
-    # Connect
+    # Do not check state, because it was tested in test_qserial_state.py
     mocker.patch.object(macus_widget._port_combo, "currentText", return_value="COM1")
-    connect_mock = mocker.patch.object(macus_widget._serial, "connect")
-    connected_stub = mocker.stub()
-    macus_widget.connected.connect(connected_stub)
+    connect_mock = mocker.patch.object(macus_widget._com_serial, "connect")
 
     QTest.mouseClick(macus_widget._connect_button, Qt.LeftButton)
 
+    QThread.msleep(QSerialStateControlThread.THREAD_SLEEP_MS * 2)
+
     assert macus_widget._connect_button.text() == macus_widget.BUTTON_DISCONNECT
     connect_mock.assert_called_once_with("COM1")  # port is not set
-    connected_stub.assert_called_once()
 
 
 # Disconnect, right now _on_button_clicked function only check the status of serial,
 # so we do not need to click the button to connect first, we only mock serial status
 def test_connect_button_disconnected(macus_widget: MacusWidget, mocker):
-    mocker.patch.object(macus_widget._serial, "is_connected", return_value=True)
-    disconnect_mock = mocker.patch.object(macus_widget._serial, "disconnect")
+    mocker.patch.object(macus_widget._com_serial, "is_connected", return_value=True)
+    disconnect_mock = mocker.patch.object(macus_widget._com_serial, "disconnect")
 
     QTest.mouseClick(macus_widget._connect_button, Qt.LeftButton)
 
@@ -82,10 +70,10 @@ def test_connect_button_disconnected(macus_widget: MacusWidget, mocker):
     "message, prefix, expected_color",
     [
         ("test\n", "", Qt.white),
-        (MacusSerial.ACK + "test", "aaa", Qt.green),
-        (MacusSerial.NACK + "test", "ccc", Qt.red),
-        ("tdd" + MacusSerial.ACK + "a", "", Qt.white),
-        ("asdasad" + MacusSerial.NACK, "", Qt.white),
+        (QSerial.ACK + "test", "aaa", Qt.green),
+        (QSerial.NACK + "test", "ccc", Qt.red),
+        ("tdd" + QSerial.ACK + "a", "", Qt.white),
+        ("asdasad" + QSerial.NACK, "", Qt.white),
     ],
 )
 def test_add_message_to_text_box(
@@ -115,3 +103,29 @@ def test_add_rx_message_to_text_box(macus_widget: MacusWidget):
     expected_message = macus_widget.RX_PREFIX + "test\n"
     assert macus_widget._text_edit.toPlainText() == expected_message
     assert macus_widget._text_edit.textColor() == Qt.white
+
+
+def test_timer_routine_popup_not_visible(macus_widget, mocker):
+    spy = mocker.spy(macus_widget, "_update_availabel_ports")
+    mocker.patch.object(macus_widget._port_combo, "is_pop_up_visible", return_value=False)
+
+    macus_widget._timer_routine()
+
+    spy.assert_called_once()
+
+
+def test_timer_routine_popup_visible(macus_widget, mocker):
+    spy = mocker.spy(macus_widget, "_update_availabel_ports")
+    mocker.patch.object(macus_widget._port_combo, "is_pop_up_visible", return_value=True)
+
+    macus_widget._timer_routine()
+
+    spy.assert_not_called()
+
+
+def test_com_serial_property(macus_widget):
+    assert macus_widget.com_serial == macus_widget._com_serial
+
+
+def test_com_serial_state_property(macus_widget):
+    assert macus_widget.com_serial_state == macus_widget._com_serial_state

@@ -2,12 +2,12 @@ import serial as pyserial
 import pytest
 from contextlib import nullcontext as does_not_rise
 
-from src.com.serial_port import SerialPort
+from src.com.serial import SerialPort
 
 COM_PORT = "COM1"
+BAUDRATE = 115200
 
 
-# tests setup
 @pytest.fixture
 def pyserial_mock(mocker) -> SerialPort:
     def connect_mock(self):
@@ -39,7 +39,7 @@ def test_init_without_port(pyserial_mock):
 
     assert isinstance(serial_port._serial, pyserial.Serial)
     assert serial_port._serial.port is None
-    assert serial_port._serial.baudrate == SerialPort.BAUDRATE
+    assert serial_port._serial.baudrate == BAUDRATE
     assert serial_port._serial.timeout == SerialPort.READ_TIMEOUT_S
     assert serial_port._serial.write_timeout == SerialPort.WRITE_TIMEOUT_S
     assert serial_port._on_rx_callback is None
@@ -49,7 +49,7 @@ def test_init_without_port(pyserial_mock):
 def test_init_with_port(serial_port: SerialPort):
     assert isinstance(serial_port._serial, pyserial.Serial)
     assert serial_port._serial.port == COM_PORT
-    assert serial_port._serial.baudrate == SerialPort.BAUDRATE
+    assert serial_port._serial.baudrate == BAUDRATE
     assert serial_port._serial.timeout == SerialPort.READ_TIMEOUT_S
     assert serial_port._serial.write_timeout == SerialPort.WRITE_TIMEOUT_S
     assert serial_port._on_rx_callback is None
@@ -60,11 +60,13 @@ def test_init_with_port_and_callbacks(pyserial_mock):
     def callback(data: str):
         pass
 
-    serial_port = SerialPort(COM_PORT, callback, callback)
+    serial_port = SerialPort(
+        COM_PORT, on_rx_callback=callback, on_tx_callback=callback
+    )
 
     assert isinstance(serial_port._serial, pyserial.Serial)
     assert serial_port._serial.port == COM_PORT
-    assert serial_port._serial.baudrate == SerialPort.BAUDRATE
+    assert serial_port._serial.baudrate == BAUDRATE
     assert serial_port._serial.timeout == SerialPort.READ_TIMEOUT_S
     assert serial_port._serial.write_timeout == SerialPort.WRITE_TIMEOUT_S
     assert serial_port._on_rx_callback == callback

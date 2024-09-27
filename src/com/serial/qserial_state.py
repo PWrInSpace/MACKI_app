@@ -2,7 +2,7 @@ from enum import Enum
 from typing import override
 from PySide6.QtCore import QThread, QReadWriteLock, Signal
 from src.utils.qt.thread_event import ThreadEvent
-from src.com.serial_port import SerialPort, logger
+from src.com.serial import SerialPort, logger
 
 
 class QSerialState(Enum):
@@ -149,6 +149,9 @@ class QSerialStateControlThread(QThread):
         """ This method runs the thread
         """
         while not self._thread_stop.occurs():
+            # this gives immidiately check for the stop signal, after handling the state
+            QThread.msleep(self.THREAD_SLEEP_MS)
+
             match self._state:
                 case QSerialState.CONNECTED:
                     self._connected_state_routine()
@@ -156,8 +159,6 @@ class QSerialStateControlThread(QThread):
                     self._missing_state_routine()
                 case QSerialState.DISCONNECTED:
                     self._disconnected_state_routine()
-
-            QThread.msleep(self.THREAD_SLEEP_MS)
 
     @override
     def terminate(self) -> None:

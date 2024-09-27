@@ -3,11 +3,12 @@ import pytest
 from contextlib import nullcontext as does_not_rise
 
 from PySide6.QtCore import QMutex
-from src.app.com.qserial import QSerial
-from src.com.serial_port import SerialPort
+from src.com.serial.qserial import QSerial
+from src.com.serial import SerialPort
 
 PORT = "COM1"
 DATA = b"data\r\n"
+BAUDRATE = 115200
 
 
 def rx_callback(data: str):
@@ -44,12 +45,17 @@ def qserial(pyserial_mock, mocker) -> SerialPort:
 
 
 def test_init(pyserial_mock):
-    serial_port = QSerial(PORT, rx_callback, tx_callback)
+    serial_port = QSerial(
+        PORT,
+        BAUDRATE,
+        on_rx_callback=rx_callback,
+        on_tx_callback=tx_callback
+    )
 
     assert isinstance(serial_port, SerialPort)
     # check that the arguemnts was passed correctly
     assert serial_port._serial.port is PORT
-    assert serial_port._serial.baudrate == SerialPort.BAUDRATE
+    assert serial_port._serial.baudrate == BAUDRATE
     assert serial_port._serial.timeout == SerialPort.READ_TIMEOUT_S
     assert serial_port._serial.write_timeout == SerialPort.WRITE_TIMEOUT_S
     assert serial_port._on_rx_callback is rx_callback

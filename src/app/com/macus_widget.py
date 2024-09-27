@@ -11,9 +11,8 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt, Signal, QTimer
-from src.com.macus_serial import MacusSerial
+from src.com.serial import QSerial, QSerialStateControlThread
 from src.utils.qt.better_combo_box import BetterComboBox
-from src.app.com.macus_widget_utils import MacusWidgetState
 
 logger = logging.getLogger("macus_widget")
 
@@ -24,28 +23,25 @@ class MacusWidget(QWidget):
     BUTTON_DISCONNECT = "Disconnect"
     TX_PREFIX = "TX: "
     RX_PREFIX = "RX: "
-
-    connected = Signal()
-    missing = Signal()
-    disconencted = Signal()
+    PORTS_TIMER_INTERVAL_MS = 1000
 
     def __init__(self) -> None:
         """This method initializes the MacusWidget class
         """
         super().__init__()
 
-        self._state = MacusWidgetState.UNKNOWN
-        self._serial = MacusSerial()
-        self._serial.set_rx_callback(self._add_rx_message_to_text_box)
-        self._serial.set_tx_callback(self._add_tx_message_to_text_box)
+        self._com_serial = QSerial(baudrate=self.BAUDRATES[0])
+        self._com_serial.set_rx_callback(self._add_rx_message_to_text_box)
+        self._com_serial.set_tx_callback(self._add_tx_message_to_text_box)
 
-        self._status_timer = QTimer()
-        self._status_timer.timeout.connect(self._timer_routine)
-        self._status_timer.start(1000)
+        self._com_serial_state = QSerialStateControlThread(self._com_serial)
+        self._com_serial_state.start()
+
+        self._available_ports_timer = QTimer()
+        self._available_ports_timer.timeout.connect(self._timer_routine)
+        self._available_ports_timer.start(self.PORTS_TIMER_INTERVAL_MS)
 
         self._init_ui()
-
-        self._change_state(MacusWidgetState.DISCONNECTED)
 
     def _create_settings_box(self) -> QGroupBox:
         """This method creates the settings box
@@ -55,7 +51,7 @@ class MacusWidget(QWidget):
         """
         port_label = QLabel("Port")
         self._port_combo = BetterComboBox()
-        self._port_combo.addItems(self._serial.get_available_ports())
+        self._port_combo.addItems(self._com_serial.get_available_ports())
         self._port_combo.clicked.connect(self._update_availabel_ports)
 
         baudrate_label = QLabel("Baudrate")
@@ -130,7 +126,7 @@ class MacusWidget(QWidget):
         """This method is called when the port combo is clicked"""
         current_port = self._port_combo.currentText()
         self._port_combo.clear()
-        self._port_combo.addItems(self._serial.get_available_ports())
+        self._port_combo.addItems(self._com_serial.get_available_ports())
         self._port_combo.setCurrentText(current_port)
 
     def _on_connect_button_clicked(self):
@@ -138,13 +134,13 @@ class MacusWidget(QWidget):
         FIXME: This implementation can lead to invalid button text,
         when the connection is lost outside of this widget
         """
-        if self._serial.is_connected():
-            self._serial.disconnect()
-            self._change_state(MacusWidgetState.DISCONNECTED)
+        if self._com_serial.is_connected():
+            self._com_serial.disconnect()
+            self._connect_button.setText(self.BUTTON_CONNECT)
         else:
             port = self._port_combo.currentText()
-            self._serial.connect(port)
-            self._change_state(MacusWidgetState.CONNECTED)
+            self._com_serial.connect(port)
+            self._connect_button.setText(self.BUTTON_DISCONNECT)
 
     def _add_message_to_text_box(self, data: str, message_prefix: str = "") -> None:
         """This method adds a message to the text box
@@ -156,9 +152,9 @@ class MacusWidget(QWidget):
         if not data.endswith("\n"):
             data += "\n"
 
-        if data.startswith(self._serial.ACK):
+        if data.startswith(self._com_serial.ACK):
             self._text_edit.setTextColor(Qt.green)
-        elif data.startswith(self._serial.NACK):
+        elif data.startswith(self._com_serial.NACK):
             self._text_edit.setTextColor(Qt.red)
         else:
             self._text_edit.setTextColor(Qt.white)
@@ -181,73 +177,34 @@ class MacusWidget(QWidget):
         """
         self._add_message_to_text_box(message, self.RX_PREFIX)
 
-    def _change_state(self, state: MacusWidgetState) -> None:
-        """This method changes the state
-
-        Args:
-            state (MacusWidgetState): The new state
-        """
-        logger.info(f"State changed from {self._state} to {state}")
-        self._state = state
-
-        match state:
-            case MacusWidgetState.DISCONNECTED:
-                self._connect_button.setText(self.BUTTON_CONNECT)
-                self._state_label.setStyleSheet("color: red;")
-                self._state_label.setText("DISCONNECTED")
-                self.disconencted.emit()
-            case MacusWidgetState.CONNECTED:
-                self._connect_button.setText(self.BUTTON_DISCONNECT)
-                self._state_label.setStyleSheet("color: #9BEC00;")
-                self._state_label.setText("CONNECTED")
-                self.connected.emit()
-            case MacusWidgetState.MISSING:
-                self._state_label.setStyleSheet("color: yellow;")
-                self._state_label.setText("MISSING")
-                self.missing.emit()
-
     def _timer_routine(self):
         """This method updates the status"""
         # update the port combo
-        if not self._port_combo.pop_up_visible:
+        if not self._port_combo.is_pop_up_visible():
             self._update_availabel_ports()
 
-        match self._state:
-            case MacusWidgetState.CONNECTED:
-                self._connected_state_routine()
-            case MacusWidgetState.MISSING:
-                self._missing_state_routine()
+    def quit(self):
+        """This method stops the threads"""
+        self._com_serial.disconnect()
+        self._com_serial_state.terminate()
+        self._com_serial_state.wait()  # wait a litle bit for the thread to finish
 
-    def _connected_state_routine(self):
-        """This method is called when the widget is in the connected state"""
-        ports = self._serial.get_available_ports()
-        current_port = self._serial.port
-
-        if current_port not in ports:
-            self._change_state(MacusWidgetState.MISSING)
-
-    def _missing_state_routine(self):
-        """This method is called when the widget is in the missing state"""
-        ports = self._serial.get_available_ports()
-        missing_port = self._serial.port
-
-        if missing_port in ports:
-            try:
-                if self._serial.is_connected():
-                    self._serial.disconnect()
-
-                self._serial.connect(missing_port)
-                self._change_state(MacusWidgetState.CONNECTED)
-            except Exception as exc:
-                # workaround: on error try again, sometimes the serial raises
-                # an error even if the port is available, the second try should works
-                logger.warning(f"Can't reconnect to the missing port: {exc}")
+        self._available_ports_timer.stop()
 
     @property
-    def serial(self) -> MacusSerial:
+    def com_serial(self) -> QSerial:
         """This method returns the serial object
 
         Returns:
             MacusSerial: The serial object
         """
-        return self._serial
+        return self._com_serial
+
+    @property
+    def com_serial_state(self) -> QSerialStateControlThread:
+        """This method returns the serial state object
+
+        Returns:
+            MacusSerialState: The serial state object
+        """
+        return self._com_serial_state

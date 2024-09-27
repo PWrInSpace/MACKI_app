@@ -1,5 +1,5 @@
 import pytest
-from src.com.com_proto_basic import ComProtoBasic
+from src.com.abstract import ComProtoBasic
 
 
 @pytest.fixture

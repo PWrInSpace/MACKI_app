@@ -1,6 +1,6 @@
 from typing import override, Callable
 from PySide6.QtCore import QMutex
-from src.com.serial_port import SerialPort
+from src.com.serial import SerialPort
 
 
 class QSerial(SerialPort):
@@ -9,6 +9,7 @@ class QSerial(SerialPort):
     def __init__(
         self,
         com_port: str = None,
+        baudrate: int = 115200,
         on_rx_callback: Callable[[str], None] = None,
         on_tx_callback: Callable[[str], None] = None,
     ) -> None:
@@ -21,7 +22,7 @@ class QSerial(SerialPort):
             on_tx_callback (Callable[[str], None], optional): callback for transmitted data.
             Defaults to None
         """
-        super().__init__(com_port, on_rx_callback, on_tx_callback)
+        super().__init__(com_port, baudrate,  on_rx_callback, on_tx_callback)
         self._serial_mutex = QMutex()
 
     @override

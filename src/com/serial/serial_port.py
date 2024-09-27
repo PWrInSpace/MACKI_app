@@ -5,14 +5,13 @@ import serial.tools.list_ports
 
 from serial.serialutil import PortNotOpenError, SerialException
 
-from src.com.com_proto_basic import ComProtoBasic
+from src.com.abstract.com_proto_basic import ComProtoBasic
 
 logger = logging.getLogger(__name__)
 
 
 class SerialPort(ComProtoBasic):
     EOF = "\r\n"
-    BAUDRATE = 115200
     READ_TIMEOUT_S = 0.1
     WRITE_TIMEOUT_S = 0.1
 
@@ -22,6 +21,7 @@ class SerialPort(ComProtoBasic):
     def __init__(
         self,
         com_port: str = None,
+        baudrate: int = 115200,
         on_rx_callback: Callable[[str], None] = None,
         on_tx_callback: Callable[[str], None] = None,
     ) -> None:
@@ -36,7 +36,7 @@ class SerialPort(ComProtoBasic):
         """
         self._serial = serial.Serial()
         self._serial.port = com_port
-        self._serial.baudrate = self.BAUDRATE
+        self._serial.baudrate = baudrate
         self._serial.timeout = self.READ_TIMEOUT_S
         self._serial.write_timeout = self.WRITE_TIMEOUT_S
 

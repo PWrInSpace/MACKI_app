@@ -9,6 +9,5 @@ class BetterComboBox(QComboBox):
         self.clicked.emit()
         return super().showPopup()
 
-    @property
-    def pop_up_visible(self) -> bool:
+    def is_pop_up_visible(self) -> bool:
         return self.view().isVisible()

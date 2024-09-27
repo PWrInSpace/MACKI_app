@@ -2,11 +2,12 @@ import pytest
 from contextlib import nullcontext as does_not_rise
 import serial
 
-from PySide6.QtCore import QReadWriteLock, QThread, QTimer
+from PySide6.QtCore import QReadWriteLock, QThread
+from PySide6.QtCore import Qt
 import serial.serialutil
-from src.app.com.qserial_state import QSerialStateControlThread, QSerialState
+from src.com.serial.qserial_state import QSerialStateControlThread, QSerialState
 # from app.com.qserial_state import QSerialState, SerialStateControlThread
-from src.com.serial_port import SerialPort
+from src.com.serial import SerialPort
 
 
 @pytest.fixture
@@ -33,6 +34,7 @@ def serial_port(pyserial_mock) -> SerialPort:
 @pytest.fixture
 def state_control(serial_port) -> SerialPort:
     serial = QSerialStateControlThread(serial_port)
+    serial.THREAD_SLEEP_MS = 1
 
     return serial
 
@@ -247,7 +249,7 @@ def test_thread_connected_state(state_control, mocker):
 
     state_control.change_state(QSerialState.CONNECTED)
     state_control.start()
-    QThread.msleep(10)
+    QThread.msleep(20)
 
     mocker.patch.object(state_control._thread_stop, "occurs", return_value=True)
     spy_connected.assert_called()
@@ -307,3 +309,27 @@ def test_terminate_stop_thread(state_control, mocker):
     QThread.msleep(50)
 
     assert state_control.isRunning() is False
+
+
+def test_reactions_on_serial_changes(state_control, mocker):
+    stub_connected = mocker.stub()
+    stub_missing = mocker.stub()
+    stub_disconnect = mocker.stub()
+
+    state_control.connected.connect(stub_connected, Qt.DirectConnection)
+    state_control.missed.connect(stub_missing)
+    state_control.disconnected.connect(stub_disconnect)
+
+    state_control.start()
+    QThread.msleep(10)
+
+    mocker.patch.object(state_control, "_check_missing_condition", return_value=False)
+    mocker.patch.object(state_control._serial._serial, "is_open", return_value=True)
+
+    QThread.msleep(10)
+
+    assert state_control.get_state() == QSerialState.CONNECTED
+    assert stub_connected.call_count == 1
+
+    state_control.terminate()
+    state_control.wait()

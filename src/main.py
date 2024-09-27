@@ -10,7 +10,6 @@ from src.app.cameras_app import QCameraApp
 from src.app.com.macus_widget import MacusWidget
 from src.com.macus_serial import MacusSerial
 
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
