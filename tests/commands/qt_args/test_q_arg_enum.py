@@ -1,5 +1,5 @@
 import pytest
-from PySide6.QtWidgets import QApplication, QComboBox
+from PySide6.QtWidgets import QComboBox
 from PySide6.QtTest import QTest
 from src.commands.qt_args.q_arg_enum import QArgEnum
 
@@ -7,13 +7,6 @@ ARG_NAME = "enum_arg"
 ENUM_OPTIONS = {"Option 1": "option1", "Option 2": "option2", "Option 3": "option3"}
 DEFAULT_NAME = "Option 2"
 DESCRIPTION = "Description of the enum argument"
-
-
-@pytest.fixture
-def qapp():
-    app = QApplication([])
-    yield app
-    app.quit()
 
 
 @pytest.fixture
