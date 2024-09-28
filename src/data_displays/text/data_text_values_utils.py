@@ -8,7 +8,7 @@ class DisplayParams:
     color: Colors
 
 
-class Values:
+class ValuesConfig:
     """Class to store a list of values with display parameters.
     It is a wrapper around a dictionary of values and their display parameters,
     which is very time efficient for lookups, because accessing a dictionary is O(1).

@@ -2,7 +2,7 @@ import pytest
 from src.data_displays import DataTextNumber
 from src.utils.colors import Colors
 
-NAME = "test"
+NAME = "test_123"
 DEFAULT_VALUE = ""
 LOWER_BOUND = -10
 UPPER_BOUND = 10

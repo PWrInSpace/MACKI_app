@@ -1,5 +1,5 @@
 import pytest
-from src.data_displays import DataTextValues, Values
+from src.data_displays import DataTextValues, ValuesConfig
 from src.utils.colors import Colors
 
 VALUES = ["val1", "val2"]
@@ -7,10 +7,9 @@ DEFAULT_VALUE = ["def1", "def2"]
 COLORS = [Colors.RED, Colors.BLUE]
 NAME = "test"
 
-
 @pytest.fixture
 def values():
-    return Values(VALUES, DEFAULT_VALUE, COLORS)
+    return ValuesConfig(VALUES, DEFAULT_VALUE, COLORS)
 
 
 def test_init(values):

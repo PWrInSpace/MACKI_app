@@ -2,7 +2,7 @@ import pytest
 from PySide6.QtWidgets import QHBoxLayout
 from src.data_displays import DataTextBasic
 
-NAME = "test"
+NAME = "test_123"
 DEFAULT_VALUE = ""
 
 
@@ -16,7 +16,7 @@ def test_init(data_text):
     assert data_text._value_label.text() == DEFAULT_VALUE
 
     assert isinstance(data_text.layout(), QHBoxLayout)
-    assert data_text.layout().itemAt(0).widget().text() == NAME
+    assert data_text.layout().itemAt(0).widget().text() == NAME.capitalize().replace("_", " ")
     assert data_text.layout().itemAt(1).widget() == data_text._value_label
 
 

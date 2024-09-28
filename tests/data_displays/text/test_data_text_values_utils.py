@@ -1,5 +1,5 @@
 import pytest
-from src.data_displays import Values, DisplayParams
+from src.data_displays import ValuesConfig, DisplayParams
 from src.utils.colors import Colors
 
 VALUES = ["val1", "val2"]
@@ -8,8 +8,8 @@ COLORS = [Colors.RED, Colors.BLUE]
 
 
 @pytest.fixture
-def values() -> Values:
-    return Values(VALUES, DEFAULT_VALUE, COLORS)
+def values() -> ValuesConfig:
+    return ValuesConfig(VALUES, DEFAULT_VALUE, COLORS)
 
 
 def test_init_pass(values):
@@ -24,25 +24,26 @@ def test_init_pass(values):
 
 def test_init_fail():
     with pytest.raises(ValueError):
-        Values(VALUES, DEFAULT_VALUE, COLORS[:-1])
+        ValuesConfig(VALUES, DEFAULT_VALUE, COLORS[:-1])
 
 
 def test_init_invalid_values_type():
     with pytest.raises(ValueError):
-        Values([1, 2], DEFAULT_VALUE, COLORS)
+        ValuesConfig([1, 2], DEFAULT_VALUE, COLORS)
 
 
 def test_init_invalid_display_values_type():
     with pytest.raises(ValueError):
-        Values(VALUES, [1, 2], COLORS)
+        ValuesConfig(VALUES, [1, 2], COLORS)
+
 
 def test_init_invalid_colors_type():
     with pytest.raises(ValueError):
-        Values(VALUES, DEFAULT_VALUE, ["red", "blue"])
+        ValuesConfig(VALUES, DEFAULT_VALUE, ["red", "blue"])
 
 
 def test_init_replace_none():
-    values = Values(VALUES, [None, None], COLORS)
+    values = ValuesConfig(VALUES, [None, None], COLORS)
 
     expected_params = [
         DisplayParams(value, color) for value, color in zip(VALUES, COLORS)
@@ -68,7 +69,7 @@ def test_getitem(values):
 
 
 def test_getitem_replace_none():
-    values = Values(VALUES, [None, None], COLORS)
+    values = ValuesConfig(VALUES, [None, None], COLORS)
 
     for value, expected in zip(VALUES, VALUES):
         assert values[value].display_value == expected
