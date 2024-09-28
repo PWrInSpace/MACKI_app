@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
 )
 from src.app.cameras_app import QCameraApp
 from src.app.com.macus_widget import MacusWidget
-from src.data_displays import DataDisplayText, DataTextBasic, DataTextNumber, DataTextValues, Values
+from src.data_displays import DataDisplayText, DataTextNumber, DataTextValues, Values
 from src.utils.colors import Colors
 
 class MainWindow(QMainWindow):
@@ -28,8 +28,6 @@ class MainWindow(QMainWindow):
         # layout.addWidget(self.macus_widget)
         values = Values(["10"], ["KOX"], [Colors.MINT])
         config = [
-            DataTextBasic("Data Display 1"),
-            DataTextBasic("Data Display 2"),
             DataTextNumber("Test", 12, 32),
             DataTextValues("Test values", values)
         ]
