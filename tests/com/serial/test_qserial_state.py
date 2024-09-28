@@ -70,7 +70,7 @@ def test_get_state_unable_to_lock(state_control, mocker):
 
 def test_change_state_already_set(state_control, mocker):
     stub = mocker.stub()
-    state_control.disconnected.connect(stub)
+    state_control.state_changed.connect(stub)
 
     state_control.change_state(QSerialState.DISCONNECTED)
     assert state_control._state == QSerialState.DISCONNECTED
@@ -79,37 +79,40 @@ def test_change_state_already_set(state_control, mocker):
 
 def test_change_state_disconnected(state_control, mocker):
     stub = mocker.stub()
-    state_control.disconnected.connect(stub)
+    state_control.state_changed.connect(stub)
 
     # pathc connected state to variable
     mocker.patch.object(state_control, "_state", QSerialState.CONNECTED)
 
     state_control.change_state(QSerialState.DISCONNECTED)
     assert state_control._state == QSerialState.DISCONNECTED
+    assert stub.call_args[0][0] == QSerialState.DISCONNECTED
     assert stub.call_count == 1
 
 
 def test_change_state_connected(state_control, mocker):
     stub = mocker.stub()
-    state_control.connected.connect(stub)
+    state_control.state_changed.connect(stub)
 
     state_control.change_state(QSerialState.CONNECTED)
     assert state_control._state == QSerialState.CONNECTED
+    assert stub.call_args[0][0] == QSerialState.CONNECTED
     assert stub.call_count == 1
 
 
 def test_change_state_missing(state_control, mocker):
     stub = mocker.stub()
-    state_control.missed.connect(stub)
+    state_control.state_changed.connect(stub)
 
     state_control.change_state(QSerialState.MISSING)
     assert state_control._state == QSerialState.MISSING
+    assert stub.call_args[0][0] == QSerialState.MISSING
     assert stub.call_count == 1
 
 
 def test_change_state_unable_to_lock(state_control, mocker):
     stub = mocker.stub()
-    state_control.missed.connect(stub)
+    state_control.state_changed.connect(stub)
 
     # patch the mutex to return False
     mocker.patch.object(
@@ -350,15 +353,10 @@ def test_terminate_stop_thread(state_control):
 
 
 def test_reactions_on_serial_changes(state_control, mocker):
-    stub_connected = mocker.stub()
-    stub_missing = mocker.stub()
-    stub_disconnect = mocker.stub()
+    stub_state_changed = mocker.stub()
 
     # direct connection to avoid the event loop
-    state_control.connected.connect(stub_connected, Qt.DirectConnection)
-    state_control.missed.connect(stub_missing, Qt.DirectConnection)
-    state_control.disconnected.connect(stub_disconnect, Qt.DirectConnection)
-
+    state_control.state_changed.connect(stub_state_changed, Qt.DirectConnection)
     serial_mock = SerialMock()
     state_control._serial = serial_mock
     state_control.start()
@@ -367,27 +365,24 @@ def test_reactions_on_serial_changes(state_control, mocker):
 
     QThread.msleep(SLEEP_TIME_MS)
     assert state_control.get_state() == QSerialState.CONNECTED
-    assert stub_connected.call_count == 1
-    assert stub_missing.call_count == 0
-    assert stub_disconnect.call_count == 0
+    assert stub_state_changed.call_count == 1
+    assert stub_state_changed.call_args[0][0] == QSerialState.CONNECTED
 
     # Disconnect
     serial_mock.set_open(False)
 
     QThread.msleep(SLEEP_TIME_MS * 2)
     assert state_control.get_state() == QSerialState.DISCONNECTED
-    assert stub_connected.call_count == 1
-    assert stub_missing.call_count == 0
-    assert stub_disconnect.call_count == 1
+    assert stub_state_changed.call_count == 2
+    assert stub_state_changed.call_args[0][0] == QSerialState.DISCONNECTED
 
     # Connect again
     serial_mock.set_open(True)
 
     QThread.msleep(SLEEP_TIME_MS)
     assert state_control.get_state() == QSerialState.CONNECTED
-    assert stub_connected.call_count == 2
-    assert stub_missing.call_count == 0
-    assert stub_disconnect.call_count == 1
+    assert stub_state_changed.call_count == 3
+    assert stub_state_changed.call_args[0][0] == QSerialState.CONNECTED
 
     # change the state to missing
     serial_mock.set_available_ports(False)
@@ -395,18 +390,16 @@ def test_reactions_on_serial_changes(state_control, mocker):
     QThread.msleep(SLEEP_TIME_MS)
 
     assert state_control.get_state() == QSerialState.MISSING
-    assert stub_connected.call_count == 2
-    assert stub_missing.call_count == 1
-    assert stub_disconnect.call_count == 1
+    assert stub_state_changed.call_count == 4
+    assert stub_state_changed.call_args[0][0] == QSerialState.MISSING
 
     # Close the port
     serial_mock.set_open(False)
 
     QThread.msleep(SLEEP_TIME_MS)
     assert state_control.get_state() == QSerialState.DISCONNECTED
-    assert stub_connected.call_count == 2
-    assert stub_missing.call_count == 1
-    assert stub_disconnect.call_count == 2
+    assert stub_state_changed.call_count == 5
+    assert stub_state_changed.call_args[0][0] == QSerialState.DISCONNECTED
 
     state_control.terminate()
     state_control.wait()

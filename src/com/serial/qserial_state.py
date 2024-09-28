@@ -30,9 +30,7 @@ class QSerialStateControlThread(QThread):
     LOCK_TIMEOUT = 1000
     THREAD_SLEEP_MS = 50
 
-    connected = Signal()
-    disconnected = Signal()
-    missed = Signal()
+    state_changed = Signal(QSerialState)
 
     def __init__(self, serial: SerialPort) -> None:
         """This method initializes the QSerialStateControlThread class
@@ -81,13 +79,7 @@ class QSerialStateControlThread(QThread):
         self._state = state
         self._state_mutex.unlock()
 
-        match state:
-            case QSerialState.DISCONNECTED:
-                self.disconnected.emit()
-            case QSerialState.CONNECTED:
-                self.connected.emit()
-            case QSerialState.MISSING:
-                self.missed.emit()
+        self.state_changed.emit(self._state)
 
     def _check_connect_condition(self) -> bool:
         """This method checks if the serial is connected

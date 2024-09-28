@@ -11,8 +11,13 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt, QTimer
-from src.com.serial import QSerial, QSerialStateControlThread
+from src.com.serial import (
+    QSerial,
+    QSerialState,
+    QSerialStateControlThread
+)
 from src.utils.qt.better_combo_box import BetterComboBox
+from src.utils.colors import Colors
 
 logger = logging.getLogger("macus_widget")
 
@@ -34,6 +39,7 @@ class MacusWidget(QWidget):
         self._com_serial.set_tx_callback(self._add_tx_message_to_text_box)
 
         self._com_serial_state = QSerialStateControlThread(self._com_serial)
+        self._com_serial_state.state_changed.connect(self._update_state_label)
         self._com_serial_state.start()
 
         self._available_ports_timer = QTimer()
@@ -66,6 +72,7 @@ class MacusWidget(QWidget):
         state_prefix = QLabel("State: ")
         self._state_label = QLabel()
         self._state_label.setAlignment(Qt.AlignmentFlag.AlignRight)
+        self._update_state_label(QSerialState.DISCONNECTED)
 
         self._connect_button = QPushButton(self.BUTTON_CONNECT)
         self._connect_button.clicked.connect(self._on_connect_button_clicked)
@@ -143,6 +150,25 @@ class MacusWidget(QWidget):
             self._com_serial.connect(port)
             self._connect_button.setText(self.BUTTON_DISCONNECT)
 
+    def _update_state_label(self, state: QSerialState):
+        """This method updates the state label
+
+        Args:
+            state (str): The state
+        """
+        match state:
+            case QSerialState.CONNECTED:
+                color = Colors.GREEN
+            case QSerialState.DISCONNECTED:
+                color = Colors.RED
+            case QSerialState.MISSING:
+                color = Colors.YELLOW
+            case _:
+                color = Colors.WHITE
+
+        self._state_label.setText(state.name)
+        self._state_label.setStyleSheet(f"color: {color.value};")
+
     def _add_message_to_text_box(self, data: str, message_prefix: str = "") -> None:
         """This method adds a message to the text box
 
@@ -186,7 +212,9 @@ class MacusWidget(QWidget):
 
     def quit(self):
         """This method stops the threads"""
-        self._com_serial.disconnect()
+        if self._com_serial.is_connected():
+            self._com_serial.disconnect()
+
         self._com_serial_state.terminate()
         self._com_serial_state.wait()  # wait a litle bit for the thread to finish
 

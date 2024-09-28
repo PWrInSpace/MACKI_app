@@ -6,7 +6,12 @@ from PySide6.QtCore import Qt, QThread
 from PySide6.QtTest import QTest
 
 from src.app.com.macus_widget import MacusWidget
-from src.com.serial import QSerial, QSerialStateControlThread
+from src.com.serial import (
+    QSerial,
+    QSerialState,
+    QSerialStateControlThread
+)
+from src.utils.colors import Colors
 
 
 @pytest.fixture
@@ -75,6 +80,19 @@ def test_connect_button_disconnected(macus_widget: MacusWidget, mocker):
 
     assert macus_widget._connect_button.text() == macus_widget.BUTTON_CONNECT
     disconnect_mock.assert_called_once()
+
+
+@pytest.mark.parametrize("state, color", [
+    (QSerialState.DISCONNECTED, Colors.RED),
+    (QSerialState.CONNECTED, Colors.GREEN),
+    (QSerialState.MISSING, Colors.YELLOW),
+    (QSerialState.UNKNOWN, Colors.WHITE),
+])
+def test_update_state_label(macus_widget: MacusWidget, state, color):
+    macus_widget._update_state_label(state)
+
+    assert macus_widget._state_label.text() == state.name
+    assert macus_widget._state_label.styleSheet() == f"color: {color.value};"
 
 
 @pytest.mark.parametrize(

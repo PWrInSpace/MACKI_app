@@ -9,3 +9,4 @@ class Colors(Enum):
     PURPLE = "#B8B5FF"
     GREEN = "#9BEC00"
     YELLOW = "#F6FA70"
+    WHITE = "#FFFFFF"
