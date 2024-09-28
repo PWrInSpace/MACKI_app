@@ -7,6 +7,7 @@ DEFAULT_VALUE = ""
 LOWER_BOUND = -10
 UPPER_BOUND = 10
 
+
 @pytest.fixture
 def data_text():
     return DataTextNumber(NAME, LOWER_BOUND, UPPER_BOUND)
@@ -52,29 +53,34 @@ def test_init_bounds_error():
         DataTextNumber(NAME, lower_bound=lower_bound, upper_bound=upper_bound)
 
 
-@pytest.mark.parametrize("value, expected_color", [
-    (0, Colors.WHITE),
-    (LOWER_BOUND, Colors.WHITE),
-    (UPPER_BOUND, Colors.WHITE),
-    (LOWER_BOUND - 1, Colors.RED),
-    (UPPER_BOUND + 1, Colors.RED),
-])
+@pytest.mark.parametrize(
+    "value, expected_color",
+    [
+        (0, Colors.WHITE),
+        (LOWER_BOUND, Colors.WHITE),
+        (UPPER_BOUND, Colors.WHITE),
+        (LOWER_BOUND - 1, Colors.RED),
+        (UPPER_BOUND + 1, Colors.RED),
+    ],
+)
 def test_update_data(data_text, value, expected_color):
     data_text.update_data(value)
     assert data_text._value_label.text() == str(value)
     assert data_text._value_label.styleSheet() == f"color: {expected_color.value}"
 
 
-
-@pytest.mark.parametrize("value, expected_color", [
-    (0, Colors.WHITE),
-    (LOWER_BOUND, Colors.WHITE),
-    (UPPER_BOUND, Colors.WHITE),
-    (LOWER_BOUND - 1, Colors.WHITE),
-    (UPPER_BOUND + 1, Colors.WHITE),
-    (1_000_000_000, Colors.WHITE),
-    (-1_000_000_000, Colors.WHITE),
-])
+@pytest.mark.parametrize(
+    "value, expected_color",
+    [
+        (0, Colors.WHITE),
+        (LOWER_BOUND, Colors.WHITE),
+        (UPPER_BOUND, Colors.WHITE),
+        (LOWER_BOUND - 1, Colors.WHITE),
+        (UPPER_BOUND + 1, Colors.WHITE),
+        (1_000_000_000, Colors.WHITE),
+        (-1_000_000_000, Colors.WHITE),
+    ],
+)
 def test_update_data_default_bounds(value, expected_color):
     data_text = DataTextNumber(NAME)
     data_text.update_data(value)

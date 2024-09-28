@@ -14,7 +14,9 @@ def values() -> Values:
 
 def test_init_pass(values):
     assert values._values.keys() == set(VALUES)
-    expected_params = [DisplayParams(value, color) for value, color in zip(DEFAULT_VALUE, COLORS)]
+    expected_params = [
+        DisplayParams(value, color) for value, color in zip(DEFAULT_VALUE, COLORS)
+    ]
     for expected, param in zip(expected_params, values._values.values()):
         assert expected.display_value == param.display_value
         assert expected.color == param.color
@@ -28,7 +30,9 @@ def test_init_fail():
 def test_init_replace_none():
     values = Values(VALUES, [None, None], COLORS)
 
-    expected_params = [DisplayParams(value, color) for value, color in zip(VALUES, COLORS)]
+    expected_params = [
+        DisplayParams(value, color) for value, color in zip(VALUES, COLORS)
+    ]
     for expected, param in zip(expected_params, values._values.values()):
         assert expected.display_value == param.display_value
         assert expected.color == param.color

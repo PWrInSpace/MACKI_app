@@ -9,17 +9,18 @@ class DisplayParams:
 
 
 class Values:
-    """ Class to store a list of values with display parameters.
-        It is a wrapper around a dictionary of values and their display parameters,
-        which is very time efficient for lookups, because accessing a dictionary is O(1).
+    """Class to store a list of values with display parameters.
+    It is a wrapper around a dictionary of values and their display parameters,
+    which is very time efficient for lookups, because accessing a dictionary is O(1).
     """
+
     def __init__(
         self,
         values: list[str],
         display_values: list[str],
         colors: list[Colors],
     ) -> None:
-        """ Initialize the Values class.
+        """Initialize the Values class.
 
         Args:
             values (list[str]): list of values.
@@ -31,9 +32,13 @@ class Values:
             ValueError: _description_
         """
         if len(values) != len(display_values) or len(values) != len(colors):
-            raise ValueError("Values, display_values, and colors must have the same length.")
+            raise ValueError(
+                "Values, display_values, and colors must have the same length."
+            )
 
-        display_params = [DisplayParams(val, c) for val, c in zip(display_values, colors)]
+        display_params = [
+            DisplayParams(val, c) for val, c in zip(display_values, colors)
+        ]
 
         self._values = {value: params for value, params in zip(values, display_params)}
 
@@ -43,7 +48,7 @@ class Values:
                 params.display_value = value
 
     def __contains__(self, value: str) -> bool:
-        """ Check if a value is in the values list.
+        """Check if a value is in the values list.
 
         Args:
             value (str): The value to check.
@@ -54,7 +59,7 @@ class Values:
         return value in self._values
 
     def __getitem__(self, value: str) -> DisplayParams | None:
-        """ Access the display parameters for a given value.
+        """Access the display parameters for a given value.
 
         Args:
             value (str): The value to get the display parameters for.
@@ -66,7 +71,7 @@ class Values:
         return self._values.get(value, None)
 
     def add_value(self, value: str, display_value: str | None, color: Colors) -> None:
-        """ Add a new value to the values list.
+        """Add a new value to the values list.
 
         Args:
             value (str): The value to add.
