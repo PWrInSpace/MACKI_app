@@ -11,11 +11,7 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt, QTimer, Signal
-from src.com.serial import (
-    QSerial,
-    QSerialState,
-    QSerialStateControlThread
-)
+from src.com.serial import QSerial, QSerialState, QSerialStateControlThread
 from src.utils.qt.better_combo_box import BetterComboBox
 from src.utils.colors import Colors
 
