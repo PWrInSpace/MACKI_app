@@ -75,15 +75,15 @@ class DataDisplayText(DataDisplayBasic):
         Returns:
             Self: The DataDisplayText object.
         """
-        decoder = _JSONDecoder(json_file)
+        decoder = _JSONDeserializer(json_file)
         return decoder.decode()
 
 
-class _JSONDecoder:
+class _JSONDeserializer:
     DEFAULT_COLOR = "white"
 
     def __init__(self, json_file: str) -> None:
-        """ Initializes the JSONDecoder class.
+        """Initializes the JSONDecoder class.
 
         Args:
             json_file (str): The path to the JSON file.
@@ -91,7 +91,7 @@ class _JSONDecoder:
         self._json_file = json_file
 
     def _parse_data_text_number_dict(self, cfg_dict: dict[str, Any]) -> DataTextNumber:
-        """ Parses a dictionary for a DataTextNumber object.
+        """Parses a dictionary for a DataTextNumber object.
 
         Args:
             cfg_dict (dict[str, Any]): The dictionary to parse.
@@ -106,7 +106,7 @@ class _JSONDecoder:
         return DataTextNumber(name, lower_bound, upper_bound)
 
     def _parse_data_text_values_dict(self, cfg_dict: dict[str, Any]) -> DataTextValues:
-        """ Parses a dictionary for a DataTextValues object.
+        """Parses a dictionary for a DataTextValues object.
 
         Args:
             cfg_dict (dict[str, Any]): The dictionary to parse.
@@ -119,7 +119,9 @@ class _JSONDecoder:
         """
         name = cfg_dict["name"]
         enum = cfg_dict["enum"]
-        colors_enum = cfg_dict.get("enum_colors", {k: self.DEFAULT_COLOR for k in enum.keys()})
+        colors_enum = cfg_dict.get(
+            "enum_colors", {k: self.DEFAULT_COLOR for k in enum.keys()}
+        )
 
         if len(enum) != len(colors_enum):
             raise ValueError("Enum and colors enum must have the same length.")
@@ -127,14 +129,16 @@ class _JSONDecoder:
         values = list(enum.keys())
         display_values = list(enum.values())
         colors = [colors_enum[v] for v in values]  # sort colors by values
-        app_colors = [Colors[color.upper()] for color in colors]  # Convert to app colors
+        app_colors = [
+            Colors[color.upper()] for color in colors
+        ]  # Convert to app colors
 
         values_cfg = ValuesConfig(values, display_values, app_colors)
 
         return DataTextValues(name, values_cfg)
 
     def _parse_data_text_basic_dict(self, cfg_dict: dict[str, Any]) -> DataTextBasic:
-        """ Parses a dictionary for a DataTextBasic object.
+        """Parses a dictionary for a DataTextBasic object.
 
         Args:
             cfg_dict (dict[str, Any]): The dictionary to parse.
@@ -146,7 +150,9 @@ class _JSONDecoder:
 
         return DataTextBasic(name)
 
-    def _data_config_from_json_dict(self, json_dict: dict[str, Any]) -> list[DataTextBasic]:
+    def _data_config_from_json_dict(
+        self, json_dict: dict[str, Any]
+    ) -> list[DataTextBasic]:
         """Converts a JSON dictionary to a list of DataTextBasic objects.
 
         Args:
@@ -159,10 +165,10 @@ class _JSONDecoder:
 
         configs = []
         for data in data_list:
-            if ("lower_bound" in data) or ("upper_bound" in data):
-                data_config = self._parse_data_text_number_dict(data)
-            elif "enum" in data:
+            if "enum" in data:
                 data_config = self._parse_data_text_values_dict(data)
+            elif ("lower_bound" in data) or ("upper_bound" in data):
+                data_config = self._parse_data_text_number_dict(data)
             else:
                 data_config = self._parse_data_text_basic_dict(data)
 
@@ -170,8 +176,10 @@ class _JSONDecoder:
 
         return configs
 
-    def _json_dict_to_DataDisplayText(self, json_dict: dict[str, Any]) -> DataDisplayText:
-        """ Converts a JSON dictionary to a DataDisplayText object.
+    def _json_dict_to_DataDisplayText(
+        self, json_dict: dict[str, Any]
+    ) -> DataDisplayText:
+        """Converts a JSON dictionary to a DataDisplayText object.
 
         Args:
             json_dict (dict[str, Any]): The JSON dictionary.
