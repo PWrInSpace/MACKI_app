@@ -16,19 +16,14 @@ vmbpy = {path = "VmbPy"}
 pytest-mock = "^3.14.0"
 pyqt6 = "^6.7.1"
 opencv-python = "^4.10.0.84"
-pyserial = "^3.5"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"
 flake8 = "^7.1.1"
 black = "^24.8.0"
-pytest-cov = "^5.0.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^8.3.2"
-
-[tool.coverage.run]
-concurrency = ["thread"]
 
 [build-system]
 requires = ["poetry-core"]
