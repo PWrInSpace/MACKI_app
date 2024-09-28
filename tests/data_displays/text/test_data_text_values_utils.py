@@ -1,5 +1,5 @@
 import pytest
-from src.data_viewers import Values, DisplayParams
+from src.data_displays import Values, DisplayParams
 from src.utils.colors import Colors
 
 VALUES = ["val1", "val2"]

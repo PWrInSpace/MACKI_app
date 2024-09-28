@@ -1,12 +1,12 @@
 import pytest
-from src.data_viewers import DataViewerBasic
+from src.data_displays import DataDisplayBasic
 
 NAME = "test"
 
 
 @pytest.fixture
 def data_viewer():
-    return DataViewerBasic(NAME)
+    return DataDisplayBasic(NAME)
 
 
 def test_init(data_viewer):

@@ -1,6 +1,6 @@
 import pytest
 from PySide6.QtWidgets import QHBoxLayout
-from src.data_viewers import DataTextBasic
+from src.data_displays import DataTextBasic
 
 NAME = "test"
 DEFAULT_VALUE = ""
