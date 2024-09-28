@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (
 )
 from src.app.cameras_app import QCameraApp
 from src.app.com.macus_widget import MacusWidget
-
+from src.data_displays import DataDisplayText, DataTextBasic, DataTextNumber, DataTextValues, Values
+from src.utils.colors import Colors
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -21,10 +22,31 @@ class MainWindow(QMainWindow):
         self.cameras = QCameraApp()
         # layout.addWidget(self.cameras)
 
-        self.macus_widget = MacusWidget()
-        self.macus_widget.settings_box.setFixedWidth(240)
-        self.macus_widget.setFixedSize(700, 240)
-        layout.addWidget(self.macus_widget)
+        # self.macus_widget = MacusWidget()
+        # self.macus_widget.settings_box.setFixedWidth(240)
+        # self.macus_widget.setFixedSize(700, 240)
+        # layout.addWidget(self.macus_widget)
+        values = Values(["10"], ["KOX"], [Colors.MINT])
+        config = [
+            DataTextBasic("Data Display 1"),
+            DataTextBasic("Data Display 2"),
+            DataTextNumber("Test", 12, 32),
+            DataTextValues("Test values", values)
+        ]
+
+        self.data_display = DataDisplayText(
+            data_display_config=config,
+            name="Data Display",
+            col_num=2,
+        )
+        data = {
+            "Data Display 1": 32,
+            "Data Display 2": 12,
+            "Test": 42,
+            "Test values": 10
+        }
+        self.data_display.update_data(data)
+        layout.addWidget(self.data_display)
 
         widget = QWidget()
         widget.setContentsMargins(0, 0, 0, 0)

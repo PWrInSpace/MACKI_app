@@ -31,6 +31,15 @@ class Values:
         Raises:
             ValueError: _description_
         """
+        if not all(isinstance(value, str) for value in values):
+            raise ValueError("Values must be a list of strings.")
+
+        if not all(isinstance(value, (str, type(None))) for value in display_values):
+            raise ValueError("Display values must be a list of strings or None.")
+
+        if not all(isinstance(color, Colors) for color in colors):
+            raise ValueError("Colors must be a list of Colors.")
+
         if len(values) != len(display_values) or len(values) != len(colors):
             raise ValueError(
                 "Values, display_values, and colors must have the same length."

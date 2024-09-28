@@ -24,3 +24,7 @@ def test_init(data_text):
 def test_update_data(data_text, value):
     data_text.update_data(value)
     assert data_text._value_label.text() == str(value)
+
+
+def test_name_property(data_text):
+    assert data_text.name == NAME

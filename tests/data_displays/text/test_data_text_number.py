@@ -21,6 +21,16 @@ def test_init_default():
     assert data_text._upper_bound == float("inf")
 
 
+def test_invalid_lower_bound_type():
+    with pytest.raises(TypeError):
+        DataTextNumber(NAME, lower_bound="invalid")
+
+
+def test_invalid_upper_bound_type():
+    with pytest.raises(TypeError):
+        DataTextNumber(NAME, upper_bound="invalid")
+
+
 def test_init_lower_bound():
     lower_bound = 0
     data_text = DataTextNumber(NAME, lower_bound=lower_bound)

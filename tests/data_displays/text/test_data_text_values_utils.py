@@ -27,6 +27,20 @@ def test_init_fail():
         Values(VALUES, DEFAULT_VALUE, COLORS[:-1])
 
 
+def test_init_invalid_values_type():
+    with pytest.raises(ValueError):
+        Values([1, 2], DEFAULT_VALUE, COLORS)
+
+
+def test_init_invalid_display_values_type():
+    with pytest.raises(ValueError):
+        Values(VALUES, [1, 2], COLORS)
+
+def test_init_invalid_colors_type():
+    with pytest.raises(ValueError):
+        Values(VALUES, DEFAULT_VALUE, ["red", "blue"])
+
+
 def test_init_replace_none():
     values = Values(VALUES, [None, None], COLORS)
 
