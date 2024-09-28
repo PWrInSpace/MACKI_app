@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 from src.com.serial import (
     QSerial,
     QSerialState,
@@ -230,10 +230,10 @@ class MacusWidget(QWidget):
         return self._com_serial
 
     @property
-    def com_serial_state(self) -> QSerialStateControlThread:
+    def com_state_changed(self) -> Signal:
         """This method returns the serial state object
 
         Returns:
             MacusSerialState: The serial state object
         """
-        return self._com_serial_state
+        return self._com_serial_state.state_changed

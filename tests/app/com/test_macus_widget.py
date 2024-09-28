@@ -160,5 +160,5 @@ def test_com_serial_property(macus_widget):
     assert macus_widget.com_serial == macus_widget._com_serial
 
 
-def test_com_serial_state_property(macus_widget):
-    assert macus_widget.com_serial_state == macus_widget._com_serial_state
+def test_com_state_changed_property(macus_widget):
+    assert macus_widget.com_state_changed == macus_widget._com_serial_state.state_changed
