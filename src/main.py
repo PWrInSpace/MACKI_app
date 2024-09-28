@@ -8,8 +8,10 @@ from PySide6.QtWidgets import (
 )
 from src.app.cameras_app import QCameraApp
 from src.app.com.macus_widget import MacusWidget
-from src.data_displays import DataDisplayText, DataTextNumber, DataTextValues, Values
-from src.utils.colors import Colors
+from src.data_displays import (
+    DataDisplayText,
+)
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,22 +28,11 @@ class MainWindow(QMainWindow):
         # self.macus_widget.settings_box.setFixedWidth(240)
         # self.macus_widget.setFixedSize(700, 240)
         # layout.addWidget(self.macus_widget)
-        values = Values(["10"], ["KOX"], [Colors.MINT])
-        config = [
-            DataTextNumber("Test", 12, 32),
-            DataTextValues("Test values", values)
-        ]
-
-        self.data_display = DataDisplayText(
-            data_display_config=config,
-            name="Data Display",
-            col_num=2,
-        )
+        self.data_display = DataDisplayText.from_JSON("config/data_text.json")
         data = {
-            "Data Display 1": 32,
-            "Data Display 2": 12,
-            "Test": 42,
-            "Test values": 10
+            "title": 32,
+            "pressure": 0,
+            "valve_state": "1",
         }
         self.data_display.update_data(data)
         layout.addWidget(self.data_display)
@@ -56,7 +47,7 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event):
         self.cameras.terminate_threads()
-        self.macus_widget.quit()
+        # self.macus_widget.quit()
         event.accept()
 
 

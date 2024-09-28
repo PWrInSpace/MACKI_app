@@ -20,7 +20,8 @@ class DataTextBasic(QWidget):
         self._init_ui()
 
     def _init_ui(self) -> None:
-        name_label = QLabel(self._name)
+        name = self._name.capitalize().replace("_", " ")
+        name_label = QLabel(name)
         self._value_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
 
         layout = QHBoxLayout()
@@ -29,7 +30,7 @@ class DataTextBasic(QWidget):
 
         # FIXME: replace hardoced size with somthing auto adjustable
         name_label.setFixedWidth(100)
-        self._value_label.setFixedWidth(50)
+        self._value_label.setFixedWidth(75)
 
         self.setLayout(layout)
 

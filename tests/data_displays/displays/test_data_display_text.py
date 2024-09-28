@@ -34,7 +34,7 @@ def test_init_variables(data_display, data_config):
 def test_init_layout(data_display, data_config):
     layout = data_display.layout()
     assert layout.rowCount() == 2
-    assert layout.columnCount() == 3 # 2 values and one bar
+    assert layout.columnCount() == 3  # 2 values and one bar
 
     row = 0
     for i, data_text in enumerate(data_config):
@@ -44,7 +44,10 @@ def test_init_layout(data_display, data_config):
         if i % COL_NUM == COL_NUM - 1:
             row += 1
         else:
-            assert layout.itemAtPosition(row, col + 1).widget().frameShape() == QFrame.VLine
+            assert (
+                layout.itemAtPosition(row, col + 1).widget().frameShape()
+                == QFrame.VLine
+            )
 
 
 def test_update_data(data_display, data_config, mocker):
