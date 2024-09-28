@@ -1,7 +1,7 @@
 from src.data_viewers.abstract.data_viewer_basic import DataViewerBasic
 
 
-class DataViewerText(DataViewerBasic):
+class DataTextValues(DataViewerBasic):
     def __init__(self, name: str = ""):
         super().__init__(name)
 
