@@ -7,26 +7,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 from src.app.cameras_app import QCameraApp
-from src.communication import CommunicationProtocolBasic
-from src.commands import QCmdGroup
-
-
-class Proto(CommunicationProtocolBasic):
-    def connect(self):
-        print("Connected")
-
-    def disconnect(self):
-        print("Disconnected")
-
-    def write(self, data: str):
-        print("Writing", data)
-
-    def read(self):
-        print("Reading")
-
-    def is_connected(self):
-        print("Is connected")
-        return True
+from src.app.com.macus_widget import MacusWidget
 
 
 class MainWindow(QMainWindow):
@@ -34,24 +15,28 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("My App")
+        self.setContentsMargins(0, 0, 0, 0)
 
         layout = QVBoxLayout()
         self.cameras = QCameraApp()
+        # layout.addWidget(self.cameras)
 
-        proto = Proto()
-        group = QCmdGroup.from_JSON("test.json", proto)
-
-        layout.addWidget(group)
-        layout.addWidget(self.cameras)
+        self.macus_widget = MacusWidget()
+        self.macus_widget.settings_box.setFixedWidth(240)
+        self.macus_widget.setFixedSize(700, 240)
+        layout.addWidget(self.macus_widget)
 
         widget = QWidget()
+        widget.setContentsMargins(0, 0, 0, 0)
         widget.setLayout(layout)
 
+        self.setFixedSize(self.sizeHint())
         self.setCentralWidget(widget)
         self.cameras.enable_cameras()
 
     def closeEvent(self, event):
         self.cameras.terminate_threads()
+        self.macus_widget.quit()
         event.accept()
 
 
