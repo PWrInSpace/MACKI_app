@@ -1,5 +1,5 @@
 import pytest
-from PySide6.QtWidgets import QApplication, QComboBox
+from PySide6.QtWidgets import QComboBox
 from PySide6.QtTest import QTest
 from src.commands.qt_args.q_arg_enum import QArgEnum
 
