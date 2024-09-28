@@ -10,13 +10,6 @@ DESCRIPTION = "Description of the enum argument"
 
 
 @pytest.fixture
-def qapp():
-    app = QApplication([])
-    yield app
-    app.quit()
-
-
-@pytest.fixture
 def q_arg_enum():
     return QArgEnum(ARG_NAME, ENUM_OPTIONS, DEFAULT_NAME, DESCRIPTION)
 

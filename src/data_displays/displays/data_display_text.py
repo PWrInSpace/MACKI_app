@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QGridLayout, QFrame
 
-from src.data_displays.displays.data_display_basic import DataDisplayBasic, logger
 from src.data_displays.text.data_text_basic import DataTextBasic
+from src.data_displays.displays.data_display_basic import DataDisplayBasic, logger
 
 
 class DataDisplayText(DataDisplayBasic):
@@ -20,7 +20,7 @@ class DataDisplayText(DataDisplayBasic):
         """
         super().__init__(name)
         self._col_num = col_num
-        self._display_config_dict = {display.name: display for display in data_display_config}
+        self._display_configs = {display.name: display for display in data_display_config}
 
         self._init_ui()
 
@@ -30,17 +30,18 @@ class DataDisplayText(DataDisplayBasic):
         layout = QGridLayout()
 
         row_num = 0
-        for i, data_text in enumerate(self._display_config_dict.values()):
+        for i, data_text in enumerate(self._display_configs.values()):
             col = (i % self._col_num) * 2
             layout.addWidget(data_text, row_num, col)
 
-            if i % self._col_num == self._col_num - 1:
-                row_num += 1
-            else:
+            if i % self._col_num != self._col_num - 1:
                 vline = QFrame()
                 vline.setFrameShape(QFrame.VLine)  # Set to vertical line
                 vline.setFrameShadow(QFrame.Sunken)
                 layout.addWidget(vline, row_num, col + 1)
+            else:
+                # end of row go to next row
+                row_num += 1
 
         self.setLayout(layout)
 
@@ -51,7 +52,7 @@ class DataDisplayText(DataDisplayBasic):
             data_dict (dict[str, any]): A dictionary containing the data to be displayed.
         """
         for name, value in data_dict.items():
-            data_text = self._display_config_dict.get(name, None)
+            data_text = self._display_configs.get(name, None)
 
             if data_text is not None:
                 data_text.update_data(value)
