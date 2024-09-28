@@ -7,6 +7,7 @@ DEFAULT_VALUE = ["def1", "def2"]
 COLORS = [Colors.RED, Colors.BLUE]
 NAME = "test"
 
+
 @pytest.fixture
 def values():
     return ValuesConfig(VALUES, DEFAULT_VALUE, COLORS)
