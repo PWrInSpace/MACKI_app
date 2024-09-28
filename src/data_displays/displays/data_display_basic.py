@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QGroupBox
 
 
-class DataViewerBasic(QGroupBox):
+class DataDisplayBasic(QGroupBox):
     def __init__(self, name: str = "") -> None:
-        """Initialize the DataViewerBasic class.
+        """Initialize the DataDisplayerBasic class.
 
         Args:
             name (str, optional): The name of the viewer. Defaults to "".

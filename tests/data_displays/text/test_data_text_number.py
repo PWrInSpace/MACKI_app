@@ -1,5 +1,5 @@
 import pytest
-from src.data_viewers import DataTextNumber
+from src.data_displays import DataTextNumber
 from src.utils.colors import Colors
 
 NAME = "test"

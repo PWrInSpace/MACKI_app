@@ -1,4 +1,4 @@
-from src.data_viewers.text.data_text_basic import DataTextBasic
+from src.data_displays.text.data_text_basic import DataTextBasic
 
 from src.utils.colors import Colors
 
@@ -9,21 +9,19 @@ class DataTextNumber(DataTextBasic):
     ) -> None:
         super().__init__(name)
 
-        self._lower_bound = float("-inf") if lower_bound is None else lower_bound
-        self._upper_bound = float("inf") if upper_bound is None else upper_bound
+        self._lower_bound = lower_bound or float("-inf")
+        self._upper_bound = upper_bound or float("inf")
 
         if self._lower_bound > self._upper_bound:
             raise ValueError("Lower bound must be less than or equal to upper bound.")
 
     def update_data(self, value: int | float) -> None:
         if self._lower_bound <= value <= self._upper_bound:
-            color = Colors.WHITE
+            self._value_label.setStyleSheet(Colors.WHITE)
         else:
-            color = Colors.RED
+            self._value_label.setStyleSheet(Colors.RED)
 
         if isinstance(value, int):
             self._value_label.setText(str(value))
         else:
             self._value_label.setText(f"{value:.2f}")
-
-        self._value_label.setStyleSheet(f"color: {color.value}")

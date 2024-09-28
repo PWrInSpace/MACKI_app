@@ -1,5 +1,5 @@
-from src.data_viewers.text.data_text_basic import DataTextBasic
-from src.data_viewers.text.data_text_values_utils import Values, DisplayParams
+from src.data_displays.text.data_text_basic import DataTextBasic
+from src.data_displays.text.data_text_values_utils import Values, DisplayParams
 from src.utils.colors import Colors
 
 
