@@ -209,8 +209,6 @@ def test_camera_change_handler_signal(mocker, camera_event):
             assert not stub.called
 
 
-# TODO: Fix the following tests
-
 # def test_start_cameras() -> None:
 #     cameras_menager = CamerasMenagerMock()
 #     vmb = cameras_menager._get_vmb_instance()
@@ -298,3 +296,15 @@ def test_camera_change_handler_signal(mocker, camera_event):
 #         assert cameras_menager.get_state() == CamerasManagerState.STOPPING
 #     else:
 #         assert cameras_menager.get_state() == initial_state
+
+
+# def test_cameras_registered_signal(cameras_menager: CamerasMenagerMock):
+#     signal = cameras_menager.cameras_registered
+#     assert signal is not None
+#     assert signal.receivers() == 0
+
+#     signal.connect(lambda: None)
+#     assert signal.receivers() == 1
+
+#     signal.disconnect()
+#     assert signal.receivers() == 0
