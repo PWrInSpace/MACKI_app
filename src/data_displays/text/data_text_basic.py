@@ -1,5 +1,9 @@
+import logging
 from typing import Any
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
+from PySide6.QtCore import Qt
+
+logger = logging.getLogger("data_text")
 
 
 class DataTextBasic(QWidget):
@@ -17,11 +21,15 @@ class DataTextBasic(QWidget):
 
     def _init_ui(self) -> None:
         name_label = QLabel(self._name)
-        self._value_label = QLabel()
+        self._value_label = QLabel(alignment=Qt.AlignmentFlag.AlignCenter)
 
         layout = QHBoxLayout()
         layout.addWidget(name_label)
         layout.addWidget(self._value_label)
+
+        # FIXME: replace hardoced size with somthing auto adjustable
+        name_label.setFixedWidth(100)
+        self._value_label.setFixedWidth(50)
 
         self.setLayout(layout)
 
@@ -34,3 +42,7 @@ class DataTextBasic(QWidget):
             be able to be converted to a string.
         """
         self._value_label.setText(str(value))
+
+    @property
+    def name(self) -> str:
+        return self._name

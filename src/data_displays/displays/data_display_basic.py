@@ -1,4 +1,7 @@
+import logging
 from PySide6.QtWidgets import QGroupBox
+
+logger = logging.getLogger("data_displayer")
 
 
 class DataDisplayBasic(QGroupBox):

@@ -9,6 +9,12 @@ class DataTextNumber(DataTextBasic):
     ) -> None:
         super().__init__(name)
 
+        if lower_bound is not None and not isinstance(lower_bound, (int, float)):
+            raise TypeError("Lower bound must be an integer or float.")
+
+        if upper_bound is not None and not isinstance(upper_bound, (int, float)):
+            raise TypeError("Upper bound must be an integer or float.")
+
         self._lower_bound = float("-inf") if lower_bound is None else lower_bound
         self._upper_bound = float("inf") if upper_bound is None else upper_bound
 
