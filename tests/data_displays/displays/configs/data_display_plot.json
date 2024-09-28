@@ -1,0 +1,19 @@
+{
+    "name": "Plots",
+    "col_num": 1,
+    "plots": [
+      {
+        "x_name": "time",
+        "y_name": "pressure",
+        "title": "Pressure vs Time",
+        "color": "red",
+        "max_points": 10,
+        "x_label": "Time (s)",
+        "y_label": "Pressure (Pa)"
+      },
+      {
+        "x_name": "time",
+        "y_name": "temperature"
+      }
+    ]
+  }

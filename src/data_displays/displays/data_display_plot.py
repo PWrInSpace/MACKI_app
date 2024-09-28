@@ -3,7 +3,7 @@ from typing import Any, Self
 from PySide6.QtWidgets import QGridLayout
 
 from src.data_displays import DataDisplayBasic
-from src.data_displays.plot.data_plot import DataPlot
+from src.data_displays.plot.data_plot import DataPlot, logger
 
 
 class DataDisplayPlot(DataDisplayBasic):
@@ -44,6 +44,10 @@ class DataDisplayPlot(DataDisplayBasic):
         for plot in self._plots:
             if plot.x_name in data and plot.y_name in data:
                 plot.add_data(data[plot.x_name], data[plot.y_name])
+            else:
+                logger.warning(
+                    f"Data for {plot.x_name} and {plot.y_name} not found in data."
+                )
 
     @staticmethod
     def from_JSON(json_file: str) -> Self:

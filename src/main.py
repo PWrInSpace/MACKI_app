@@ -7,11 +7,9 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 from src.app.cameras_app import QCameraApp
-from src.app.com.macus_widget import MacusWidget
 from src.data_displays import (
     DataDisplayText,
     DataDisplayPlot,
-    DataPlot,
 )
 
 
@@ -53,7 +51,6 @@ class MainWindow(QMainWindow):
         # self.setFixedSize(self.sizeHint())
         self.setCentralWidget(widget)
         # self.cameras.enable_cameras()
-
 
     def closeEvent(self, event):
         self.cameras.terminate_threads()

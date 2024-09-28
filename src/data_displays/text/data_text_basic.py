@@ -1,6 +1,6 @@
 import logging
 from typing import Any
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QSizePolicy
+from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
 from PySide6.QtCore import Qt
 
 logger = logging.getLogger("data_text")

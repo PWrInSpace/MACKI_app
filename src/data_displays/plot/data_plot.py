@@ -15,7 +15,7 @@ class DataPlot(LivePlot):
         x_label: str = "",
         y_label: str = "",
     ) -> None:
-        """ Initialize the DataPlot class.
+        """Initialize the DataPlot class.
 
         Args:
             x_name (str): name of received data to be plotted on x axis.
@@ -31,7 +31,7 @@ class DataPlot(LivePlot):
         super().__init__(title, color, max_points, x_label, y_label)
 
     def add_data(self, data_x: int | float, data_y: int | float) -> None:
-        """ Add a data point to the plot.
+        """Add a data point to the plot.
 
         Args:
             data_x (int | float): The x value of the data point.
@@ -39,9 +39,11 @@ class DataPlot(LivePlot):
         """
         if not isinstance(data_y, (int, float)):
             logger.error(f"Data point {data_y} is not a number.")
+            return
 
         if not isinstance(data_x, (int, float)):
             logger.error(f"Data point {data_x} is not a number.")
+            return
 
         self._data_connector.cb_append_data_point(data_y, data_x)
 
