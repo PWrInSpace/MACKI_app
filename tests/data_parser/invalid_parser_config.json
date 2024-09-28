@@ -1,0 +1,8 @@
+{
+    "format": ">if",
+    "data_names": [
+        "time",
+        "value",
+        "extra"
+    ]
+}
