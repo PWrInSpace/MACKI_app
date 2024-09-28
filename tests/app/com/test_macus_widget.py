@@ -134,7 +134,7 @@ def test_add_rx_message_to_text_box(macus_widget: MacusWidget):
 
 
 def test_timer_routine_popup_not_visible(macus_widget, mocker):
-    spy = mocker.spy(macus_widget, "_update_availabel_ports")
+    spy = mocker.spy(macus_widget, "_update_available_ports")
     mocker.patch.object(
         macus_widget._port_combo, "is_pop_up_visible", return_value=False
     )
@@ -145,7 +145,7 @@ def test_timer_routine_popup_not_visible(macus_widget, mocker):
 
 
 def test_timer_routine_popup_visible(macus_widget, mocker):
-    spy = mocker.spy(macus_widget, "_update_availabel_ports")
+    spy = mocker.spy(macus_widget, "_update_available_ports")
     mocker.patch.object(
         macus_widget._port_combo, "is_pop_up_visible", return_value=True
     )

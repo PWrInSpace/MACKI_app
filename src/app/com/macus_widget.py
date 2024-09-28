@@ -53,7 +53,7 @@ class MacusWidget(QWidget):
         port_label = QLabel("Port")
         self._port_combo = BetterComboBox()
         self._port_combo.addItems(self._com_serial.get_available_ports())
-        self._port_combo.clicked.connect(self._update_availabel_ports)
+        self._port_combo.clicked.connect(self._update_available_ports)
 
         baudrate_label = QLabel("Baudrate")
         self._baudrate_combo = QComboBox()
@@ -124,7 +124,7 @@ class MacusWidget(QWidget):
 
         self.setLayout(grid_layout)
 
-    def _update_availabel_ports(self):
+    def _update_available_ports(self):
         """This method is called when the port combo is clicked"""
         current_port = self._port_combo.currentText()
         available_ports = [port.name for port in self._com_serial.get_available_ports()]
@@ -204,7 +204,7 @@ class MacusWidget(QWidget):
         """This method updates the status"""
         # update the port combo
         if not self._port_combo.is_pop_up_visible():
-            self._update_availabel_ports()
+            self._update_available_ports()
 
     def quit(self):
         """This method stops the threads"""
