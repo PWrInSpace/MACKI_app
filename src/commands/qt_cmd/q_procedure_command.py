@@ -7,6 +7,7 @@ from src.utils.qt import QSerialCmdLay
 from src.commands.qt_cmd.q_serial_command import QSerialCmd
 from src.commands.qt_cmd.q_command_basic import logger
 
+# TO DO: add args test and signal argument tests
 
 class QProcedureCmd(QSerialCmd):
     ADDITIONAL_COLUMNS_NB = 3
@@ -15,8 +16,8 @@ class QProcedureCmd(QSerialCmd):
     LOCK_UNCHECKED = "Locked"
     LOCK_CHECKED = "Unlocked"
 
-    unlocked = Signal()
-    locked = Signal()
+    unlocked = Signal(str)
+    locked = Signal(str)
 
     def __init__(self, name: str, columns_nb: int) -> None:
         """Create a new QProcedureCmd
@@ -66,12 +67,16 @@ class QProcedureCmd(QSerialCmd):
             self._send_lock_widget.setText(self.LOCK_CHECKED)
             self._send_button.setDisabled(False)
             self._unlocked_timer.start(self.UNLOCK_TIMER_TIMEOUT)
-            self.unlocked.emit()
+            self.unlocked.emit(self._name)
         else:
             self._send_lock_widget.setText(self.LOCK_UNCHECKED)
             self._send_button.setDisabled(True)
             self._unlocked_timer.stop()
-            self.locked.emit()
+            self.locked.emit(self._name)
+
+    def set_locked(self) -> None:
+        """Set the command as unlocked"""
+        self._send_lock_widget.setChecked(False)
 
     def set_args_list(self, args_list: list[str]):
         """Set the list of arguments for the command"""
