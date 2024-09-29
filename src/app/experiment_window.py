@@ -21,6 +21,6 @@ class ExperimentWindow(QWidget):
         layout = QGridLayout()
         layout.addWidget(self._cmd_group)
 
-        self.setFixedSize(400, 300)
+        self.setFixedSize(600, 300)
         self.setLayout(layout)
 

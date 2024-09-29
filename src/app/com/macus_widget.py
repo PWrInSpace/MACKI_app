@@ -16,6 +16,8 @@ from src.com.serial import QSerial, QSerialState, QSerialStateControlThread
 from src.utils.qt.better_combo_box import BetterComboBox
 from src.utils.colors import Colors
 
+from datetime import datetime
+
 logger = logging.getLogger("macus_widget")
 
 
@@ -191,7 +193,8 @@ class MacusWidget(QWidget):
         char_format.setForeground(color)
         cursor.setCharFormat(char_format)
 
-        cursor.insertText(message_prefix + data)
+        text = datetime.now().strftime("%H:%M:%S") + " " + message_prefix + data
+        cursor.insertText(text)
         self._text_edit.setTextCursor(cursor)
 
     def _add_tx_message_to_text_box(self, message: str) -> None:
