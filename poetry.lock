@@ -166,7 +166,7 @@ files = [
 
 [[package]]
 name = "numpy"
-version = "1.26.4"
+version = "2.1.1"
 description = "Fundamental package for array computing in Python"
 optional = false
 python-versions = ">=3.10"
@@ -397,6 +397,20 @@ files = [
 numpy = ">=1.22.0"
 
 [[package]]
+name = "pyserial"
+version = "3.5"
+description = "Python Serial Port Extension"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pyserial-3.5-py2.py3-none-any.whl", hash = "sha256:c4451db6ba391ca6ca299fb3ec7bae67a5c55dde170964c7a14ceefec02f2cf0"},
+    {file = "pyserial-3.5.tar.gz", hash = "sha256:3c77e014170dfffbd816e6ffc205e9842efb10be9f58ec16d3e8675b4925cddb"},
+]
+
+[package.extras]
+cp2110 = ["hidapi"]
+
+[[package]]
 name = "pyside6"
 version = "6.7.3"
 description = "Python bindings for the Qt cross-platform application and UI framework"
@@ -528,5 +542,5 @@ url = "VmbPy"
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.11, <3.13"
-content-hash = "b14deb5cbca61868b64f1023753fa2ca247755e5f8e8be26fcb7688406e346a4"
+python-versions = ">3.12 <3.13"
+content-hash = "f75af47aae75458ec94ddc147be0a85db20129ea9ef2f84c345c37716caecb43"
