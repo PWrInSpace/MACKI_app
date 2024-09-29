@@ -4,21 +4,12 @@
   "plots": [
     {
       "x_name": "time",
-      "y_name": "pressure",
-      "title": "Pressure vs Time",
-      "color": "red",
-      "max_points": 10,
-      "x_label": "Time (s)",
-      "y_label": "Pressure (Pa)"
-    },
-    {
-      "x_name": "time",
-      "y_name": "temperature",
-      "title": "Temperature vs Time",
+      "y_name": "load_cell",
+      "title": "Load cell measurements",
       "color": "cyan",
       "max_points": 10,
       "x_label": "Time (s)",
-      "y_label": "Temperature (K)"
+      "y_label": "Force (N)"
     }
   ]
 }
