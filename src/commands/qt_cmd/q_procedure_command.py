@@ -27,7 +27,7 @@ class QProcedureCmd(QSerialCmd):
             for sending/reading the command
         """
         super().__init__(name, None, columns_nb)
-
+        self._args_list = []
         self._unlocked_timer = QTimer()
         self._unlocked_timer.setSingleShot(True)
         self._unlocked_timer.timeout.connect(self._on_unlock_timer_timeout)
@@ -72,6 +72,26 @@ class QProcedureCmd(QSerialCmd):
             self._send_button.setDisabled(True)
             self._unlocked_timer.stop()
             self.locked.emit()
+
+    def set_args_list(self, args_list: list[str]):
+        """Set the list of arguments for the command"""
+        self._args_list = args_list
+
+    @override
+    def _create_command_str(self) -> str:
+        """Create the command string
+        We do not have arguments to choose from, so we just send
+        command with the arguments gicen in the args_list
+
+        Returns:
+            str: command string
+        """
+        command_str = self._name
+
+        if self._args_list:
+            command_str += " " + " ".join(self._args_list)
+
+        return command_str + self.COMMAND_EOF
 
     @override
     def _send_button_clicked(self):
