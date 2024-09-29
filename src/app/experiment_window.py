@@ -1,5 +1,6 @@
 import os
 import logging
+from typing import Any
 from PySide6.QtWidgets import (
     QTabWidget,
     QWidget,
@@ -57,10 +58,15 @@ class ExperimentWindow(QTabWidget):
 
         # Data update timer
         self._data_update_timer = QTimer()
-        self._data_update_timer.timeout.connect(self._update_data)
-        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+        self._data_update_timer.timeout.connect(self._on_update_data_timer)
+        # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
 
     def _experiment_tab(self) -> QWidget:
+        """  Experiment widget
+
+        Returns:
+            QWidget: Experiment widget
+        """
         self._cmd_group = ProcedureCommands(self._protocol)
         self._cameras = QCameraApp()
 
@@ -87,6 +93,11 @@ class ExperimentWindow(QTabWidget):
         return widget
 
     def _service_widget(self) -> QWidget:
+        """Service widget
+
+        Returns:
+            QWidget: Service widget
+        """
         self._service_cmd = QCmdGroup.from_JSON(self.COMMANDS_CONFIG_FILE, self._protocol)
         # TODO: load variable names from parser, to display all available data
         # self._service_data = DataDisplayText.from_JSON(self.DATA_TEXT_CONFIG_FILE)
@@ -103,30 +114,44 @@ class ExperimentWindow(QTabWidget):
 
         return widget
 
-    def _update_data(self) -> None:
-        if self.isHidden():
-            return
+    def _read_data(self) -> str | None:
+        """Reads data from the device
 
+        Returns:
+            str | None: Data read from the device
+        """
         self._protocol.write_command(self.READ_DATA_COMMAND)
         response = self._protocol.read_until_response()
 
-        if response.startswith(self._protocol.NACK):
-            # TODO: raise exception on error???
+        if response.startswith(self._protocol.ACK):
+            return_response = response.replace(self._protocol.ACK, "")
+        elif response.startswith(self._protocol.NACK):
             logger.error("Failed to read data - NACK received")
-            self._continous_nack_counter += 1
+            return_response = None
         elif not response:
             logger.error("Failed to read data - no response")
+            return_response = None
         else:
-            self._continous_nack_counter = 0
-            data_dict = self._parser.parse(response)
-            logger.info(f"Received data: {data_dict}")
+            logger.error(f"Unexpected response: {response}")
+            return_response = None
 
-            if self.currentIndex() == self.IDX_TAB_EXPERIMENT:
-                self._data_texts.update_data(data_dict)
-                self._data_plots.update_data(data_dict)
-            else:
-                self._service_data.update_data(data_dict)
+        return return_response
 
+    def _update_widgets(self, data_dict: dict[str, Any]) -> None:
+        """Updates the widgets with the data
+
+        Args:
+            data_dict (dict[str, Any]): Dictionary with the data keys and values
+        """
+        if self.currentIndex() == self.IDX_TAB_EXPERIMENT:
+            self._data_texts.update_widgets()
+            self._data_plots.update_widgets()
+        else:
+            self._service_data.update_widgets()
+
+    def _check_nack_counter(self) -> None:
+        """ Checks the NACK counter and shows a message box if the limit is reached
+        """
         if self._continous_nack_counter > self.NACK_COUNTER_LIMIT:
             self._continous_nack_counter = 0
             msg_box = QMessageBox()
@@ -134,3 +159,20 @@ class ExperimentWindow(QTabWidget):
             msg_box.setText("Failed to read data - NACK received - check the data_read command!!!")
             msg_box.setWindowTitle("Error")
             msg_box.exec()
+
+    def _on_update_data_timer(self) -> None:
+        """Routine to read the data from the device and update the widgets
+        """
+        if self.isHidden():
+            return
+
+        data = self._read_data()
+        if data:
+            self._continous_nack_counter = 0
+            data_dict = self._parser.parse(data)
+            self._update_widgets(data_dict)
+
+            logger.info(f"Received data: {data_dict}")
+        else:
+            self._continous_nack_counter += 1
+            self._check_nack_counter()
