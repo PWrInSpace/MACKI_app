@@ -4,7 +4,8 @@ from typing import Self
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QGroupBox, QVBoxLayout
 
-from src.communication import CommunicationProtocolBasic
+from src.com.abstract import ComProtoBasic
+from src.com.serial import SerialPort
 from src.commands.qt_cmd import (
     QCmdBasic,
     QSerialCmd,
@@ -20,14 +21,14 @@ class QCmdGroup(QGroupBox):
         self,
         name: str,
         commands: QCmdBasic,
-        protocol: CommunicationProtocolBasic | None = None,
+        protocol: ComProtoBasic | None = None,
     ) -> None:
         """Create a new QCmdGroup
 
         Args:
             name (str): group name
             commands (QCmdBasic): commands
-            protocol (CommunicationProtocolBasic | None, optional): communication protocol.
+            protocol (ComProtoBasic | None, optional): communication protocol.
             Defaults to None.
         """
         super().__init__(name)
@@ -37,11 +38,11 @@ class QCmdGroup(QGroupBox):
 
         self._init_ui()
 
-    def set_protocol(self, protocol: CommunicationProtocolBasic) -> None:
+    def set_protocol(self, protocol: ComProtoBasic) -> None:
         """Set the communication protocol
 
         Args:
-            protocol (CommunicationProtocolBasic): communication protocol
+            protocol (ComProtoBasic): communication protocol
         """
         self._protocol = protocol
 
@@ -64,16 +65,23 @@ class QCmdGroup(QGroupBox):
         """
         if self._protocol is not None:
             self._protocol.write(message)
+            ret = self._protocol.read_until_response()
+            if ret is None:
+                raise ValueError("No response received")
+            elif ret.startswith(self._protocol.NACK):
+                raise ValueError(f"NACK received {ret}")
+            else:
+                logger.info(f"ACK received {ret}")
         else:
             logger.fatal("No protocol set for command group")
 
     @staticmethod
-    def from_JSON(file: str, protocol: CommunicationProtocolBasic) -> Self:
+    def from_JSON(file: str, protocol: ComProtoBasic) -> Self:
         """Create a QCmdGroup from a JSON file
 
         Args:
             file (str): path to JSON file
-            protocol (CommunicationProtocolBasic): communication protocol
+            protocol (ComProtoBasic): communication protocol
 
         Returns:
             Self: QCmdGroup

@@ -10,3 +10,4 @@ class Colors(Enum):
     GREEN = "#9BEC00"
     YELLOW = "#F6FA70"
     WHITE = "#FFFFFF"
+    BLACK = "#000000"
