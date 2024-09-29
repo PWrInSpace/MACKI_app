@@ -76,6 +76,5 @@ class QProcedureCmd(QSerialCmd):
     @override
     def _send_button_clicked(self):
         """Called when the send button is clicked"""
-        logger.info("Send button clicked")
         super()._send_button_clicked()
         self._send_lock_widget.setChecked(False)

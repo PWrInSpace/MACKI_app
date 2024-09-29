@@ -92,7 +92,8 @@ class SerialPort(ComProtoBasic):
         if not data.endswith(self.EOF):
             tx_data += self.EOF
 
-        logger.info(f"TX: {tx_data}")
+        logger.info(f"TX: {tx_data.strip()}")
+        self._serial.reset_input_buffer()
         self._serial.write(tx_data.encode())
 
         if self._on_tx_callback:
