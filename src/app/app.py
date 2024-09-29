@@ -41,9 +41,7 @@ class App(QMainWindow):
             case QSerialState.DISCONNECTED | QSerialState.MISSING:
                 self._experiment_window.setEnabled(False)
 
-
     def closeEvent(self, event):
         self._macus_widget.quit()
         self._experiment_window.hide()
         event.accept()
-

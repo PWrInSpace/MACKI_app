@@ -1,10 +1,11 @@
 import os
 from PySide6.QtWidgets import (
-    QTabWidget, QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QSizePolicy
+    QTabWidget,
+    QWidget,
+    QGridLayout,
+    QVBoxLayout,
 )
-from PySide6.QtCore import (
-    Qt
-)
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.abstract import ComProtoBasic
@@ -24,7 +25,9 @@ class ExperimentWindow(QTabWidget):
         """This method initializes the ExperimentWindow class"""
         super().__init__()
         self.setWindowTitle("MACKI - Experiment window")
-        self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint | Qt.WindowMaximizeButtonHint)
+        self.setWindowFlags(
+            Qt.Window | Qt.CustomizeWindowHint | Qt.WindowMaximizeButtonHint
+        )
         self.setWindowIcon(QIcon(self.OCTOPUS_LOGO))
 
         experiment_tab = self._experiment_tab(protocol)

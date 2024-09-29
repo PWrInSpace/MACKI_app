@@ -14,7 +14,9 @@ class ProcedureCommands(QCmdGroup):
     def __init__(self, protocol):
         commands = {
             self.MOTION_COMMAND: QProcedureCmd(self.MOTION_COMMAND, self.COLUMNS_NUM),
-            self.PRESSURE_COMMAND: QProcedureCmd(self.PRESSURE_COMMAND, self.COLUMNS_NUM),
+            self.PRESSURE_COMMAND: QProcedureCmd(
+                self.PRESSURE_COMMAND, self.COLUMNS_NUM
+            ),
             self.TEST_COMMAND: QProcedureCmd(self.TEST_COMMAND, self.COLUMNS_NUM),
             self.MAIN_COMMAND: QProcedureCmd(self.MAIN_COMMAND, self.COLUMNS_NUM),
         }

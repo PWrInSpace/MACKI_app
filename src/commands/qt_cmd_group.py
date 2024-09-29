@@ -5,7 +5,6 @@ from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QGroupBox, QVBoxLayout
 
 from src.com.abstract import ComProtoBasic
-from src.com.serial import SerialPort
 from src.commands.qt_cmd import (
     QCmdBasic,
     QSerialCmd,
