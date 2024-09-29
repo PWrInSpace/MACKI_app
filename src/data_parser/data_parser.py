@@ -53,7 +53,7 @@ class DataParser:
         return data_dict
 
     @staticmethod
-    def from_json(json_file: str) -> Self:
+    def from_JSON(json_file: str) -> Self:
         """Creates a DataParser object from a json file
 
         Args:
@@ -66,3 +66,12 @@ class DataParser:
             json_data = json.load(file)
 
         return DataParser(json_data["format"], json_data["data_names"])
+
+    @property
+    def data_names(self) -> list[str]:
+        """ Returns the data keys of the DataParser object
+
+        Returns:
+            List[str]: List of data keys (data names)
+        """
+        return self._data_keys

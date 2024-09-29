@@ -1,17 +1,24 @@
 import os
+import logging
 from PySide6.QtWidgets import (
     QTabWidget,
     QWidget,
     QGridLayout,
     QVBoxLayout,
+    QMessageBox
 )
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
-from src.com.abstract import ComProtoBasic
+from src.com.serial import QSerial
 from src.app.cameras_app import QCameraApp
 from src.app.commands import ProcedureCommands
-from src.data_displays import DataDisplayText, DataDisplayPlot
+from src.data_displays import (
+    DataDisplayText, DataDisplayPlot, DataTextBasic
+)
+from src.data_parser import DataParser
+
+logger = logging.getLogger("experiment_window")
 
 
 class ExperimentWindow(QTabWidget):
@@ -19,9 +26,14 @@ class ExperimentWindow(QTabWidget):
     COMMANDS_CONFIG_FILE = os.path.join(CONFIG_DIR, "service_commands.json")
     DATA_PLOT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_plot.json")
     DATA_TEXT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_text.json")
+    PARSER_CONFIG_FILE = os.path.join(CONFIG_DIR, "data_parser.json")
     OCTOPUS_LOGO = os.path.join(os.getcwd(), "resources", "octopus.svg")
+    NACK_COUNTER_LIMIT = 10
+    DATA_UPDATE_INTERVAL = 500
+    IDX_TAB_EXPERIMENT = 0
+    READ_DATA_COMMAND = "data"  # TODO: move the all available commands to a separate file
 
-    def __init__(self, protocol: ComProtoBasic) -> None:
+    def __init__(self, protocol: QSerial) -> None:
         """This method initializes the ExperimentWindow class"""
         super().__init__()
         self.setWindowTitle("MACKI - Experiment window")
@@ -30,14 +42,26 @@ class ExperimentWindow(QTabWidget):
         )
         self.setWindowIcon(QIcon(self.OCTOPUS_LOGO))
 
-        experiment_tab = self._experiment_tab(protocol)
-        service_tab = self._service_widget(protocol)
+        self._protocol = protocol
+
+        # Parser
+        self._parser = DataParser.from_JSON(self.PARSER_CONFIG_FILE)
+        self._continous_nack_counter = 0
+
+        # Tabs
+        experiment_tab = self._experiment_tab()
+        service_tab = self._service_widget()
 
         self.addTab(experiment_tab, "Experiment")
         self.addTab(service_tab, "Service")
 
-    def _experiment_tab(self, protocol: ComProtoBasic) -> QWidget:
-        self._cmd_group = ProcedureCommands(protocol)
+        # Data update timer
+        self._data_update_timer = QTimer()
+        self._data_update_timer.timeout.connect(self._update_data)
+        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+
+    def _experiment_tab(self) -> QWidget:
+        self._cmd_group = ProcedureCommands(self._protocol)
         self._cameras = QCameraApp()
 
         self._data_plots = DataDisplayPlot.from_JSON(self.DATA_PLOT_CONFIG_FILE)
@@ -62,10 +86,13 @@ class ExperimentWindow(QTabWidget):
 
         return widget
 
-    def _service_widget(self, protocol: ComProtoBasic) -> QWidget:
-        self._service_cmd = QCmdGroup.from_JSON(self.COMMANDS_CONFIG_FILE, protocol)
+    def _service_widget(self) -> QWidget:
+        self._service_cmd = QCmdGroup.from_JSON(self.COMMANDS_CONFIG_FILE, self._protocol)
         # TODO: load variable names from parser, to display all available data
-        self._service_data = DataDisplayText.from_JSON(self.DATA_TEXT_CONFIG_FILE)
+        # self._service_data = DataDisplayText.from_JSON(self.DATA_TEXT_CONFIG_FILE)
+        variable_list = self._parser.data_names
+        display_cfg = [DataTextBasic(var) for var in variable_list]
+        self._service_data = DataDisplayText(display_cfg, "data", 4)
 
         layout = QGridLayout()
         layout.addWidget(self._service_cmd, 0, 0)
@@ -75,3 +102,35 @@ class ExperimentWindow(QTabWidget):
         widget.setLayout(layout)
 
         return widget
+
+    def _update_data(self) -> None:
+        if self.isHidden():
+            return
+
+        self._protocol.write_command(self.READ_DATA_COMMAND)
+        response = self._protocol.read_until_response()
+
+        if response.startswith(self._protocol.NACK):
+            # TODO: raise exception on error???
+            logger.error("Failed to read data - NACK received")
+            self._continous_nack_counter += 1
+        elif not response:
+            logger.error("Failed to read data - no response")
+        else:
+            self._continous_nack_counter = 0
+            data_dict = self._parser.parse(response)
+            logger.info(f"Received data: {data_dict}")
+
+            if self.currentIndex() == self.IDX_TAB_EXPERIMENT:
+                self._data_texts.update_data(data_dict)
+                self._data_plots.update_data(data_dict)
+            else:
+                self._service_data.update_data(data_dict)
+
+        if self._continous_nack_counter > self.NACK_COUNTER_LIMIT:
+            self._continous_nack_counter = 0
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Critical)
+            msg_box.setText("Failed to read data - NACK received - check the data_read command!!!")
+            msg_box.setWindowTitle("Error")
+            msg_box.exec()

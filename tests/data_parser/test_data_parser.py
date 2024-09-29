@@ -62,13 +62,13 @@ def test_from_json_invalid_file():
     json_file_path = os.path.join(CONFIG_FILES_DIR, "parser_config_fail.json")
 
     with pytest.raises(FileNotFoundError):
-        DataParser.from_json(json_file_path)
+        DataParser.from_JSON(json_file_path)
 
 
 def test_from_json_pass():
     json_file_path = os.path.join(CONFIG_FILES_DIR, "parser_config.json")
 
-    data_parser = DataParser.from_json(json_file_path)
+    data_parser = DataParser.from_JSON(json_file_path)
 
     assert data_parser._format == ">if"
     assert data_parser._data_keys == ["time", "value"]
@@ -78,4 +78,4 @@ def test_from_json_invalid_format():
     json_file_path = os.path.join(CONFIG_FILES_DIR, "invalid_parser_config.json")
 
     with pytest.raises(ValueError):
-        DataParser.from_json(json_file_path)
+        DataParser.from_JSON(json_file_path)
