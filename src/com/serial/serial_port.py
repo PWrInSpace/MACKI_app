@@ -15,8 +15,8 @@ class SerialPort(ComProtoBasic):
     READ_TIMEOUT_S = 0.1
     WRITE_TIMEOUT_S = 0.1
 
-    ACK = "ACK"
-    NACK = "NACK"
+    ACK = "OK: "
+    NACK = "ERR: "
 
     def __init__(
         self,
@@ -92,6 +92,7 @@ class SerialPort(ComProtoBasic):
         if not data.endswith(self.EOF):
             tx_data += self.EOF
 
+        logger.info(f"TX: {tx_data}")
         self._serial.write(tx_data.encode())
 
         if self._on_tx_callback:
@@ -156,22 +157,25 @@ class SerialPort(ComProtoBasic):
         """
         self._on_tx_callback = callback
 
-    # def read_response(self) -> str:
-    #     """ This method reads the response from the device
+    def read_until_response(self) -> str:
+        """ This method reads the response from the device
 
-    #     Returns:
-    #         str: The response from the device
-    #     """
-    #     response = self.read()
+        Returns:
+            str: The response from the device
+        """
+        iterations = 0
+        while iterations < 10:
+            iterations += 1
+            line = self._serial.read_until(self.EOF.encode())
+            line = line.decode().strip()
 
-    #     if self.ACK in response:
-    #         response = response.replace(self.ACK, "")
-    #     elif self.NACK in response:
-    #         raise SerialException(f"NACK received: {response}")
-    #     else:
-    #         raise SerialException(f"Invalid response: {response}")
+            if line.startswith((self.ACK, self.NACK)):
+                if self._on_rx_callback:
+                    self._on_rx_callback(line)
 
-    #     return response
+                return line
+
+        return None
 
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response

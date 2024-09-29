@@ -54,7 +54,7 @@
         },
         {
             "cmd_type": "QProcedureCmd",
-            "name": "test"
+            "name": "dummy"
         }
     ]
 }
