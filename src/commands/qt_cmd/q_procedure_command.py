@@ -5,9 +5,9 @@ from PySide6.QtWidgets import QLabel, QCheckBox, QPushButton
 
 from src.utils.qt import QSerialCmdLay
 from src.commands.qt_cmd.q_serial_command import QSerialCmd
-from src.commands.qt_cmd.q_command_basic import logger
 
 # TO DO: add args test and signal argument tests
+
 
 class QProcedureCmd(QSerialCmd):
     ADDITIONAL_COLUMNS_NB = 3

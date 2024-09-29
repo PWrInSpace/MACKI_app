@@ -159,7 +159,7 @@ class SerialPort(ComProtoBasic):
         self._on_tx_callback = callback
 
     def read_until_response(self) -> str:
-        """ This method reads the response from the device
+        """This method reads the response from the device
 
         Returns:
             str: The response from the device

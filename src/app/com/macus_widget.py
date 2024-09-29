@@ -131,7 +131,9 @@ class MacusWidget(QWidget):
     def _update_available_ports(self):
         """This method is called when the port combo is clicked"""
         current_port = self._port_combo.currentText()
-        available_ports = [port.device for port in self._com_serial.get_available_ports()]
+        available_ports = [
+            port.device for port in self._com_serial.get_available_ports()
+        ]
 
         self._port_combo.clear()
         self._port_combo.addItems(available_ports)
