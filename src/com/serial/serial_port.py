@@ -170,6 +170,9 @@ class SerialPort(ComProtoBasic):
             line = self._serial.read_until(self.EOF.encode())
             line = line.decode().strip()
 
+
+            print(f"RX: {line}")
+
             if line.startswith((self.ACK, self.NACK)):
                 if self._on_rx_callback:
                     self._on_rx_callback(line)

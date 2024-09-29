@@ -4,27 +4,29 @@
     "commands": [
         {
             "cmd_type": "QSerialCmd",
-            "name": "test",
+            "name": "move_valve",
             "args": [
                 {
-                    "arg_type": "QArgInt",
-                    "name": "test",
-                    "default_value": 0,
-                    "min_value": 0,
-                    "max_value": 10,
-                    "unit": "test",
-                    "description": "test"
+                    "arg_type": "QArgEnum",
+                    "name": "valve",
+                    "enum": {
+                        "valve1": 0,
+                        "valve2": 1,
+                        "valve3": 2,
+                        "valve4": 3
+                    },
+                    "default_name": "valve1",
+                    "description": ""
                 },
                 {
                     "arg_type": "QArgEnum",
-                    "name": "enum",
+                    "name": "state",
                     "enum": {
-                        "test": 0,
-                        "test2": 1,
-                        "test3": 2
+                        "CLOSE": 0,
+                        "OPEN": 1
                     },
-                    "default_name": "test2",
-                    "description": "enum description"
+                    "default_name": "CLOSE",
+                    "description": "Valve state"
                 }
             ]
         },
