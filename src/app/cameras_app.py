@@ -26,6 +26,7 @@ class QCameraApp(QCamerasManager):
     Camera app - main widget, handling all cameras and
     widgets for displaying and writing frames.
     """
+    OCTOPUS_LOGO = os.path.join(os.getcwd(), "resources", "octopus_apple.png")
 
     def __init__(self):
         cameras = [
@@ -39,6 +40,7 @@ class QCameraApp(QCamerasManager):
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
+                        self.OCTOPUS_LOGO
                     ),
                     VideoWriter("CAM1", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
                 ],
@@ -54,6 +56,7 @@ class QCameraApp(QCamerasManager):
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
+                        self.OCTOPUS_LOGO
                     ),
                     VideoWriter("CAM2", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
                 ],
@@ -69,6 +72,7 @@ class QCameraApp(QCamerasManager):
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
+                        self.OCTOPUS_LOGO
                     ),
                     VideoWriter("CAM3", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
                 ],
@@ -84,6 +88,7 @@ class QCameraApp(QCamerasManager):
                         DEFAULT_FRAME_SIZE,
                         MINI_FRAME_SIZE,
                         FRAME_FORMAT,
+                        self.OCTOPUS_LOGO
                     ),
                     VideoWriter("Alvium", 9, (1216, 1936), VIDEO_DIR),
                 ],

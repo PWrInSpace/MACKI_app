@@ -168,7 +168,7 @@ class CameraHandler(QThread):
             frame (npt.ArrayLike): The frame to be added
         """
         if frame is None:
-            logger.warn(f"Camera {self._id}, frame is None :C")
+            logger.warning(f"Camera {self._id}, frame is None :C")
             return
 
         for handler in self._handlers:
