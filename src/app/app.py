@@ -5,17 +5,16 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Slot
 from PySide6.QtGui import QIcon
 
+from src.app.config import OCTOPUS_SERIAL_WIN
 from src.app.com.macus_widget import MacusWidget
 from src.com.serial import QSerialState
 from src.app.experiment_window import ExperimentWindow
 
 
 class App(QMainWindow):
-    OCTOPUS_LOGO = os.path.join(os.getcwd(), "resources", "octopus.png")
-
     def __init__(self):
         super().__init__()
-        self.setWindowIcon(QIcon(self.OCTOPUS_LOGO))
+        self.setWindowIcon(QIcon(OCTOPUS_SERIAL_WIN))
 
         self._macus_widget = MacusWidget()
         self._macus_widget.settings_box.setFixedWidth(240)

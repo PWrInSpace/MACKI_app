@@ -1,4 +1,3 @@
-import os
 import logging
 from typing import Any
 from PySide6.QtWidgets import (
@@ -7,6 +6,14 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QVBoxLayout,
     QMessageBox
+)
+from src.app.config import (
+    COMMANDS_CONFIG_FILE,
+    DATA_PLOT_CONFIG_FILE,
+    DATA_TEXT_CONFIG_FILE,
+    PARSER_CONFIG_FILE,
+    OCTOPUS_EXP_WIN,
+    OCTOPUS_CAM_WIN
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
@@ -23,16 +30,12 @@ logger = logging.getLogger("experiment_window")
 
 
 class ExperimentWindow(QTabWidget):
-    CONFIG_DIR = os.path.join(os.getcwd(), "config")
-    COMMANDS_CONFIG_FILE = os.path.join(CONFIG_DIR, "service_commands.json")
-    DATA_PLOT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_plot.json")
-    DATA_TEXT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_text.json")
-    PARSER_CONFIG_FILE = os.path.join(CONFIG_DIR, "data_parser.json")
-    OCTOPUS_LOGO = os.path.join(os.getcwd(), "resources", "octopus.svg")
     NACK_COUNTER_LIMIT = 10
     DATA_UPDATE_INTERVAL = 500
     IDX_TAB_EXPERIMENT = 0
     READ_DATA_COMMAND = "data"  # TODO: move the all available commands to a separate file
+    SERVICE_DATA_NAME = "Data"
+    SERVICE_DATA_COLUMNS = 4
 
     def __init__(self, protocol: QSerial) -> None:
         """This method initializes the ExperimentWindow class"""
@@ -41,12 +44,12 @@ class ExperimentWindow(QTabWidget):
         self.setWindowFlags(
             Qt.Window | Qt.CustomizeWindowHint | Qt.WindowMaximizeButtonHint
         )
-        self.setWindowIcon(QIcon(self.OCTOPUS_LOGO))
+        self.setWindowIcon(QIcon(OCTOPUS_EXP_WIN))
 
         self._protocol = protocol
 
         # Parser
-        self._parser = DataParser.from_JSON(self.PARSER_CONFIG_FILE)
+        self._parser = DataParser.from_JSON(PARSER_CONFIG_FILE)
         self._continous_nack_counter = 0
 
         # Tabs
@@ -68,10 +71,10 @@ class ExperimentWindow(QTabWidget):
             QWidget: Experiment widget
         """
         self._cmd_group = ProcedureCommands(self._protocol)
-        self._cameras = QCameraApp()
+        self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
 
-        self._data_plots = DataDisplayPlot.from_JSON(self.DATA_PLOT_CONFIG_FILE)
-        self._data_texts = DataDisplayText.from_JSON(self.DATA_TEXT_CONFIG_FILE)
+        self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
+        self._data_texts = DataDisplayText.from_JSON(DATA_TEXT_CONFIG_FILE)
 
         data_layout = QVBoxLayout()
         data_layout.setContentsMargins(0, 0, 0, 0)
@@ -98,12 +101,13 @@ class ExperimentWindow(QTabWidget):
         Returns:
             QWidget: Service widget
         """
-        self._service_cmd = QCmdGroup.from_JSON(self.COMMANDS_CONFIG_FILE, self._protocol)
-        # TODO: load variable names from parser, to display all available data
-        # self._service_data = DataDisplayText.from_JSON(self.DATA_TEXT_CONFIG_FILE)
+        self._service_cmd = QCmdGroup.from_JSON(COMMANDS_CONFIG_FILE, self._protocol)
+
         variable_list = self._parser.data_names
         display_cfg = [DataTextBasic(var) for var in variable_list]
-        self._service_data = DataDisplayText(display_cfg, "data", 4)
+        self._service_data = DataDisplayText(
+            display_cfg, self.SERVICE_DATA_NAME, self.SERVICE_DATA_COLUMNS
+        )
 
         layout = QGridLayout()
         layout.addWidget(self._service_cmd, 0, 0)
