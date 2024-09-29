@@ -48,4 +48,3 @@ class ExperimentWindow(QWidget):
 
         # self.setFixedSize(600, 300)
         self.setLayout(layout)
-
