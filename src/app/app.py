@@ -17,8 +17,8 @@ class App(QMainWindow):
         self.setWindowIcon(QIcon(OCTOPUS_SERIAL_WIN))
 
         self._macus_widget = MacusWidget()
-        self._macus_widget.settings_box.setFixedWidth(240)
-        self._macus_widget.setFixedSize(700, 240)
+        self._macus_widget.settings_box.setFixedWidth(250)
+        self._macus_widget.setFixedSize(700, 250)
 
         self._macus_widget.com_state_changed.connect(self._on_state_changed)
 

@@ -17,9 +17,12 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
 
 def main():
-    # sys.excepthook = excepthook
+    sys.excepthook = excepthook
     logging.basicConfig(level=logging.INFO)
     app = QApplication(sys.argv)
+
+    with open("resources/theme.qss") as f:
+        app.setStyleSheet(f.read())
 
     window = App()
     window.show()

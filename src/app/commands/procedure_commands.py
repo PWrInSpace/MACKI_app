@@ -7,7 +7,7 @@ from src.commands.qt_cmd import QProcedureCmd
 class ProcedureCommands(QCmdGroup):
     COLUMNS_NUM = 3
     MOTION_COMMAND = "Motion procedure"
-    PRESSURE_COMMAND = "Pressurization procedure"
+    PRESSURE_COMMAND = "Press procedure"
     TEST_COMMAND = "Test procedure"
     MAIN_COMMAND = "Main procedure"
 
