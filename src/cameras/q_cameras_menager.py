@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout
+from PySide6.QtWidgets import QGroupBox, QVBoxLayout
 from PySide6.QtCore import QTimer
 from src.cameras.cameras_manager import CamerasManager
 from src.cameras.camera_handler import CameraHandler, logger
@@ -7,11 +7,11 @@ from src.cameras.q_camera import (
 )
 
 
-class QCamerasManager(QWidget):
+class QCamerasManager(QGroupBox):
     STATUS_UPDATE_INTERVAL_MS = 100
 
-    def __init__(self, cameras: list[QCamera]) -> None:
-        super().__init__()
+    def __init__(self, cameras: list[QCamera], name: str = "Cameras") -> None:
+        super().__init__(name)
 
         self._cameras_backend_dict = {camera.id: camera for camera in cameras}
 
