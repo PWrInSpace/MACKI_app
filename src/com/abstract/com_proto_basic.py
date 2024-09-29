@@ -1,4 +1,7 @@
 class ComProtoBasic:
+    ACK = "ACK"
+    NACK = "NACK"
+
     def connect(self):
         """Connect to the device"""
         raise NotImplementedError("Method not implemented")
@@ -21,4 +24,8 @@ class ComProtoBasic:
 
     def is_connected(self):
         """Check if the device is connected"""
+        raise NotImplementedError("Method not implemented")
+
+    def read_until_response(self):
+        """Read until a response is received"""
         raise NotImplementedError("Method not implemented")
