@@ -1,12 +1,33 @@
 {
   "name": "Experiment data",
-  "col_num": 2,
+  "col_num": 4,
   "data": [
+    {
+      "name": "time"
+    },
     {
       "name": "title"
     },
     {
+      "name": "load_cell"
+    },
+    {
+      "name": "temperature",
+      "lower_bound": 0,
+      "upper_bound": 100
+    },
+    {
+      "name": "humidity",
+      "lower_bound": 0,
+      "upper_bound": 100
+    },
+    {
       "name": "pressure",
+      "lower_bound": 0,
+      "upper_bound": 10
+    },
+    {
+      "name": "flow_rate",
       "lower_bound": 0,
       "upper_bound": 10
     },

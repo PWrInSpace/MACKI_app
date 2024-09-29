@@ -184,7 +184,7 @@ class MacusWidget(QWidget):
         elif data.startswith(self._com_serial.NACK):
             color = Qt.red
         else:
-            color = Qt.black
+            color = Qt.white
 
         cursor = self._text_edit.textCursor()
         cursor.movePosition(QTextCursor.Start)
