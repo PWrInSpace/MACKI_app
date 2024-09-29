@@ -30,20 +30,23 @@ class ProcedureCommands(QCmdGroup):
             if command.name != name:
                 command.set_locked()
 
+    def _add_command_to_layout(self, layout, command):
+        layout.addWidget(command)
+        command.send_clicked.connect(self._on_send_clicked)
+
     @override
     def _init_ui(self):
         layout = QVBoxLayout()
 
         commands_list = list(self._commands.values())
         for command in commands_list[:-1]:
-            layout.addWidget(command)
-            command.send_clicked.connect(self._on_send_clicked)
+            self._add_command_to_layout(layout, command)
 
         horizontal_bar = QFrame()
         horizontal_bar.setFrameShape(QFrame.HLine)
         horizontal_bar.setFrameShadow(QFrame.Sunken)
         layout.addWidget(horizontal_bar)
 
-        layout.addWidget(commands_list[-1])
+        self._add_command_to_layout(layout, commands_list[-1])
 
         self.setLayout(layout)
