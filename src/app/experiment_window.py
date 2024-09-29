@@ -9,6 +9,7 @@ from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.abstract import ComProtoBasic
 from src.app.cameras_app import QCameraApp
+from src.app.commands import ProcedureCommands
 from src.data_displays import DataDisplayText, DataDisplayPlot
 
 
@@ -33,7 +34,7 @@ class ExperimentWindow(QTabWidget):
         self.addTab(service_tab, "Service")
 
     def _experiment_tab(self, protocol: ComProtoBasic) -> QWidget:
-        self._cmd_group = QCmdGroup.from_JSON(self.COMMANDS_CONFIG_FILE, protocol)
+        self._cmd_group = ProcedureCommands(protocol)
         self._cameras = QCameraApp()
 
         self._data_plots = DataDisplayPlot.from_JSON(self.DATA_PLOT_CONFIG_FILE)
