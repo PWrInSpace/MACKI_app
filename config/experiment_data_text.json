@@ -6,42 +6,72 @@
       "name": "time"
     },
     {
-      "name": "title"
+      "name": "acceleration"
     },
     {
-      "name": "load_cell"
-    },
-    {
-      "name": "temperature",
+      "name": "pressure tank",
       "lower_bound": 0,
-      "upper_bound": 100
+      "upper_bound": 4
     },
     {
-      "name": "humidity",
+      "name": "pressure gripper",
       "lower_bound": 0,
-      "upper_bound": 100
+      "upper_bound": 1.5
     },
     {
-      "name": "pressure",
-      "lower_bound": 0,
-      "upper_bound": 10
-    },
-    {
-      "name": "flow_rate",
-      "lower_bound": 0,
-      "upper_bound": 10
-    },
-    {
-      "name": "valve_state",
+      "name": "fill valve",
       "enum": {
-        "1": "ROTATING",
-        "2": "STATIC",
+        "1": "OPEN",
+        "2": "CLOSE",
         "3": "UNKNOWN"
       },
       "enum_colors": {
-        "1": "mint",
-        "2": "green",
-        "3": "blue"
+        "1": "blue",
+        "2": "white",
+        "3": "red"
+      }
+    },
+    {
+      "name": "vent valve",
+      "enum": {
+        "1": "OPEN",
+        "2": "CLOSE",
+        "3": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "blue",
+        "2": "white",
+        "3": "red"
+      }
+    },
+    {
+      "name": "motor 1",
+      "enum": {
+        "1": "IDLE",
+        "2": "CW",
+        "3": "CCW",
+        "4": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "white",
+        "2": "mint",
+        "3": "purple",
+        "4": "red"
+      }
+    },
+    {
+      "name": "motor 2",
+      "enum": {
+        "1": "IDLE",
+        "2": "CW",
+        "3": "CCW",
+        "4": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "white",
+        "2": "mint",
+        "3": "purple",
+        "4": "red"
       }
     }
   ]

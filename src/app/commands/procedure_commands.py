@@ -9,7 +9,7 @@ class ProcedureCommands(QCmdGroup):
     MOTION_COMMAND = "Motion procedure"
     PRESSURE_COMMAND = "Press procedure"
     TEST_COMMAND = "Test procedure"
-    MAIN_COMMAND = "Main procedure"
+    MAIN_COMMAND = "procedure"
 
     def __init__(self, protocol):
         commands = {
@@ -21,8 +21,6 @@ class ProcedureCommands(QCmdGroup):
             self.MAIN_COMMAND: QProcedureCmd(self.MAIN_COMMAND, self.COLUMNS_NUM),
         }
         super().__init__("Procedure Commands", commands, protocol)
-
-        commands[self.MAIN_COMMAND].set_args_list(["123", "skibidi"])
 
         for command in commands.values():
             command.unlocked.connect(self._on_command_unlock)

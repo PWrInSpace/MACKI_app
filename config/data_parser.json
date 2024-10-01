@@ -1,7 +1,28 @@
 {
-    "format": ">if",
+    "format": ">iiiiiiiiiiiiiiiiiiiiiii",
     "data_names": [
         "time",
-        "value"
+        "load_cell",
+        "acceleration",
+        "pressure tank",
+        "pressure gripper",
+        "fill valve",
+        "vent valve",
+        "motor 1 state",
+        "motor 2 state",
+        "motor 1 speed",
+        "motor 2 speed",
+        "distance sensor 1",
+        "distance sensor 2",
+        "temperature 1",
+        "temperature 2",
+        "endstop motor1 top",
+        "endstop motor2 bottom",
+        "endstop motor2 top",
+        "endstop motor2 bottom",
+        "endstop door 1",
+        "endstop door 2",
+        "board state",
+        "procedrue time"
     ]
 }

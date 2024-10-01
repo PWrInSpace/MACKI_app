@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Any
 from PySide6.QtWidgets import (
     QTabWidget,
@@ -63,6 +64,23 @@ class ExperimentWindow(QTabWidget):
         self._data_update_timer = QTimer()
         self._data_update_timer.timeout.connect(self._on_update_data_timer)
         # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+
+        for i in range(0, 50):
+            self._update_widgets({"time": i, "load_cell": random.randint(0, 10)})
+
+        self._update_widgets(
+            {
+                "time": 50,
+                "load_cell": 3,
+                "acceleration": 9.83,
+                "pressure tank": 3.5,
+                "pressure gripper": 2.5,
+                "fill valve": "1",
+                "vent valve": "2",
+                "motor 1": "2",
+                "motor 2": "3"
+            }
+        )
 
     def _experiment_tab(self) -> QWidget:
         """  Experiment widget
@@ -148,10 +166,10 @@ class ExperimentWindow(QTabWidget):
             data_dict (dict[str, Any]): Dictionary with the data keys and values
         """
         if self.currentIndex() == self.IDX_TAB_EXPERIMENT:
-            self._data_texts.update_widgets()
-            self._data_plots.update_widgets()
+            self._data_texts.update_data(data_dict)
+            self._data_plots.update_data(data_dict)
         else:
-            self._service_data.update_widgets()
+            self._service_data.update_data(data_dict)
 
     def _check_nack_counter(self) -> None:
         """ Checks the NACK counter and shows a message box if the limit is reached

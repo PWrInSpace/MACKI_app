@@ -3,7 +3,7 @@ from enum import Enum
 
 class Colors(Enum):
     RED = "#FF204E"
-    BLUE = "#A3D8FF"
+    BLUE = "#05d9ff"
     MINT = "#15F5BA"
     PINK = "#AF47D2"
     PURPLE = "#B8B5FF"
