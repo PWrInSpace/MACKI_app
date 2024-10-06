@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 from typing import override
 from queue import Queue
-from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType
+from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType, PixelFormat
 from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler
 from src.utils.qt.thread_event import ThreadEvent
@@ -127,7 +127,8 @@ class CameraHandler(QThread):
                 self._frame_queue.get_nowait()
                 logger.warning(f"Camera {self._id} lost one frame")
 
-            self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
+            debayered_frame = frame_cpy.convert_pixel_format(PixelFormat.Rgb8)
+            self._frame_queue.put_nowait(debayered_frame.as_numpy_ndarray())
 
         camera.queue_frame(frame)
 
@@ -185,6 +186,7 @@ class CameraHandler(QThread):
 
         try:
             frame = self._get_the_newest_frame()
+
             self._add_frame_to_handlers(frame)
         finally:
             self._handler_mutex.unlock()

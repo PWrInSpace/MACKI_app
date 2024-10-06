@@ -90,6 +90,7 @@ class ExperimentWindow(QTabWidget):
         """
         self._cmd_group = ProcedureCommands(self._protocol)
         self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
+        self._cameras.enable_cameras()
 
         self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
         self._data_texts = DataDisplayText.from_JSON(DATA_TEXT_CONFIG_FILE)
