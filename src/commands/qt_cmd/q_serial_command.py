@@ -58,8 +58,9 @@ class QSerialCmd(QCmdBasic):
     def _send_button_clicked(self) -> None:
         """Called when the send button is clicked"""
         command_str = self._create_command_str()
-        self.send_clicked.emit(command_str)
         logger.info(
             f"Send button clicked for command {self._name}, "
             f"sending message: {command_str.strip()}"
         )
+
+        self.send_clicked.emit(command_str)

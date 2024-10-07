@@ -1,0 +1,78 @@
+{
+  "name": "Experiment data",
+  "col_num": 4,
+  "data": [
+    {
+      "name": "time"
+    },
+    {
+      "name": "acceleration"
+    },
+    {
+      "name": "pressure tank",
+      "lower_bound": 0,
+      "upper_bound": 4
+    },
+    {
+      "name": "pressure gripper",
+      "lower_bound": 0,
+      "upper_bound": 1.5
+    },
+    {
+      "name": "fill valve",
+      "enum": {
+        "1": "OPEN",
+        "2": "CLOSE",
+        "3": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "blue",
+        "2": "white",
+        "3": "red"
+      }
+    },
+    {
+      "name": "vent valve",
+      "enum": {
+        "1": "OPEN",
+        "2": "CLOSE",
+        "3": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "blue",
+        "2": "white",
+        "3": "red"
+      }
+    },
+    {
+      "name": "motor 1",
+      "enum": {
+        "1": "IDLE",
+        "2": "CW",
+        "3": "CCW",
+        "4": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "white",
+        "2": "mint",
+        "3": "purple",
+        "4": "red"
+      }
+    },
+    {
+      "name": "motor 2",
+      "enum": {
+        "1": "IDLE",
+        "2": "CW",
+        "3": "CCW",
+        "4": "UNKNOWN"
+      },
+      "enum_colors": {
+        "1": "white",
+        "2": "mint",
+        "3": "purple",
+        "4": "red"
+      }
+    }
+  ]
+}

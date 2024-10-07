@@ -1,50 +1,33 @@
 import sys
 import logging
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QVBoxLayout,
-    QWidget,
-)
-from src.app.cameras_app import QCameraApp
-from src.app.com.macus_widget import MacusWidget
+from PySide6.QtWidgets import QApplication
+
+from src.app.app import App
+from PySide6.QtWidgets import QMessageBox
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("My App")
-        self.setContentsMargins(0, 0, 0, 0)
-
-        layout = QVBoxLayout()
-        self.cameras = QCameraApp()
-        # layout.addWidget(self.cameras)
-
-        self.macus_widget = MacusWidget()
-        self.macus_widget.settings_box.setFixedWidth(240)
-        self.macus_widget.setFixedSize(700, 240)
-        layout.addWidget(self.macus_widget)
-
-        widget = QWidget()
-        widget.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(layout)
-
-        self.setFixedSize(self.sizeHint())
-        self.setCentralWidget(widget)
-        self.cameras.enable_cameras()
-
-    def closeEvent(self, event):
-        self.cameras.terminate_threads()
-        self.macus_widget.quit()
-        event.accept()
+def excepthook(exc_type, exc_value, exc_traceback):
+    error_message = f"Exception type: {exc_type.__name__}\nException value: {exc_value}"
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Critical)
+    msg_box.setText("An unexpected error occurred")
+    msg_box.setInformativeText(error_message)
+    msg_box.setWindowTitle("Error")
+    msg_box.exec()
 
 
-logging.basicConfig(level=logging.INFO)
+def main():
+    sys.excepthook = excepthook
+    logging.basicConfig(level=logging.INFO)
+    app = QApplication(sys.argv)
+
+    with open("resources/theme.qss") as f:
+        app.setStyleSheet(f.read())
+
+    window = App()
+    window.show()
+    app.exec()
 
 
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-app.exec()
+if __name__ == "__main__":
+    main()
