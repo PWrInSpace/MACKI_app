@@ -63,24 +63,24 @@ class ExperimentWindow(QTabWidget):
         # Data update timer
         self._data_update_timer = QTimer()
         self._data_update_timer.timeout.connect(self._on_update_data_timer)
-        # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
 
-        for i in range(0, 50):
-            self._update_widgets({"time": i, "load_cell": random.randint(0, 10)})
+        # for i in range(0, 50):
+        #     self._update_widgets({"time": i, "load_cell": random.randint(0, 10)})
 
-        self._update_widgets(
-            {
-                "time": 50,
-                "load_cell": 3,
-                "acceleration": 9.83,
-                "pressure tank": 3.5,
-                "pressure gripper": 2.5,
-                "fill valve": "1",
-                "vent valve": "2",
-                "motor 1": "2",
-                "motor 2": "3"
-            }
-        )
+        # self._update_widgets(
+        #     {
+        #         "time": 50,
+        #         "load_cell": 3,
+        #         "acceleration": 9.83,
+        #         "pressure tank": 3.5,
+        #         "pressure gripper": 2.5,
+        #         "fill valve": "1",
+        #         "vent valve": "2",
+        #         "motor 1": "2",
+        #         "motor 2": "3"
+        #     }
+        # )
 
     def _experiment_tab(self) -> QWidget:
         """  Experiment widget
@@ -144,21 +144,21 @@ class ExperimentWindow(QTabWidget):
             str | None: Data read from the device
         """
         self._protocol.write_command(self.READ_DATA_COMMAND)
-        response = self._protocol.read_until_response()
+        response = self._protocol.read_raw()
 
-        if response.startswith(self._protocol.ACK):
-            return_response = response.replace(self._protocol.ACK, "")
-        elif response.startswith(self._protocol.NACK):
-            logger.error("Failed to read data - NACK received")
-            return_response = None
-        elif not response:
-            logger.error("Failed to read data - no response")
-            return_response = None
-        else:
-            logger.error(f"Unexpected response: {response}")
-            return_response = None
+        # if response.startswith(self._protocol.ACK):
+        #     return_response = response.replace(self._protocol.ACK, "")
+        # elif response.startswith(self._protocol.NACK):
+        #     logger.error("Failed to read data - NACK received")
+        #     return_response = None
+        # elif not response:
+        #     logger.error("Failed to read data - no response")
+        #     return_response = None
+        # else:
+        #     logger.error(f"Unexpected response: {response}")
+        #     return_response = None
 
-        return return_response
+        return response
 
     def _update_widgets(self, data_dict: dict[str, Any]) -> None:
         """Updates the widgets with the data

@@ -124,6 +124,26 @@ class SerialPort(ComProtoBasic):
 
         return response
 
+    def read_raw(self, read_timeout_s: float = 0.1) -> str:
+        """This method reads data from the serial port
+
+        Args:
+            read_timeout_s (float, optional): read timeout. Defaults to 0.1.
+
+        Raises:
+            PortNotOpenError: Serial port is not open
+
+        Returns:
+            str: The data read from the serial port
+        """
+        if not self.is_connected():
+            raise PortNotOpenError()
+
+        self._serial.timeout = read_timeout_s
+        raw_response = self._serial.read_until(self.EOF.encode())
+
+        return raw_response
+
     @override
     def is_connected(self) -> bool:
         """This method checks if the device is connected
