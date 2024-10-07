@@ -67,7 +67,7 @@ class VideoWriter(BasicFrameHandler):
 
         file_name = self._generate_file_path()
         self._writer = cv2.VideoWriter(
-            file_name, self._fourcc, self._fps, self._frame_size, False
+            file_name, self._fourcc, self._fps, self._frame_size, True
         )
 
         logger.info(f"Starting video writer for {self._name}, file: {file_name}")

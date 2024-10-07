@@ -76,6 +76,7 @@ class FrameDisplay(BasicFrameHandler):
     def add_frame(self, frame: np.ndarray) -> None:
         """Add a frame to the handler and update the window image if it is open"""
         if self.is_running:
+            frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
             self.window.update_image(frame)
 
     @override
