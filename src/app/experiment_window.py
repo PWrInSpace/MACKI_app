@@ -20,7 +20,7 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.serial import QSerial
-from src.app.cameras_app import QCameraApp
+# from src.app.cameras_app import QCameraApp
 from src.app.commands import ProcedureCommands
 from src.data_displays import (
     DataDisplayText, DataDisplayPlot, DataTextBasic
@@ -89,8 +89,8 @@ class ExperimentWindow(QTabWidget):
             QWidget: Experiment widget
         """
         self._cmd_group = ProcedureCommands(self._protocol)
-        self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
-        self._cameras.enable_cameras()
+        # self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
+        # self._cameras.enable_cameras()
 
         self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
         self._data_texts = DataDisplayText.from_JSON(DATA_TEXT_CONFIG_FILE)
@@ -106,7 +106,7 @@ class ExperimentWindow(QTabWidget):
 
         layout = QGridLayout()
         layout.addWidget(self._cmd_group, 0, 0, 1, 1)
-        layout.addWidget(self._cameras, 1, 0, 1, 1)
+        # layout.addWidget(self._cameras, 1, 0, 1, 1)
         layout.addWidget(data_widget, 0, 1, 2, 1)
 
         widget = QWidget()
