@@ -32,7 +32,7 @@ logger = logging.getLogger("experiment_window")
 
 class ExperimentWindow(QTabWidget):
     NACK_COUNTER_LIMIT = 10
-    DATA_UPDATE_INTERVAL = 500
+    DATA_UPDATE_INTERVAL = 2000
     IDX_TAB_EXPERIMENT = 0
     READ_DATA_COMMAND = "data"  # TODO: move the all available commands to a separate file
     SERVICE_DATA_NAME = "Data"
@@ -190,6 +190,7 @@ class ExperimentWindow(QTabWidget):
             return
 
         data = self._read_data()
+        print(data)
         if data:
             self._continous_nack_counter = 0
             data_dict = self._parser.parse(data)
