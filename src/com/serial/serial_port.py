@@ -43,6 +43,9 @@ class SerialPort(ComProtoBasic):
         self._on_rx_callback = on_rx_callback
         self._on_tx_callback = on_tx_callback
 
+        self._ack_bytes = self.ACK.encode()
+        self._nack_bytes = self.NACK.encode()
+
     @override
     def connect(self, com_port: str = None) -> None:
         """This method connects to the serial port
@@ -92,7 +95,6 @@ class SerialPort(ComProtoBasic):
         if not data.endswith(self.EOF):
             tx_data += self.EOF
 
-        logger.info(f"TX: {tx_data.strip()}")
         self._serial.reset_input_buffer()
         self._serial.write(tx_data.encode())
 
@@ -124,20 +126,14 @@ class SerialPort(ComProtoBasic):
 
         return response
 
-    def read_raw(self, read_timeout_s: float = 0.1) -> str:
+    def read_raw_until_response(self, read_timeout_s: float = 0.1) -> str:
         iterations = 0
         while iterations < 10:
             iterations += 1
             line = self._serial.read_until(self.EOF.encode())
-            if b"data" in line:
-                continue
 
-            return line[:-3]
-            # if line.startswith((self.ACK.encode(), self.NACK.encode())):
-            #     if self._on_rx_callback:
-            #         self._on_rx_callback(line)
-
-            #     return line
+            if self._ack_bytes in line or self._nack_bytes in line:
+                return line
 
         return None
 
@@ -181,22 +177,16 @@ class SerialPort(ComProtoBasic):
         Returns:
             str: The response from the device
         """
-        iterations = 0
-        while iterations < 10:
-            iterations += 1
-            line = self._serial.read_until(self.EOF.encode())
-            line = line.decode().strip()
+        response = self.read_raw_until_response()
 
+        if not response:
+            return None
 
-            print(f"RX: {line}")
+        decoded_response = response.decode().strip()
+        self._on_rx_callback(decoded_response)
 
-            if line.startswith((self.ACK, self.NACK)):
-                if self._on_rx_callback:
-                    self._on_rx_callback(line)
+        return decoded_response
 
-                return line
-
-        return None
 
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response
@@ -222,3 +212,21 @@ class SerialPort(ComProtoBasic):
             str: The COM port
         """
         return self._serial.port
+
+    @property
+    def ack_bytes(self) -> bytes:
+        """This method returns the ACK bytes
+
+        Returns:
+            bytes: The ACK bytes
+        """
+        return self._ack_bytes
+
+    @property
+    def nack_bytes(self) -> bytes:
+        """This method returns the NACK bytes
+
+        Returns:
+            bytes: The NACK bytes
+        """
+        return self._nack_bytes

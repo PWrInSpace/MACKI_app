@@ -27,6 +27,7 @@ class MacusWidget(QWidget):
     BUTTON_DISCONNECT = "Disconnect"
     TX_PREFIX = "TX: "
     RX_PREFIX = "RX: "
+    TX_DISPLAY_EXCLUDE = ["data"]
     PORTS_TIMER_INTERVAL_MS = 1000
 
     def __init__(self) -> None:
@@ -205,6 +206,9 @@ class MacusWidget(QWidget):
         Args:
             message (str): The message to add
         """
+        if any(excd in message for excd in self.TX_DISPLAY_EXCLUDE):
+            return
+
         self._add_message_to_text_box(message, self.TX_PREFIX)
 
     def _add_rx_message_to_text_box(self, message: str) -> None:
