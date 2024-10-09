@@ -1,5 +1,5 @@
 {
-    "format": ">qh",
+    "format": "<qh",
     "data_names": [
         "time",
         "load_cell"

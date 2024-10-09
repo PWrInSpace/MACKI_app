@@ -7,7 +7,7 @@
       "y_name": "load_cell",
       "title": "Load cell measurements",
       "color": "cyan",
-      "max_points": 50,
+      "max_points": 500,
       "x_label": "Time (s)",
       "y_label": "Force (N)"
     }

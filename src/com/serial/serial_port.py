@@ -129,11 +129,10 @@ class SerialPort(ComProtoBasic):
         while iterations < 10:
             iterations += 1
             line = self._serial.read_until(self.EOF.encode())
-            line = line
             if b"data" in line:
                 continue
 
-            return line[:-2]
+            return line[:-3]
             # if line.startswith((self.ACK.encode(), self.NACK.encode())):
             #     if self._on_rx_callback:
             #         self._on_rx_callback(line)
