@@ -65,7 +65,7 @@ class QCmdGroup(QGroupBox):
         if self._protocol is not None:
             self._protocol.write(message)
             ret = self._protocol.read_until_response()
-            if ret is None:
+            if not ret:
                 raise ValueError("No response received")
             elif ret.startswith(self._protocol.NACK):
                 raise ValueError(f"NACK received {ret}")
