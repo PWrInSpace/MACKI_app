@@ -34,11 +34,17 @@ class App(QMainWindow):
     def _on_state_changed(self, state: QSerialState):
         match state:
             case QSerialState.CONNECTED:
+                self._experiment_window.start_data_update()
                 self._experiment_window.setEnabled(True)
                 if self._experiment_window.isHidden():
                     self._experiment_window.show()
+
             case QSerialState.DISCONNECTED | QSerialState.MISSING:
                 self._experiment_window.setEnabled(False)
+                self._experiment_window.stop_data_update()
+
+            case _:
+                raise RuntimeError(f"Unknown state: {state}")
 
     def closeEvent(self, event):
         self._macus_widget.quit()

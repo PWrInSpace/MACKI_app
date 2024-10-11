@@ -31,7 +31,7 @@ logger = logging.getLogger("experiment_window")
 
 class ExperimentWindow(QTabWidget):
     NACK_COUNTER_LIMIT = 20
-    DATA_UPDATE_INTERVAL = 250
+    DATA_UPDATE_INTERVAL = 100
     IDX_TAB_EXPERIMENT = 0
     READ_DATA_COMMAND = "data"  # TODO: move the all available commands to a separate file
     SERVICE_DATA_NAME = "Data"
@@ -62,7 +62,16 @@ class ExperimentWindow(QTabWidget):
         # Data update timer
         self._data_update_timer = QTimer()
         self._data_update_timer.timeout.connect(self._on_update_data_timer)
+
+    def start_data_update(self) -> None:
+        """Starts the data update timer
+        """
         self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+
+    def stop_data_update(self) -> None:
+        """Stops the data update timer
+        """
+        self._data_update_timer.stop()
 
     def _experiment_tab(self) -> QWidget:
         """  Experiment widget

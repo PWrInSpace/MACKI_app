@@ -14,7 +14,7 @@ QCalendar {
 QTextEdit {
 	border-width: 1px;
 	border-style: solid;
-	border-color: #a07ebf;
+	border-color: #999999;
 	background-color: #333333;
 	color: #d3dae3;
 }
@@ -61,9 +61,6 @@ QToolButton:pressed{
 	padding: 2px;
 	background-color: rgb(142,142,142);
 }
-QGroupBox{
-    border-style
-}
 QPushButton{
 	border-style: solid;
 	border-color: #a07ebf;
@@ -73,6 +70,7 @@ QPushButton{
 	padding: 2px;
 	background-color: #151a1e;
 }
+
 QPushButton::default{
 	border-style: solid;
 	border-color: #a07ebf;
@@ -167,7 +165,7 @@ QTabWidget {
 	background-color:#252525;
 }
 QTabWidget::pane {
-		border-color: #a07ebf;
+		border-color: #999999;
 		background-color: #252525;
 		border-style: solid;
 		border-width: 1px;

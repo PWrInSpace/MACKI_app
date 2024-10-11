@@ -12,8 +12,9 @@ logger = logging.getLogger(__name__)
 
 class SerialPort(ComProtoBasic):
     EOF = "\r\n"
-    READ_TIMEOUT_S = 0.1
-    WRITE_TIMEOUT_S = 0.1
+    READ_TIMEOUT_S = 0.01
+    WRITE_TIMEOUT_S = 0.01
+    ITERATIONS = 10
 
     ACK = "OK: "
     NACK = "ERR: "
@@ -96,13 +97,14 @@ class SerialPort(ComProtoBasic):
             tx_data += self.EOF
 
         self._serial.reset_input_buffer()
+        self._serial.reset_output_buffer()
         self._serial.write(tx_data.encode())
 
         if self._on_tx_callback:
             self._on_tx_callback(data)
 
     @override
-    def read(self, read_timeout_s: float = 0.1) -> str:
+    def read(self, read_timeout_s: float = 0.01) -> str:
         """This method reads data from the serial port
 
         Args:
@@ -126,9 +128,9 @@ class SerialPort(ComProtoBasic):
 
         return response
 
-    def read_raw_until_response(self, read_timeout_s: float = 0.1) -> bytes:
+    def read_raw_until_response(self) -> bytes:
         iterations = 0
-        while iterations < 10:
+        while iterations < self.ITERATIONS:
             iterations += 1
             line = self._serial.read_until(self.EOF.encode())
 

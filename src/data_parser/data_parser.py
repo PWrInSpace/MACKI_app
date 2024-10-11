@@ -43,7 +43,8 @@ class DataParser:
             an empty dictionary is returned
         """
         if len(data) != struct.calcsize(self._format):
-            logger.error("Data length does not match the format string")
+            logger.error(f"Data length does not match the format string, {data}, "
+                         f"data len {len(data)}, size {struct.calcsize(self._format)}")
             return {}
 
         unpacked_data = struct.unpack(self._format, data)
