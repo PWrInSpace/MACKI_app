@@ -130,6 +130,7 @@ class ExperimentWindow(QTabWidget):
         response = self._protocol.read_raw_until_response()
 
         if self._protocol.ack_bytes in response:
+            # Remove the ACK and EOF bytes
             return_response = response[len(self._protocol.ack_bytes):-2]
         elif self._protocol.nack_bytes in response:
             logger.error("Failed to read data - NACK received")

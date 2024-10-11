@@ -126,7 +126,7 @@ class SerialPort(ComProtoBasic):
 
         return response
 
-    def read_raw_until_response(self, read_timeout_s: float = 0.1) -> str:
+    def read_raw_until_response(self, read_timeout_s: float = 0.1) -> bytes:
         iterations = 0
         while iterations < 10:
             iterations += 1
@@ -135,7 +135,7 @@ class SerialPort(ComProtoBasic):
             if self._ack_bytes in line or self._nack_bytes in line:
                 return line
 
-        return None
+        return b""
 
     @override
     def is_connected(self) -> bool:
