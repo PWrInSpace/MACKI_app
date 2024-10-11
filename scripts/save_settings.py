@@ -24,6 +24,7 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
+
 import sys
 from typing import Optional
 
@@ -31,23 +32,25 @@ from vmbpy import *
 
 
 def print_preamble():
-    print('////////////////////////////////////////')
-    print('/// VmbPy Load Save Settings Example ///')
-    print('////////////////////////////////////////\n')
+    print("////////////////////////////////////////")
+    print("/// VmbPy Load Save Settings Example ///")
+    print("////////////////////////////////////////\n")
 
 
 def print_usage():
-    print('Usage:')
-    print('    python load_save_settings.py [camera_id]')
-    print('    python load_save_settings.py [/h] [-h]')
+    print("Usage:")
+    print("    python load_save_settings.py [camera_id]")
+    print("    python load_save_settings.py [/h] [-h]")
     print()
-    print('Parameters:')
-    print('    camera_id   ID of the camera to use (using first camera if not specified)')
+    print("Parameters:")
+    print(
+        "    camera_id   ID of the camera to use (using first camera if not specified)"
+    )
     print()
 
 
 def abort(reason: str, return_code: int = 1, usage: bool = False):
-    print(reason + '\n')
+    print(reason + "\n")
 
     if usage:
         print_usage()
@@ -60,7 +63,7 @@ def parse_args() -> Optional[str]:
     argc = len(args)
 
     for arg in args:
-        if arg in ('/h', '-h'):
+        if arg in ("/h", "-h"):
             print_usage()
             sys.exit(0)
 
@@ -77,12 +80,12 @@ def get_camera(camera_id: Optional[str]) -> Camera:
                 return vmb.get_camera_by_id(camera_id)
 
             except VmbCameraError:
-                abort('Failed to access Camera \'{}\'. Abort.'.format(camera_id))
+                abort("Failed to access Camera '{}'. Abort.".format(camera_id))
 
         else:
             cams = vmb.get_all_cameras()
             if not cams:
-                abort('No Cameras accessible. Abort.')
+                abort("No Cameras accessible. Abort.")
 
             return cams[0]
 
@@ -98,7 +101,7 @@ def main():
             print("--> Camera has been opened (%s)" % cam.get_id())
 
             # Save camera settings to file.
-            settings_file = '{}_settings.xml'.format(cam.get_id())
+            settings_file = "{}_settings.xml".format(cam.get_id())
             cam.save_settings(settings_file, PersistType.NoLUT)
             print("--> Feature values have been saved to '%s'" % settings_file)
 
@@ -121,5 +124,5 @@ def main():
             # print("--> Feature values have been loaded from given file '%s'" % settings_file)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

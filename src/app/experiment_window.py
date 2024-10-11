@@ -1,12 +1,6 @@
 import logging
 from typing import Any
-from PySide6.QtWidgets import (
-    QTabWidget,
-    QWidget,
-    QGridLayout,
-    QVBoxLayout,
-    QMessageBox
-)
+from PySide6.QtWidgets import QTabWidget, QWidget, QGridLayout, QVBoxLayout, QMessageBox
 from src.app.config import (
     COMMANDS_CONFIG_FILE,
     DATA_PLOT_CONFIG_FILE,
@@ -19,11 +13,10 @@ from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.serial import QSerial
+
 # from src.app.cameras_app import QCameraApp
 from src.app.commands import ProcedureCommands
-from src.data_displays import (
-    DataDisplayText, DataDisplayPlot, DataTextBasic
-)
+from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
 
 logger = logging.getLogger("experiment_window")
@@ -33,7 +26,9 @@ class ExperimentWindow(QTabWidget):
     NACK_COUNTER_LIMIT = 20
     DATA_UPDATE_INTERVAL = 100
     IDX_TAB_EXPERIMENT = 0
-    READ_DATA_COMMAND = "data"  # TODO: move the all available commands to a separate file
+    READ_DATA_COMMAND = (
+        "data"  # TODO: move the all available commands to a separate file
+    )
     SERVICE_DATA_NAME = "Data"
     SERVICE_DATA_COLUMNS = 4
 
@@ -64,17 +59,15 @@ class ExperimentWindow(QTabWidget):
         self._data_update_timer.timeout.connect(self._on_update_data_timer)
 
     def start_data_update(self) -> None:
-        """Starts the data update timer
-        """
+        """Starts the data update timer"""
         self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
 
     def stop_data_update(self) -> None:
-        """Stops the data update timer
-        """
+        """Stops the data update timer"""
         self._data_update_timer.stop()
 
     def _experiment_tab(self) -> QWidget:
-        """  Experiment widget
+        """Experiment widget
 
         Returns:
             QWidget: Experiment widget
@@ -139,7 +132,8 @@ class ExperimentWindow(QTabWidget):
 
         if self._protocol.ack_bytes in response:
             # Remove the ACK and EOF bytes
-            return_response = response[len(self._protocol.ack_bytes):-2]
+            start_idx = response.index(self._protocol.ack_bytes)
+            return_response = response[start_idx:-2]
         elif self._protocol.nack_bytes in response:
             logger.error("Failed to read data - NACK received")
             return_response = None
@@ -165,19 +159,19 @@ class ExperimentWindow(QTabWidget):
             self._service_data.update_data(data_dict)
 
     def _check_nack_counter(self) -> None:
-        """ Checks the NACK counter and shows a message box if the limit is reached
-        """
+        """Checks the NACK counter and shows a message box if the limit is reached"""
         if self._continous_nack_counter > self.NACK_COUNTER_LIMIT:
             self._continous_nack_counter = 0
             msg_box = QMessageBox()
             msg_box.setIcon(QMessageBox.Critical)
-            msg_box.setText("Failed to read data - NACK received - check the data_read command!!!")
+            msg_box.setText(
+                "Failed to read data - NACK received - check the data_read command!!!"
+            )
             msg_box.setWindowTitle("Error")
             msg_box.exec()
 
     def _on_update_data_timer(self) -> None:
-        """Routine to read the data from the device and update the widgets
-        """
+        """Routine to read the data from the device and update the widgets"""
         if self.isHidden():
             return
 

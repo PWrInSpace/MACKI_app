@@ -43,8 +43,10 @@ class DataParser:
             an empty dictionary is returned
         """
         if len(data) != struct.calcsize(self._format):
-            logger.error(f"Data length does not match the format string, {data}, "
-                         f"data len {len(data)}, size {struct.calcsize(self._format)}")
+            logger.error(
+                f"Data length does not match the format string, {data}, "
+                f"data len {len(data)}, size {struct.calcsize(self._format)}"
+            )
             return {}
 
         unpacked_data = struct.unpack(self._format, data)
@@ -55,7 +57,6 @@ class DataParser:
 
     @staticmethod
     def from_JSON(json_file: str) -> Self:
-
         """Creates a DataParser object from a json file
 
         Args:
@@ -71,10 +72,9 @@ class DataParser:
 
     @property
     def data_names(self) -> list[str]:
-        """ Returns the data keys of the DataParser object
+        """Returns the data keys of the DataParser object
 
         Returns:
             List[str]: List of data keys (data names)
         """
         return self._data_keys
-
