@@ -2,6 +2,7 @@ import sys
 import logging
 from PySide6.QtWidgets import QApplication
 
+
 from src.app.app import App
 from PySide6.QtWidgets import QMessageBox
 
@@ -14,7 +15,6 @@ def excepthook(exc_type, exc_value, exc_traceback):
     msg_box.setInformativeText(error_message)
     msg_box.setWindowTitle("Error")
     msg_box.exec()
-
 
 def main():
     sys.excepthook = excepthook
