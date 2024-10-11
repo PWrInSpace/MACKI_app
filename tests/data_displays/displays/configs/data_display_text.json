@@ -1,0 +1,27 @@
+{
+    "name": "Test data",
+    "col_num": 2,
+    "data": [
+      {
+        "name": "title"
+      },
+      {
+        "name": "pressure",
+        "lower_bound": 0,
+        "upper_bound": 10
+      },
+      {
+        "name": "valve_state",
+        "enum": {
+          "1": "ROTATING",
+          "2": "STATIC",
+          "3": "UNKNOWN"
+        },
+        "enum_colors": {
+          "1": "mint",
+          "2": "green",
+          "3": "blue"
+        }
+      }
+    ]
+  }
