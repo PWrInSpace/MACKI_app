@@ -8,7 +8,6 @@ from src.cameras.frame_handlers import FrameDisplayFormats
 MAKO_CONFIG_FILE = os.path.join("config", "mako.xml")
 ALVIUM_CONFIG_FILE = os.path.join("config", "alvium2.xml")
 TEST_CONFIG_FILE = os.path.join("config", "DEV_000A4727B2BF_settings.xml")
-ALVIUM2_CONFIG_FILE = os.path.join("config", "DEV_000A472B9D47_settings.xml")
 # MAKO_CONFIG_FILE = None
 # ALVIUM_CONFIG_FILE = None
 
