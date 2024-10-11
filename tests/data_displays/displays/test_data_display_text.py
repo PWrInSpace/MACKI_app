@@ -57,6 +57,7 @@ def test_init_layout(data_display, data_config):
 
 def test_update_data(data_display, data_config, mocker):
     spy = mocker.spy(data_display, "update_data")
+
     data = {
         DATA_TEXT1: 42,
         DATA_TEXT2: "Hello, World!",

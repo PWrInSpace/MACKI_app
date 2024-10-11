@@ -55,6 +55,7 @@ class DataParser:
 
     @staticmethod
     def from_JSON(json_file: str) -> Self:
+
         """Creates a DataParser object from a json file
 
         Args:
@@ -76,3 +77,4 @@ class DataParser:
             List[str]: List of data keys (data names)
         """
         return self._data_keys
+

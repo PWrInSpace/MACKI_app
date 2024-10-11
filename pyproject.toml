@@ -20,6 +20,7 @@ pyqtgraph = "^0.13.7"
 pglive = "^0.7.6"
 pyserial = "^3.5"
 
+
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"
 flake8 = "^7.1.1"

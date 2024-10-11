@@ -67,7 +67,6 @@ def test_from_json_invalid_file():
 
 def test_from_json_pass():
     json_file_path = os.path.join(CONFIG_FILES_DIR, "parser_config.json")
-
     data_parser = DataParser.from_JSON(json_file_path)
 
     assert data_parser._format == ">if"
