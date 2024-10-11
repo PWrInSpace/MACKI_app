@@ -62,8 +62,6 @@ class DataDisplayText(DataDisplayBasic):
 
             if data_text is not None:
                 data_text.update_data(value)
-            # else:
-                # logger.error(f"Data display '{name}' not found in display config.")
 
     @staticmethod
     def from_JSON(json_file: str) -> Self:

@@ -162,7 +162,7 @@ def test_read(serial_port: SerialPort, mocker):
     message = serial_port.read()
 
     assert message == "ACK: HELLO"
-    assert serial_port._serial.timeout == 0.1  # default timeout
+    assert serial_port._serial.timeout == serial_port.READ_TIMEOUT_S  # default timeout
     read_spy.assert_called_with(serial_port.EOF.encode())
 
 
