@@ -1,5 +1,4 @@
 import logging
-import random
 from typing import Any
 from PySide6.QtWidgets import (
     QTabWidget,
@@ -14,7 +13,7 @@ from src.app.config import (
     DATA_TEXT_CONFIG_FILE,
     PARSER_CONFIG_FILE,
     OCTOPUS_EXP_WIN,
-    OCTOPUS_CAM_WIN
+    # OCTOPUS_CAM_WIN
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon

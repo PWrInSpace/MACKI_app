@@ -187,7 +187,6 @@ class SerialPort(ComProtoBasic):
 
         return decoded_response
 
-
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response
 
