@@ -1,0 +1,85 @@
+QMainWindow {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+}
+
+QWidget {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+}
+
+QMenuBar {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+}
+
+QMenuBar::item {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+}
+
+QMenuBar::item:selected {
+    background-color: #555555;
+}
+
+QMenu {
+    background-color: #2B2B2B;
+    color: #F0F0F0;
+}
+
+QMenu::item:selected {
+    background-color: #555555;
+}
+
+QToolBar {
+    background-color: #2B2B2B;
+}
+
+QPushButton {
+    background-color: #3C3C3C;
+    color: #F0F0F0;
+    border: 1px solid #555555;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+QPushButton:hover {
+    background-color: #555555;
+}
+
+QPushButton:pressed {
+    background-color: #1A1A1A;
+}
+
+QLineEdit {
+    background-color: #3C3C3C;
+    color: #F0F0F0;
+    border: 1px solid #555555;
+    padding: 3px;
+}
+
+QLabel {
+    color: #F0F0F0;
+}
+
+QScrollBar:vertical {
+    background-color: #2B2B2B;
+    width: 15px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #555555;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #777777;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}

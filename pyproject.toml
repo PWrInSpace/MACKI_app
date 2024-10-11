@@ -9,7 +9,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.11, <3.13"
+python = ">3.12 <3.13"
 pyside6 = "^6.7.2"
 numpy = "^1.26.0"
 vmbpy = {path = "VmbPy"}
@@ -18,6 +18,8 @@ pyqt6 = "^6.7.1"
 opencv-python = "^4.10.0.84"
 pyqtgraph = "^0.13.7"
 pglive = "^0.7.6"
+pyserial = "^3.5"
+
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.11.1"

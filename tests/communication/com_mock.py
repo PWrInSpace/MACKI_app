@@ -1,7 +1,7 @@
-from src.communication import CommunicationProtocolBasic
+from src.com.abstract import ComProtoBasic
 
 
-class ComMock(CommunicationProtocolBasic):
+class ComMock(ComProtoBasic):
     def __init__(self):
         self.last_write = None
         self.write_count = 0
@@ -21,3 +21,6 @@ class ComMock(CommunicationProtocolBasic):
 
     def is_connected(self) -> bool:
         pass
+
+    def read_until_response(self) -> str:
+        return self.ACK
