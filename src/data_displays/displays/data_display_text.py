@@ -3,7 +3,7 @@ import json
 from typing import Self
 from PySide6.QtWidgets import QGridLayout, QFrame
 
-from src.data_displays.displays.data_display_basic import DataDisplayBasic, logger
+from src.data_displays.displays.data_display_basic import DataDisplayBasic
 from src.data_displays.text.data_text_basic import DataTextBasic
 from src.data_displays.text.data_text_number import DataTextNumber
 from src.data_displays.text.data_text_values import DataTextValues
@@ -62,8 +62,6 @@ class DataDisplayText(DataDisplayBasic):
 
             if data_text is not None:
                 data_text.update_data(value)
-            else:
-                logger.error(f"Data display '{name}' not found in display config.")
 
     @staticmethod
     def from_JSON(json_file: str) -> Self:

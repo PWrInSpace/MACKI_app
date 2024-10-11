@@ -11,9 +11,12 @@ from PySide6.QtWidgets import (
 )
 
 from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QTextCursor, QTextCharFormat
 from src.com.serial import QSerial, QSerialState, QSerialStateControlThread
 from src.utils.qt.better_combo_box import BetterComboBox
 from src.utils.colors import Colors
+
+from datetime import datetime
 
 logger = logging.getLogger("macus_widget")
 
@@ -24,6 +27,7 @@ class MacusWidget(QWidget):
     BUTTON_DISCONNECT = "Disconnect"
     TX_PREFIX = "TX: "
     RX_PREFIX = "RX: "
+    TX_DISPLAY_EXCLUDE = ["data"]
     PORTS_TIMER_INTERVAL_MS = 1000
 
     def __init__(self) -> None:
@@ -52,7 +56,8 @@ class MacusWidget(QWidget):
         """
         port_label = QLabel("Port")
         self._port_combo = BetterComboBox()
-        self._port_combo.addItems(self._com_serial.get_available_ports())
+        # self._port_combo.addItems(self._com_serial.get_available_ports())
+        self._update_available_ports()
         self._port_combo.clicked.connect(self._update_available_ports)
 
         baudrate_label = QLabel("Baudrate")
@@ -127,7 +132,9 @@ class MacusWidget(QWidget):
     def _update_available_ports(self):
         """This method is called when the port combo is clicked"""
         current_port = self._port_combo.currentText()
-        available_ports = [port.name for port in self._com_serial.get_available_ports()]
+        available_ports = [
+            port.device for port in self._com_serial.get_available_ports()
+        ]
 
         self._port_combo.clear()
         self._port_combo.addItems(available_ports)
@@ -172,17 +179,26 @@ class MacusWidget(QWidget):
             data (str): The data to add
             message_prefix (str, optional): The message prefix. Defaults to "".
         """
-        if not data.endswith("\n"):
-            data += "\n"
+        data = data.strip()
+        data += "\n"
 
         if data.startswith(self._com_serial.ACK):
-            self._text_edit.setTextColor(Qt.green)
+            color = Qt.green
         elif data.startswith(self._com_serial.NACK):
-            self._text_edit.setTextColor(Qt.red)
+            color = Qt.red
         else:
-            self._text_edit.setTextColor(Qt.white)
+            color = Qt.white
 
-        self._text_edit.insertPlainText(message_prefix + data)
+        cursor = self._text_edit.textCursor()
+        cursor.movePosition(QTextCursor.Start)
+
+        char_format = QTextCharFormat()
+        char_format.setForeground(color)
+        cursor.setCharFormat(char_format)
+
+        text = datetime.now().strftime("%H:%M:%S") + " " + message_prefix + data
+        cursor.insertText(text)
+        self._text_edit.setTextCursor(cursor)
 
     def _add_tx_message_to_text_box(self, message: str) -> None:
         """This method adds a TX message to the text box
@@ -190,6 +206,9 @@ class MacusWidget(QWidget):
         Args:
             message (str): The message to add
         """
+        if any(excd in message for excd in self.TX_DISPLAY_EXCLUDE):
+            return
+
         self._add_message_to_text_box(message, self.TX_PREFIX)
 
     def _add_rx_message_to_text_box(self, message: str) -> None:

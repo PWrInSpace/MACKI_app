@@ -109,11 +109,13 @@ def test_add_message_to_text_box(
 ):
     macus_widget._add_message_to_text_box(message, prefix)
 
+    message = message.strip()
     if not message.endswith("\n"):
         message += "\n"
 
     message = prefix + message
-    assert macus_widget._text_edit.toPlainText() == message
+    # we skip the timestamp
+    assert macus_widget._text_edit.toPlainText()[9:] == message
     assert macus_widget._text_edit.textColor() == expected_color
 
 
@@ -121,7 +123,7 @@ def test_add_tx_message_to_text_box(macus_widget: MacusWidget):
     macus_widget._add_tx_message_to_text_box("test")
 
     expected_message = macus_widget.TX_PREFIX + "test\n"
-    assert macus_widget._text_edit.toPlainText() == expected_message
+    assert macus_widget._text_edit.toPlainText()[9:] == expected_message
     assert macus_widget._text_edit.textColor() == Qt.white
 
 
@@ -129,7 +131,7 @@ def test_add_rx_message_to_text_box(macus_widget: MacusWidget):
     macus_widget._add_rx_message_to_text_box("test")
 
     expected_message = macus_widget.RX_PREFIX + "test\n"
-    assert macus_widget._text_edit.toPlainText() == expected_message
+    assert macus_widget._text_edit.toPlainText()[9:] == expected_message
     assert macus_widget._text_edit.textColor() == Qt.white
 
 

@@ -4,7 +4,6 @@ from contextlib import nullcontext as does_not_raise
 
 from src.data_displays import DataTextBasic, DataDisplayText, DisplayParams
 from src.data_displays.displays.data_display_text import _JSONDeserializer
-from src.data_displays.displays.data_display_basic import logger
 from src.utils.colors import Colors
 
 from tests.data_displays.displays.config_paths import JSON_TEXT_FILE
@@ -56,7 +55,8 @@ def test_init_layout(data_display, data_config):
 
 
 def test_update_data(data_display, data_config, mocker):
-    spy = mocker.spy(logger, "error")
+    spy = mocker.spy(data_display, "update_data")
+
     data = {
         DATA_TEXT1: 42,
         DATA_TEXT2: "Hello, World!",

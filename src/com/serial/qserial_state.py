@@ -111,7 +111,7 @@ class QSerialStateControlThread(QThread):
         Returns:
             bool: True if the serial is missing, False otherwise
         """
-        ports = [port.name for port in self._serial.get_available_ports()]
+        ports = [port.device for port in self._serial.get_available_ports()]
         return self._serial.port not in ports
 
     def _connected_state_routine(self):

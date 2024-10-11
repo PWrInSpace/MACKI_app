@@ -22,6 +22,8 @@ def pyserial_mock(mocker) -> SerialPort:
     mocker.patch("serial.Serial.open", connect_mock)
     mocker.patch("serial.Serial.close", disconnect_mock)
     mocker.patch("serial.Serial.timeout", timeout_setter_mock)
+    mocker.patch("serial.Serial.reset_input_buffer")
+    mocker.patch("serial.Serial.reset_output_buffer")
     mocker.patch("serial.Serial.write")
 
     return None
@@ -162,7 +164,7 @@ def test_read(serial_port: SerialPort, mocker):
     message = serial_port.read()
 
     assert message == "ACK: HELLO"
-    assert serial_port._serial.timeout == 0.1  # default timeout
+    assert serial_port._serial.timeout == serial_port.READ_TIMEOUT_S  # default timeout
     read_spy.assert_called_with(serial_port.EOF.encode())
 
 

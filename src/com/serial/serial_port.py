@@ -12,11 +12,12 @@ logger = logging.getLogger(__name__)
 
 class SerialPort(ComProtoBasic):
     EOF = "\r\n"
-    READ_TIMEOUT_S = 0.1
-    WRITE_TIMEOUT_S = 0.1
+    READ_TIMEOUT_S = 0.01
+    WRITE_TIMEOUT_S = 0.01
+    ITERATIONS = 10
 
-    ACK = "ACK"
-    NACK = "NACK"
+    ACK = "OK: "
+    NACK = "ERR: "
 
     def __init__(
         self,
@@ -42,6 +43,9 @@ class SerialPort(ComProtoBasic):
 
         self._on_rx_callback = on_rx_callback
         self._on_tx_callback = on_tx_callback
+
+        self._ack_bytes = self.ACK.encode()
+        self._nack_bytes = self.NACK.encode()
 
     @override
     def connect(self, com_port: str = None) -> None:
@@ -92,13 +96,15 @@ class SerialPort(ComProtoBasic):
         if not data.endswith(self.EOF):
             tx_data += self.EOF
 
+        self._serial.reset_input_buffer()
+        self._serial.reset_output_buffer()
         self._serial.write(tx_data.encode())
 
         if self._on_tx_callback:
             self._on_tx_callback(data)
 
     @override
-    def read(self, read_timeout_s: float = 0.1) -> str:
+    def read(self, read_timeout_s: float = 0.01) -> str:
         """This method reads data from the serial port
 
         Args:
@@ -121,6 +127,17 @@ class SerialPort(ComProtoBasic):
             self._on_rx_callback(response)
 
         return response
+
+    def read_raw_until_response(self) -> bytes:
+        iterations = 0
+        while iterations < self.ITERATIONS:
+            iterations += 1
+            line = self._serial.read_until(self.EOF.encode())
+
+            if self._ack_bytes in line or self._nack_bytes in line:
+                return line
+
+        return b""
 
     @override
     def is_connected(self) -> bool:
@@ -156,22 +173,21 @@ class SerialPort(ComProtoBasic):
         """
         self._on_tx_callback = callback
 
-    # def read_response(self) -> str:
-    #     """ This method reads the response from the device
+    def read_until_response(self) -> str:
+        """This method reads the response from the device
 
-    #     Returns:
-    #         str: The response from the device
-    #     """
-    #     response = self.read()
+        Returns:
+            str: The response from the device
+        """
+        response = self.read_raw_until_response()
 
-    #     if self.ACK in response:
-    #         response = response.replace(self.ACK, "")
-    #     elif self.NACK in response:
-    #         raise SerialException(f"NACK received: {response}")
-    #     else:
-    #         raise SerialException(f"Invalid response: {response}")
+        if not response:
+            return None
 
-    #     return response
+        decoded_response = response.decode().strip()
+        self._on_rx_callback(decoded_response)
+
+        return decoded_response
 
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response
@@ -197,3 +213,21 @@ class SerialPort(ComProtoBasic):
             str: The COM port
         """
         return self._serial.port
+
+    @property
+    def ack_bytes(self) -> bytes:
+        """This method returns the ACK bytes
+
+        Returns:
+            bytes: The ACK bytes
+        """
+        return self._ack_bytes
+
+    @property
+    def nack_bytes(self) -> bytes:
+        """This method returns the NACK bytes
+
+        Returns:
+            bytes: The NACK bytes
+        """
+        return self._nack_bytes

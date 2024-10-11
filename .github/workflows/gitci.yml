@@ -4,7 +4,7 @@ jobs:
   flake8:
     runs-on: ubuntu-latest
     container:
-      image: cimg/python:3.11
+      image: cimg/python:3.12
 
     steps:
       - name: Checkout code
@@ -20,7 +20,7 @@ jobs:
   black:
     runs-on: ubuntu-latest
     container:
-      image: cimg/python:3.11
+      image: cimg/python:3.12
 
     steps:
       - name: Checkout code
