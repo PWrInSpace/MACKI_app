@@ -22,6 +22,8 @@ def pyserial_mock(mocker) -> SerialPort:
     mocker.patch("serial.Serial.open", connect_mock)
     mocker.patch("serial.Serial.close", disconnect_mock)
     mocker.patch("serial.Serial.timeout", timeout_setter_mock)
+    mocker.patch("serial.Serial.reset_input_buffer")
+    mocker.patch("serial.Serial.reset_output_buffer")
     mocker.patch("serial.Serial.write")
 
     return None
