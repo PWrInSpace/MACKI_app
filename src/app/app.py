@@ -26,9 +26,9 @@ class App(QMainWindow):
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedSize(self.sizeHint())
 
-        procedure = ProceduresWidget(self._macus_widget.com_serial)
-        self.setCentralWidget(procedure)
-        # self.setCentralWidget(self._macus_widget)
+        # procedure = ProceduresWidget(self._macus_widget.com_serial)
+        # self.setCentralWidget(procedure)
+        self.setCentralWidget(self._macus_widget)
 
         self._experiment_window = ExperimentWindow(self._macus_widget.com_serial)
         self._experiment_window.setMinimumWidth(1400)

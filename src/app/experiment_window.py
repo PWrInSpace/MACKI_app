@@ -24,7 +24,7 @@ logger = logging.getLogger("experiment_window")
 
 class ExperimentWindow(QTabWidget):
     NACK_COUNTER_LIMIT = 20
-    DATA_UPDATE_INTERVAL = 100
+    DATA_UPDATE_INTERVAL = 150
     IDX_TAB_EXPERIMENT = 0
     READ_DATA_COMMAND = (
         "data"  # TODO: move the all available commands to a separate file
@@ -129,10 +129,11 @@ class ExperimentWindow(QTabWidget):
         """
         self._protocol.write(self.READ_DATA_COMMAND)
         response = self._protocol.read_raw_until_response()
+        # print(response)
 
         if self._protocol.ack_bytes in response:
             # Remove the ACK and EOF bytes
-            start_idx = response.index(self._protocol.ack_bytes)
+            start_idx = len(self._protocol.ack_bytes)
             return_response = response[start_idx:-2]
         elif self._protocol.nack_bytes in response:
             logger.error("Failed to read data - NACK received")
@@ -181,7 +182,6 @@ class ExperimentWindow(QTabWidget):
             data_dict = self._parser.parse(data)
             self._update_widgets(data_dict)
 
-            logger.info(f"Received data: {data_dict}")
         else:
             self._continous_nack_counter += 1
             self._check_nack_counter()

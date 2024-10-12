@@ -100,8 +100,10 @@ class _JSONDeserializer:
         name = cfg_dict["name"]
         lower_bound = cfg_dict.get("lower_bound", None)
         upper_bound = cfg_dict.get("upper_bound", None)
+        signal_color = cfg_dict.get("signal_color", "red")
+        signal_color = Colors[signal_color.upper()]
 
-        return DataTextNumber(name, lower_bound, upper_bound)
+        return DataTextNumber(name, lower_bound, upper_bound, signal_color)
 
     def _parse_data_text_values_dict(self, cfg_dict: dict[str, Any]) -> DataTextValues:
         """Parses a dictionary for a DataTextValues object.
