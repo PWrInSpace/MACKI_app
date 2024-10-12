@@ -7,7 +7,7 @@
       "y_name": "load_cell",
       "title": "Load cell measurements",
       "color": "cyan",
-      "max_points": 100,
+      "max_points": 50,
       "x_label": "Time (s)",
       "y_label": "Force (N)"
     },
@@ -16,7 +16,7 @@
       "y_name": "distance",
       "title": "Distance sensor measurements",
       "color": "lime",
-      "max_points": 100,
+      "max_points": 50,
       "x_label": "Time (s)",
       "y_label": "Distance (?)"
     }
