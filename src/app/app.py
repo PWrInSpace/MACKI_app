@@ -8,6 +8,7 @@ from src.app.config import OCTOPUS_SERIAL_WIN
 from src.app.com.macus_widget import MacusWidget
 from src.com.serial import QSerialState
 from src.app.experiment_window import ExperimentWindow
+from src.procedures.procedures_widget import ProceduresWidget
 
 
 class App(QMainWindow):
@@ -25,7 +26,9 @@ class App(QMainWindow):
         self.setContentsMargins(0, 0, 0, 0)
         self.setFixedSize(self.sizeHint())
 
-        self.setCentralWidget(self._macus_widget)
+        procedure = ProceduresWidget(self._macus_widget.com_serial)
+        self.setCentralWidget(procedure)
+        # self.setCentralWidget(self._macus_widget)
 
         self._experiment_window = ExperimentWindow(self._macus_widget.com_serial)
         self._experiment_window.setMinimumWidth(1400)
