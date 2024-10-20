@@ -103,8 +103,24 @@
     ]
   },
   {
-        "cmd_type": "QProcedureCmd",
-        "name": "dummy"
+    "cmd_type": "QSerialCmd",
+    "name": "move_motors",
+    "args": [
+        {
+            "arg_type": "QArgEnum",
+            "name": "direction",
+            "enum": {
+                "up": 1,
+                "down": 2
+            },
+            "default_name": "up",
+            "description": ""
+        },
+        {
+            "arg_type": "QArgFloat",
+            "name": "velocity"
+        }
+    ]
   }
   ]
 }

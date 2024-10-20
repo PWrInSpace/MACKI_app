@@ -32,6 +32,7 @@ class App(QMainWindow):
 
         self._experiment_window = ExperimentWindow(self._macus_widget.com_serial)
         self._experiment_window.setMinimumWidth(1400)
+        self._experiment_window.show()
 
     @Slot(QSerialState)
     def _on_state_changed(self, state: QSerialState):

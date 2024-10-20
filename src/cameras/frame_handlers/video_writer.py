@@ -109,6 +109,8 @@ class VideoWriter(BasicFrameHandler):
                 f"Frame size ({frame.shape[1]}, {frame.shape[0]})"
                 f"does not match video frame size {self._frame_size}"
             )
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         self._writer.write(frame)
 
     @override

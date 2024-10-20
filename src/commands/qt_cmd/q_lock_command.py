@@ -9,7 +9,7 @@ from src.commands.qt_cmd.q_serial_command import QSerialCmd
 # TO DO: add args test and signal argument tests
 
 
-class QProcedureCmd(QSerialCmd):
+class QLockCmd(QSerialCmd):
     ADDITIONAL_COLUMNS_NB = 3
     LABEL_STRETCH = 1
     UNLOCK_TIMER_TIMEOUT = 5000
@@ -20,7 +20,7 @@ class QProcedureCmd(QSerialCmd):
     locked = Signal(str)
 
     def __init__(self, name: str, columns_nb: int) -> None:
-        """Create a new QProcedureCmd
+        """Create a new QLockCmd
 
         Args:
             command (Command): Command to create GUI for

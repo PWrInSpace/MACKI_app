@@ -1,7 +1,7 @@
 from typing import override
 from PySide6.QtWidgets import QVBoxLayout, QFrame
 from src.commands.qt_cmd_group import QCmdGroup
-from src.commands.qt_cmd import QProcedureCmd
+from src.commands.qt_cmd import QLockCmd
 
 
 class ProcedureCommands(QCmdGroup):
@@ -13,12 +13,12 @@ class ProcedureCommands(QCmdGroup):
 
     def __init__(self, protocol):
         commands = {
-            self.MOTION_COMMAND: QProcedureCmd(self.MOTION_COMMAND, self.COLUMNS_NUM),
-            self.PRESSURE_COMMAND: QProcedureCmd(
+            self.MOTION_COMMAND: QLockCmd(self.MOTION_COMMAND, self.COLUMNS_NUM),
+            self.PRESSURE_COMMAND: QLockCmd(
                 self.PRESSURE_COMMAND, self.COLUMNS_NUM
             ),
-            self.TEST_COMMAND: QProcedureCmd(self.TEST_COMMAND, self.COLUMNS_NUM),
-            self.MAIN_COMMAND: QProcedureCmd(self.MAIN_COMMAND, self.COLUMNS_NUM),
+            self.TEST_COMMAND: QLockCmd(self.TEST_COMMAND, self.COLUMNS_NUM),
+            self.MAIN_COMMAND: QLockCmd(self.MAIN_COMMAND, self.COLUMNS_NUM),
         }
         super().__init__("Procedure Commands", commands, protocol)
 

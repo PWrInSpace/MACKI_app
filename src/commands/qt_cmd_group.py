@@ -8,7 +8,7 @@ from src.com.abstract import ComProtoBasic
 from src.commands.qt_cmd import (
     QCmdBasic,
     QSerialCmd,
-    QProcedureCmd,
+    QLockCmd,
 )
 from src.commands.qt_args import QArgInt, QArgFloat, QArgEnum, QArgBasic
 
@@ -141,8 +141,8 @@ class _JSON_decoder(json.JSONDecoder):
         cmd_type = d.pop("cmd_type")
         if cmd_type == "QSerialCmd":
             return QSerialCmd(**d)
-        elif cmd_type == "QProcedureCmd":
-            return QProcedureCmd(**d)
+        elif cmd_type == "QLockCmd":
+            return QLockCmd(**d)
         else:
             raise ValueError(f"Invalid command type: {cmd_type}")
 

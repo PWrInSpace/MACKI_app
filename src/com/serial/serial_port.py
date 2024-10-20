@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 
 class SerialPort(ComProtoBasic):
     EOF = "\r\n"
-    READ_TIMEOUT_S = 0.01
+    READ_TIMEOUT_S = 0.1
     WRITE_TIMEOUT_S = 0.01
     ITERATIONS = 10
 
@@ -104,7 +104,7 @@ class SerialPort(ComProtoBasic):
             self._on_tx_callback(data)
 
     @override
-    def read(self, read_timeout_s: float = 0.01) -> str:
+    def read(self, read_timeout_s: float = 0.1) -> str:
         """This method reads data from the serial port
 
         Args:

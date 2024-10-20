@@ -16,6 +16,7 @@ from src.com.serial import QSerial
 
 from src.app.cameras_app import QCameraApp
 from src.app.commands import ProcedureCommands
+from src.procedures.procedures_widget import ProceduresWidget
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
 
@@ -72,7 +73,8 @@ class ExperimentWindow(QTabWidget):
         Returns:
             QWidget: Experiment widget
         """
-        self._cmd_group = ProcedureCommands(self._protocol)
+        # self._cmd_group = ProcedureCommands(self._protocol)
+        self._procedures = ProceduresWidget()
         self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
         self._cameras.enable_cameras()
 
@@ -89,7 +91,7 @@ class ExperimentWindow(QTabWidget):
         data_widget.setLayout(data_layout)
 
         layout = QGridLayout()
-        layout.addWidget(self._cmd_group, 0, 0, 1, 1)
+        layout.addWidget(self._procedures, 0, 0, 1, 1)
         layout.addWidget(self._cameras, 1, 0, 1, 1)
         layout.addWidget(data_widget, 0, 1, 2, 1)
 
@@ -129,7 +131,6 @@ class ExperimentWindow(QTabWidget):
         """
         self._protocol.write(self.READ_DATA_COMMAND)
         response = self._protocol.read_raw_until_response()
-        # print(response)
 
         if self._protocol.ack_bytes in response:
             # Remove the ACK and EOF bytes

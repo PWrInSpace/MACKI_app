@@ -1,33 +1,38 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QGroupBox, QComboBox, QPushButton, QGridLayout
 from src.com.abstract import ComProtoBasic
 from src.procedures.procedure_plot import ProcedurePlot
+# from src.commands.qt_cmd.q_lock_command import QLockCmd
+from src.procedures.procedure_command import ProcedureCmd
 
-class ProceduresWidget(QWidget):
+
+class ProceduresWidget(QGroupBox):
     BUTTON_TXT_START = "Start"
     BUTTON_TXT_STOP = "Stop"
 
     def __init__(self, protocol: ComProtoBasic | None = None):
-        super().__init__()
+        super().__init__("Procedure control")
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        self.label = QLabel("Procedures")
-        self.layout.addWidget(self.label)
+        label = QLabel("Procedure name")
+        procedure_type = QComboBox()
+        procedure_type.addItems(["Procedure 1", "Procedure 2", "Procedure 3"])
+        info_button = QPushButton("Procedure values")
 
-        self._procedure_button = QPushButton(self.BUTTON_TXT_START)
-        self._procedure_button.setStyleSheet("background-color: green")
-        self._procedure_button.clicked.connect(self._on_procedure_button_clicked)
-        self.layout.addWidget(self._procedure_button)
+        layout = QGridLayout()
+        layout.addWidget(label, 0, 0)
+        layout.addWidget(procedure_type, 0, 1)
+        layout.addWidget(info_button, 0, 2)
+        widget = QWidget()
+        widget.setLayout(layout)
 
-        self.setFixedSize(500, 300)
+        horizontal_bar = QFrame()
+        horizontal_bar.setFrameShape(QFrame.HLine)
+        horizontal_bar.setFrameShadow(QFrame.Sunken)
+
+        # self.setFixedSize(500, 500)
         self._plot = ProcedurePlot()
+        self.layout.addWidget(widget)
         self.layout.addWidget(self._plot)
-
-
-    def _on_procedure_button_clicked(self):
-        if self._procedure_button.text() == self.BUTTON_TXT_START:
-            self._procedure_button.setText(self.BUTTON_TXT_STOP)
-            self._procedure_button.setStyleSheet("background-color: red")
-        else:
-            self._procedure_button.setText(self.BUTTON_TXT_START)
-            self._procedure_button.setStyleSheet("background-color: green")
+        self.layout.addWidget(horizontal_bar)
+        self.layout.addWidget(ProcedureCmd("Procedure", 3))
