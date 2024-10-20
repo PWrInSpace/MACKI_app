@@ -73,7 +73,7 @@ class ProcedureParameters:
 
         # Check if the velocity profile is sorted by time.
         for i in range(len(self.velocity_profile) - 1):
-            if self.velocity_profile[i][self.TIME_IDX] >= self.velocity_profile[i + 1][self.TIME_IDX]:
+            if self.velocity_profile[i][self.TIME_IDX] > self.velocity_profile[i + 1][self.TIME_IDX]:
                 raise ValueError("The velocity profile is not sorted by time.")
 
         # Check the velocity values

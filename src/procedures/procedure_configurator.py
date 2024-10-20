@@ -13,7 +13,7 @@ from src.procedures.procedure_table import ProcedureTable
 from src.utils.numbers import is_number
 
 
-class ProcedureConfiguration(QWidget):
+class ProcedureConfigurator(QWidget):
     def __init__(self, params: ProcedureParameters):
         super().__init__()
 
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         pressurization_time_ms=2,
         depressurization_time_ms=3
     )
-    widget = ProcedureConfiguration(params)
+    widget = ProcedureConfigurator(params)
     widget.show()
 
     app.exec()
