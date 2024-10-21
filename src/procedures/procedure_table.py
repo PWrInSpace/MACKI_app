@@ -51,7 +51,7 @@ class ProcedureTable(QTableWidget):
             self.removeRow(selected_row)
             self.itemChanged.emit(self.item(selected_row, 0))
 
-    def set_profile(self, profile: list[tuple[float, float]]):
+    def set_profile(self, profile: list[tuple[int, int]]):
         self.setRowCount(0)
         for time, velocity in profile:
             self._add_new_row(self.rowCount())
@@ -70,8 +70,8 @@ class ProcedureTable(QTableWidget):
             time_text = time_item.text()
             velocity_text = velocity_item.text()
             if is_number(time_text) and is_number(velocity_text):
-                time = float(time_text)
-                velocity = float(velocity_text)
+                time = int(time_text)
+                velocity = int(velocity_text)
                 velocity_profile.append((time, velocity))
             else:
                 return None

@@ -31,6 +31,8 @@ class ExperimentWindow(QTabWidget):
     READ_DATA_COMMAND = (
         "data"  # TODO: move the all available commands to a separate file
     )
+    PROCEDURE_START_COMMAND = "procedure"
+    PROCEDURE_STOP_COMMAND = "stop_procedure"
     SERVICE_DATA_NAME = "Data"
     SERVICE_DATA_COLUMNS = 4
 
@@ -206,8 +208,10 @@ class ExperimentWindow(QTabWidget):
         self._cameras.change_output_dir(self._data_logger.procedure_folder)
         procedure.to_csv(self._data_logger.procedure_profile_file)
 
-        print(procedure.procedure_profile_args())
+        args = procedure.procedure_profile_args()
+        self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
 
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()
+        self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)

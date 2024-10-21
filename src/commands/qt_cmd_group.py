@@ -63,16 +63,7 @@ class QCmdGroup(QGroupBox):
             message (str): message to be sent
         """
         if self._protocol is not None:
-            self._protocol.write(message)
-            ret = self._protocol.read_until_response()
-            if not ret:
-                raise ValueError("No response received")
-            elif ret.startswith(self._protocol.NACK):
-                raise ValueError(f"NACK received {ret}")
-            else:
-                logger.info(f"ACK received {ret}")
-        else:
-            logger.fatal("No protocol set for command group")
+            self._protocol.write_and_check(message)
 
     @staticmethod
     def from_JSON(file: str, protocol: ComProtoBasic) -> Self:

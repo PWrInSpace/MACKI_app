@@ -189,6 +189,30 @@ class SerialPort(ComProtoBasic):
 
         return decoded_response
 
+    def write_and_check(self, message: str) -> None:
+        """This method writes a command to the serial port and checks the response
+           Will raise an exception if the response is NACK or no response is received
+
+        Args:
+            message (str): The message to write
+
+        Raises:
+            ValueError: No response received
+            ValueError: NACK received
+
+        Returns:
+            bool: True if the response is ACK, False otherwise
+        """
+        self.write(message)
+        ret = self.read_until_response()
+
+        if not ret:
+            raise ValueError("No response received")
+        elif ret.startswith(self.NACK):
+            raise ValueError(f"NACK received {ret}")
+        else:
+            logger.info(f"ACK received {ret}")
+
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response
 
@@ -203,7 +227,7 @@ class SerialPort(ComProtoBasic):
         for arg in argv:
             command += f" {arg}"
 
-        self.write(command)
+        self.write_and_check(command)
 
     @property
     def port(self) -> str:

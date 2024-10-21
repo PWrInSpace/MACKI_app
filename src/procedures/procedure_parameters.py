@@ -223,7 +223,7 @@ class ProcedureParameters:
         Returns:
             str: String with the step
         """
-        return f"{step[self.TIME_IDX]}:{step[self.VELOCITY_IDX]};"
+        return f"{int(step[self.TIME_IDX])}:{int(step[self.VELOCITY_IDX])};"
 
     def procedure_profile_args(self) -> list[str]:
         """Get the procedure profile arguments.
