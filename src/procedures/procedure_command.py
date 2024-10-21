@@ -13,8 +13,9 @@ class ProcedureCmdState(Enum):
 class ProcedureCmd(QLockCmd):
     BUTTON_TXT_START = "Start"
     BUTTON_TXT_STOP = "Stop"
-    BUTON_START_STYLE = "background-color: green"
-    BUTTON_STOP_STYLE = "background-color: red"
+    BUTTON_START_STYLE = "background-color: lime; color: black"
+    BUTTON_STOP_STYLE = "background-color: red; color: black"
+    BUTTON_DISABLED_STYLE = "background-color: grey"
     start_clicked = Signal()
     stop_clicked = Signal()
 
@@ -27,7 +28,7 @@ class ProcedureCmd(QLockCmd):
     def _create_gui(self, columns_nb) -> None:
         super()._create_gui(columns_nb)
         self._send_button.setText(self.BUTTON_TXT_START)
-        self._send_button.setStyleSheet(self.BUTON_START_STYLE)
+        self._send_button.setStyleSheet(self.BUTTON_DISABLED_STYLE)
 
         # disconnect the previous connection
         self._send_button.clicked.disconnect(self._send_button_clicked)
@@ -38,6 +39,15 @@ class ProcedureCmd(QLockCmd):
         if self._procedures_state != ProcedureCmdState.RUNNING:
             super()._on_unlock_timer_timeout()
 
+    @override
+    def _send_lock_stage_changed(self):
+        super()._send_lock_stage_changed()
+
+        if self._send_button.isEnabled():
+            self._send_button.setStyleSheet(self.BUTTON_START_STYLE)
+        else:
+            self._send_button.setStyleSheet(self.BUTTON_DISABLED_STYLE)
+
     def _on_procedure_button_clicked(self):
         if self._procedures_state == ProcedureCmdState.IDLE:
             self._procedures_state = ProcedureCmdState.RUNNING
@@ -47,6 +57,6 @@ class ProcedureCmd(QLockCmd):
         else:
             self._procedures_state = ProcedureCmdState.IDLE
             self._send_button.setText(self.BUTTON_TXT_START)
-            self._send_button.setStyleSheet(self.BUTON_START_STYLE)
+            self._send_button.setStyleSheet(self.BUTTON_START_STYLE)
             self._send_lock_widget.setChecked(False)
             self.stop_clicked.emit()
