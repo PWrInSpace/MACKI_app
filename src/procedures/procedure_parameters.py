@@ -1,4 +1,5 @@
 import logging
+from typing import Self, Any
 from dataclasses import dataclass
 
 logger = logging.getLogger("procedure_parameters")
@@ -9,8 +10,8 @@ class ProcedureParameters:
     """
     Data class for procedure parameters.
     """
-    MAX_VELOCITY = 1000
-    MIN_VELOCITY = 0
+    MAX_VELOCITY = 100_000
+    MIN_VELOCITY = -100_000
     TIME_IDX = 0
     VELOCITY_IDX = 1
 
@@ -55,6 +56,14 @@ class ProcedureParameters:
 
         if self.pressurization_time_ms is None and self.depressurization_time_ms is not None:
             raise ValueError("The depressurization time is set but not the pressurization.")
+
+        if self.pressurization_time_ms is not None and self.depressurization_time_ms is not None:
+            if self.pressurization_time_ms < 0 or self.depressurization_time_ms < 0:
+                raise ValueError("Pressurization or depressurization time is negative.")
+
+        if self.pressurization_time_ms is not None and self.depressurization_time_ms is not None:
+            if self.pressurization_time_ms > self.depressurization_time_ms:
+                raise ValueError("Press time is greater than depress time.")
 
     def _check_velocity_profile(self) -> bool:
         """
@@ -155,3 +164,46 @@ class ProcedureParameters:
             file.write("time [ms];velocity\n")
             for time, velocity in self.velocity_profile:
                 file.write(f"{time};{velocity}\n")
+
+    @staticmethod
+    def from_dict(dict: dict[str, Any]) -> Self:
+        """Load the procedure parameters from a dictionary.
+        The dictionary format:
+        {
+            "name": str,
+            "pressurization": float | None,
+            "depressurization": float | None,
+            "time_profile": list[float] | None,
+            "velocity_profile": list[float] | None,
+        }
+        Args:
+            dict (dict[str, Any]): Dictionary with the procedure parameters
+
+        Returns:
+            Self: The procedure parameters
+        """
+        velocity_profile = dict["velocity_profile"]
+        time_profile = dict["time_profile"]
+        procedure_profile = [
+            (time, velocity) for time, velocity in zip(time_profile, velocity_profile)
+        ]
+
+        return ProcedureParameters(
+            dict["name"],
+            procedure_profile,
+            dict["pressurization"],
+            dict["depressurization"],
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert the procedure parameters to a dictionary.
+        Returns:
+            dict[str, Any]: Dictionary with the procedure parameters
+        """
+        return {
+            "name": self.name,
+            "pressurization": self.pressurization_time_ms,
+            "depressurization": self.depressurization_time_ms,
+            "time_profile": self.get_time_list(),
+            "velocity_profile": self.get_velocity_list(),
+        }

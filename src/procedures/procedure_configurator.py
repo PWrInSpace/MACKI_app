@@ -7,6 +7,7 @@ from PySide6.QtWidgets import (
     QTableWidgetItem,
     QMessageBox,
 )
+from PySide6.QtCore import Signal
 from src.procedures.procedure_parameters import ProcedureParameters
 from src.procedures.procedure_plot import ProcedurePlot
 from src.procedures.procedure_table import ProcedureTable
@@ -14,6 +15,9 @@ from src.utils.numbers import is_number
 
 
 class ProcedureConfigurator(QWidget):
+    closed = Signal()
+    updated = Signal(ProcedureParameters)
+
     def __init__(self, params: ProcedureParameters):
         super().__init__()
 
@@ -67,7 +71,7 @@ class ProcedureConfigurator(QWidget):
         if params:
             self.plot.set_procedure_parameters(params)
 
-    def generate_procedure_params(self) -> ProcedureParameters:
+    def generate_procedure_params(self, skip_check: bool = True) -> ProcedureParameters:
         press_time_text = self.press_input.text()
         depr_time_text = self.depr_input.text()
 
@@ -83,38 +87,37 @@ class ProcedureConfigurator(QWidget):
             pressurization_time_ms=press_time_ms,
             depressurization_time_ms=depr_time_ms,
             velocity_profile=velocity_profile,
-            skip_check=True
+            skip_check=skip_check
         )
 
+    def _save_changes_window(self) -> bool:
+        """Show a message box to save the changes
+
+        Returns:
+            bool: True if the user wants to save the changes, False otherwise
+        """
+        if self._value_changed is False:
+            return False
+
+        reply = QMessageBox.question(
+            self,
+            'Save Changes',
+            'You have changed the parameters. Do you want to save them?',
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+
+        return reply == QMessageBox.Yes
+
     def closeEvent(self, event):
-        if self._value_changed:
-            reply = QMessageBox.question(
-                self,
-                'Save Changes',
-                'You have changed the parameters. Do you want to save them?',
-                QMessageBox.Yes | QMessageBox.No,
-                QMessageBox.No
-            )
-
-            if reply == QMessageBox.Yes:
-                params = self.generate_procedure_params()
-                # Save params to file or handle accordingly
-                print("Changes saved")
-
-        return super().closeEvent(event)
-
-
-if __name__ == "__main__":
-    app = QApplication([])
-    items = [(0, 2), (3, 4)]
-
-    params = ProcedureParameters(
-        name="Test",
-        velocity_profile=items,
-        pressurization_time_ms=2,
-        depressurization_time_ms=3
-    )
-    widget = ProcedureConfigurator(params)
-    widget.show()
-
-    app.exec()
+        if self._save_changes_window():
+            try:
+                params = self.generate_procedure_params(skip_check=False)
+                self.updated.emit(params)
+                self.closed.emit()
+            except ValueError as e:
+                event.ignore()
+                QMessageBox.critical(self, "Error", str(e))
+        else:
+            event.accept()
+            self.closed.emit()

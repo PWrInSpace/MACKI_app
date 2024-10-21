@@ -7,8 +7,8 @@ from src.app.config import (
     DATA_PLOT_CONFIG_FILE,
     DATA_TEXT_CONFIG_FILE,
     PARSER_CONFIG_FILE,
+    PROCEDURES_CONFIG_FILE,
     OCTOPUS_EXP_WIN,
-    OCTOPUS_CAM_WIN
 )
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtGui import QIcon
@@ -78,7 +78,7 @@ class ExperimentWindow(QTabWidget):
             QWidget: Experiment widget
         """
         # self._cmd_group = ProcedureCommands(self._protocol)
-        self._procedures = ProceduresWidget()
+        self._procedures = ProceduresWidget(PROCEDURES_CONFIG_FILE)
         self._procedures.start_procedure_clicked.connect(self._on_start_procedure)
         self._procedures.stop_procedure_clicked.connect(self._on_stop_procedure)
 

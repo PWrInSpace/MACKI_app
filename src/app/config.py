@@ -8,6 +8,7 @@ COMMANDS_CONFIG_FILE = os.path.join(CONFIG_DIR, "service_commands.json")
 DATA_PLOT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_plot.json")
 DATA_TEXT_CONFIG_FILE = os.path.join(CONFIG_DIR, "experiment_data_text.json")
 PARSER_CONFIG_FILE = os.path.join(CONFIG_DIR, "data_parser.json")
+PROCEDURES_CONFIG_FILE = os.path.join(CONFIG_DIR, "procedures.json")
 
 RESOURCES_DIR = os.path.join(os.getcwd(), "resources")
 OCTOPUS_EXP_WIN = os.path.join(RESOURCES_DIR, "octopus.svg")
