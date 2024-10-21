@@ -42,11 +42,11 @@ class ProcedureConfigurator(QWidget):
 
         press_label = QLabel("Pressurization Time [ms]")
         self._press_input = QLineEdit()
-        self._press_input.setText(str(params.pressurization_time_ms))
+        self._press_input.setText(str(params.press_time_ms))
 
         depr_label = QLabel("Depressurization Time [ms]")
         self._depr_input = QLineEdit()
-        self._depr_input.setText(str(params.depressurization_time_ms))
+        self._depr_input.setText(str(params.depr_time_ms))
 
         self._table = ProcedureTable()
         self._table.set_profile(params.velocity_profile)
@@ -91,8 +91,8 @@ class ProcedureConfigurator(QWidget):
 
         return ProcedureParameters(
             name=self.windowTitle(),
-            pressurization_time_ms=press_time_ms,
-            depressurization_time_ms=depr_time_ms,
+            press_time_ms=press_time_ms,
+            depr_time_ms=depr_time_ms,
             velocity_profile=velocity_profile,
             skip_check=skip_check
         )

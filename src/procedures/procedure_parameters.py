@@ -1,6 +1,7 @@
 import logging
 from typing import Self, Any
 from dataclasses import dataclass
+import numpy as np
 
 logger = logging.getLogger("procedure_parameters")
 
@@ -10,6 +11,12 @@ class ProcedureParameters:
     """
     Data class for procedure parameters.
     """
+    KEY_NAME = "name"
+    KEY_PRESS = "pressurization"
+    KEY_DEPR = "depressurization"
+    KEY_TIME_PROFILE = "time_profile"
+    KEY_VELOCITY_PROFILE = "velocity_profile"
+
     MAX_VELOCITY = 100_000
     MIN_VELOCITY = -100_000
     TIME_IDX = 0
@@ -20,9 +27,9 @@ class ProcedureParameters:
     # The velocity profile of the procedure., list of tuples (time, velocity)
     velocity_profile: list[tuple[float, float]] | None
     # The time of pressurization of the system.
-    pressurization_time_ms: float | None
+    press_time_ms: float | None
     # The time of depressurization of the system.
-    depressurization_time_ms: float | None
+    depr_time_ms: float | None
     # # The time of the procedure.
     skip_check: bool = False
 
@@ -37,32 +44,33 @@ class ProcedureParameters:
            not isinstance(self.velocity_profile, list):
             raise ValueError("The velocity profile is not a list.")
 
-        if self.pressurization_time_ms is not None and\
-           not isinstance(self.pressurization_time_ms, (int, float)):
+        if self.press_time_ms is not None and\
+           not isinstance(self.press_time_ms, (int, float)):
             raise ValueError("The pressurization time is not a number.")
 
-        if self.depressurization_time_ms is not None and\
-           not isinstance(self.depressurization_time_ms, (int, float)):
+        if self.depr_time_ms is not None and\
+           not isinstance(self.depr_time_ms, (int, float)):
             raise ValueError("The depressurization time is not a number.")
 
+    def _check_dependencies(self):
         if self.velocity_profile is None and\
-           (self.pressurization_time_ms is None or self.depressurization_time_ms is None):
+           (self.press_time_ms is None or self.depr_time_ms is None):
             raise ValueError(
                 "The velocity profile is None and the press or depress time is None."
             )
 
-        if self.pressurization_time_ms is not None and self.depressurization_time_ms is None:
+        if self.press_time_ms is not None and self.depr_time_ms is None:
             raise ValueError("The pressurization time is set but not the depressurization.")
 
-        if self.pressurization_time_ms is None and self.depressurization_time_ms is not None:
+        if self.press_time_ms is None and self.depr_time_ms is not None:
             raise ValueError("The depressurization time is set but not the pressurization.")
 
-        if self.pressurization_time_ms is not None and self.depressurization_time_ms is not None:
-            if self.pressurization_time_ms < 0 or self.depressurization_time_ms < 0:
+        if self.press_time_ms is not None and self.depr_time_ms is not None:
+            if self.press_time_ms < 0 or self.depr_time_ms < 0:
                 raise ValueError("Pressurization or depressurization time is negative.")
 
-        if self.pressurization_time_ms is not None and self.depressurization_time_ms is not None:
-            if self.pressurization_time_ms > self.depressurization_time_ms:
+        if self.press_time_ms is not None and self.depr_time_ms is not None:
+            if self.press_time_ms > self.depr_time_ms:
                 raise ValueError("Press time is greater than depress time.")
 
     def _check_velocity_profile(self) -> bool:
@@ -77,9 +85,6 @@ class ProcedureParameters:
             self.velocity_profile = None
             logger.warning("The velocity profile is empty, setting it to None.")
             return True
-
-        if self.velocity_profile[0][self.TIME_IDX] != 0:
-            raise ValueError("The first time value is not 0.")
 
         # Check if the velocity profile is sorted by time.
         for i in range(len(self.velocity_profile) - 1):
@@ -121,13 +126,14 @@ class ProcedureParameters:
             return
 
         self._initial_check()
+        self._check_dependencies()
 
         # Check if the velocity profile is valid.
         self._check_velocity_profile()
 
         # Check if the pressurization time is valid.
-        self._check_time_param(self.pressurization_time_ms)
-        self._check_time_param(self.depressurization_time_ms)
+        self._check_time_param(self.press_time_ms)
+        self._check_time_param(self.depr_time_ms)
 
     def get_time_list(self) -> list[float]:
         """
@@ -158,8 +164,8 @@ class ProcedureParameters:
         """
         with open(file_path, "w") as file:
             file.write(f"Procedure name: {self.name}\n")
-            file.write(f"Pressurization time: {self.pressurization_time_ms}\n")
-            file.write(f"Depressurization time: {self.depressurization_time_ms}\n\n")
+            file.write(f"Pressurization time: {self.press_time_ms}\n")
+            file.write(f"Depressurization time: {self.depr_time_ms}\n\n")
 
             file.write("time [ms];velocity\n")
             for time, velocity in self.velocity_profile:
@@ -182,17 +188,17 @@ class ProcedureParameters:
         Returns:
             Self: The procedure parameters
         """
-        velocity_profile = dict["velocity_profile"]
-        time_profile = dict["time_profile"]
+        velocity_profile = dict[ProcedureParameters.KEY_VELOCITY_PROFILE]
+        time_profile = dict[ProcedureParameters.KEY_TIME_PROFILE]
         procedure_profile = [
             (time, velocity) for time, velocity in zip(time_profile, velocity_profile)
         ]
 
         return ProcedureParameters(
-            dict["name"],
+            dict[ProcedureParameters.KEY_NAME],
             procedure_profile,
-            dict["pressurization"],
-            dict["depressurization"],
+            dict[ProcedureParameters.KEY_PRESS],
+            dict[ProcedureParameters.KEY_DEPR],
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -201,9 +207,45 @@ class ProcedureParameters:
             dict[str, Any]: Dictionary with the procedure parameters
         """
         return {
-            "name": self.name,
-            "pressurization": self.pressurization_time_ms,
-            "depressurization": self.depressurization_time_ms,
-            "time_profile": self.get_time_list(),
-            "velocity_profile": self.get_velocity_list(),
+            self.KEY_NAME: self.name,
+            self.KEY_PRESS: self.press_time_ms,
+            self.KEY_DEPR: self.depr_time_ms,
+            self.KEY_TIME_PROFILE: self.get_time_list(),
+            self.KEY_VELOCITY_PROFILE: self.get_velocity_list(),
         }
+
+    def _movement_step_from_tuple(self, step: tuple[float, float]) -> str:
+        """Get the movement step from a tuple.
+
+        Args:
+            step (tuple[float, float]): Tuple with the step
+
+        Returns:
+            str: String with the step
+        """
+        return f"{step[self.TIME_IDX]}:{step[self.VELOCITY_IDX]};"
+
+    def procedure_profile_args(self) -> list[str]:
+        """Get the procedure profile arguments.
+        Returns:
+            list[str]: List of arguments
+        """
+        movement_profile = self._movement_step_from_tuple(self.velocity_profile[0])
+        for idx, step in enumerate(self.velocity_profile[1:-1]):
+            t_0, v_0 = self.velocity_profile[idx]
+            t_1, v_1 = step
+
+            if v_0 != v_1:
+                if t_0 == t_1:
+                    movement_profile += self._movement_step_from_tuple(step)
+                else:
+                    for t in np.linspace(t_0, t_1, 6)[1:]:
+                        # equation v = v_0 + a * t, where a = (v_1 - v_0) / (t_1 - t_0),
+                        # t = (t - t_0)
+                        v = v_0 + (v_1 - v_0) * (t - t_0) / (t_1 - t_0)
+                        movement_profile += self._movement_step_from_tuple((t, v))
+
+        movement_profile += self._movement_step_from_tuple(self.velocity_profile[-1])
+        movement_profile = movement_profile[:-1]
+
+        return [movement_profile, str(self.press_time_ms), str(self.depr_time_ms)]

@@ -206,6 +206,8 @@ class ExperimentWindow(QTabWidget):
         self._cameras.change_output_dir(self._data_logger.procedure_folder)
         procedure.to_csv(self._data_logger.procedure_profile_file)
 
+        print(procedure.procedure_profile_args())
+
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()

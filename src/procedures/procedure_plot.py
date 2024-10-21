@@ -86,20 +86,20 @@ class ProcedurePlot(pg.LayoutWidget):
                 velocity_list, time_list
             )
 
-        if params.pressurization_time_ms is not None:
+        if params.press_time_ms is not None:
             self._data_connectors[self.PLOT_PRESSURIZATION].cb_append_data_array(
-                velocity_range, [params.pressurization_time_ms] * 2
+                velocity_range, [params.press_time_ms] * 2
             )
 
-        if params.depressurization_time_ms is not None:
+        if params.depr_time_ms is not None:
             self._data_connectors[self.PLOT_DEPRESSURIZATION].cb_append_data_array(
-                velocity_range, [params.depressurization_time_ms] * 2
+                velocity_range, [params.depr_time_ms] * 2
             )
 
         plot = self._plot_widget.getPlotItem()
         if len(time_list) > 1:
             plot.setXRange(min(time_list), max(time_list))
         else:
-            plot.setXRange(0, params.pressurization_time_ms + params.depressurization_time_ms)
+            plot.setXRange(0, params.press_time_ms + params.depr_time_ms)
 
         plot.setYRange(velocity_range[0], velocity_range[1], padding=0)
