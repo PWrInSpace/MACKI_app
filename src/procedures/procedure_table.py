@@ -51,6 +51,13 @@ class ProcedureTable(QTableWidget):
             self.removeRow(selected_row)
             self.itemChanged.emit(self.item(selected_row, 0))
 
+    def set_profile(self, profile: list[tuple[float, float]]):
+        self.setRowCount(0)
+        for time, velocity in profile:
+            self._add_new_row(self.rowCount())
+            self.item(self.rowCount() - 1, 0).setText(str(time))
+            self.item(self.rowCount() - 1, 1).setText(str(velocity))
+
     def get_velocity_profile(self) -> list[tuple[str, str]] | None:
         velocity_profile = []
 

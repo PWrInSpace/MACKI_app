@@ -14,6 +14,7 @@ RESOURCES_DIR = os.path.join(os.getcwd(), "resources")
 OCTOPUS_EXP_WIN = os.path.join(RESOURCES_DIR, "octopus.svg")
 OCTOPUS_CAM_WIN = os.path.join(RESOURCES_DIR, "octopus_apple.png")
 OCTOPUS_SERIAL_WIN = os.path.join(RESOURCES_DIR, "octopus.png")
+OCTOPUS_PROC_CONFIG_WIN = os.path.join(RESOURCES_DIR, "octopus_procedure_config.png")
 
 
 # TEMPORARY
