@@ -9,7 +9,8 @@ logger = logging.getLogger("data_logger")
 
 class DataLogger:
     BASE_FOLDER = "data"
-    DATA_FILE_NAME = "data.txt"
+    DATA_FILE_NAME = "data.csv"
+    PROCEDURE_PROFILE_NAME = "procedure.csv"
 
     def __init__(self, data_parser: DataParser):
         """Initializes the DataLogger object with the data parser
@@ -29,7 +30,7 @@ class DataLogger:
         self._write_header_to_file(self._data_file)
 
         self._procedure_folder = None
-        self._procedure_file = None
+        self._procedure_data_file = None
 
     def _get_current_time(self) -> str:
         """Returns the current time in the format YYYY-MM-DD_HH-MM-SS-MS
@@ -70,8 +71,8 @@ class DataLogger:
         else:
             self._write_data_to_file(self._data_file, data)
 
-            if self._procedure_file:
-                self._write_data_to_file(self._procedure_file, data)
+            if self._procedure_data_file:
+                self._write_data_to_file(self._procedure_data_file, data)
 
     def create_procedure_logger(self, procedure_name: str = "") -> None:
         """Creates a procedure logger
@@ -83,11 +84,32 @@ class DataLogger:
         self._procedure_folder = os.path.join(self._data_folder, self._procedure_folder)
         os.makedirs(self._procedure_folder)
 
-        self._procedure_file = os.path.join(self._procedure_folder, self.DATA_FILE_NAME)
-        self._write_header_to_file(self._procedure_file)
+        self._procedure_data_file = os.path.join(self._procedure_folder, self.DATA_FILE_NAME)
+        self._write_header_to_file(self._procedure_data_file)
 
     def remove_procedure_logger(self) -> None:
         """Removes the procedure logger
         """
         self._procedure_folder = None
-        self._procedure_file = None
+        self._procedure_data_file = None
+
+    @property
+    def procedure_folder(self) -> str:
+        """Returns the procedure folder
+
+        Returns:
+            str: Procedure folder
+        """
+        return self._procedure_folder
+
+    @property
+    def procedure_profile_file(self) -> str:
+        """Returns the procedure file
+
+        Returns:
+            str: Procedure file
+        """
+        if not self._procedure_folder:
+            return ""
+
+        return os.path.join(self._procedure_folder, self.PROCEDURE_PROFILE_NAME)

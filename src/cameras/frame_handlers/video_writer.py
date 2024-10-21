@@ -118,3 +118,20 @@ class VideoWriter(BasicFrameHandler):
     def is_running(self) -> bool:
         """Check if the video writer is running."""
         return self._writer is not None
+
+    def change_output_dir(self, out_dir_paht: str) -> bool:
+        """Change the output directory of the video writer.
+
+        Args:
+            out_dir_paht (str): The new output directory path.
+
+        Returns:
+            bool: True if the output directory was changed successfully, False otherwise.
+        """
+        if self.is_running:
+            return False
+
+        self._out_folder = out_dir_paht
+        self._check_out_folder()
+
+        return True

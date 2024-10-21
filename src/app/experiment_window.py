@@ -1,3 +1,4 @@
+import os
 import logging
 from typing import Any
 from PySide6.QtWidgets import QTabWidget, QWidget, QGridLayout, QVBoxLayout, QMessageBox
@@ -14,7 +15,7 @@ from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.serial import QSerial
 
-from src.app.cameras_app import QCameraApp
+from app.cameras_app import QCameraApp
 from src.procedures.procedures_widget import ProceduresWidget
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
@@ -81,7 +82,7 @@ class ExperimentWindow(QTabWidget):
         self._procedures.start_procedure_clicked.connect(self._on_start_procedure)
         self._procedures.stop_procedure_clicked.connect(self._on_stop_procedure)
 
-        self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
+        self._cameras = QCameraApp()
         self._cameras.enable_cameras()
 
         self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
@@ -198,6 +199,12 @@ class ExperimentWindow(QTabWidget):
         """Starts the procedure"""
         procedure = self._procedures.get_procedure_parameters()
         self._data_logger.create_procedure_logger(procedure.name)
+
+        if not self._data_logger.procedure_folder:
+            raise RuntimeError("Failed to create a procedure logger")
+
+        self._cameras.change_output_dir(self._data_logger.procedure_folder)
+        procedure.to_csv(self._data_logger.procedure_profile_file)
 
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""

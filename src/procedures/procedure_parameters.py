@@ -137,3 +137,21 @@ class ProcedureParameters:
             return []
 
         return [velocity for _, velocity in self.velocity_profile]
+
+    def to_csv(self, file_path: str) -> None:
+        """Save the procedure parameters to a CSV file.
+
+        Note:
+           Delimiter is hardcoded to be a semicolon.
+
+        Args:
+            file_path (str): File path
+        """
+        with open(file_path, "w") as file:
+            file.write(f"Procedure name: {self.name}\n")
+            file.write(f"Pressurization time: {self.pressurization_time_ms}\n")
+            file.write(f"Depressurization time: {self.depressurization_time_ms}\n\n")
+
+            file.write("time [ms];velocity\n")
+            for time, velocity in self.velocity_profile:
+                file.write(f"{time};{velocity}\n")

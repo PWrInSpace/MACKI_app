@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QLabel, QPushButton, QHBoxLayout
 from src.cameras.frame_handlers import BasicFrameHandler, FrameDisplay, VideoWriter
-from src.app.camera_widget_utils import CameraStatus, STATUS_TO_COLOR
+from src.app.cameras.camera_widget_utils import CameraStatus, STATUS_TO_COLOR
 from src.cameras.q_camera import QCamera
 from typing import override
 
