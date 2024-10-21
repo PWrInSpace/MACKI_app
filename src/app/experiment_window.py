@@ -1,4 +1,3 @@
-import os
 import logging
 from typing import Any
 from PySide6.QtWidgets import QTabWidget, QWidget, QGridLayout, QVBoxLayout, QMessageBox
@@ -28,12 +27,13 @@ class ExperimentWindow(QTabWidget):
     NACK_COUNTER_LIMIT = 20
     DATA_UPDATE_INTERVAL = 150
     IDX_TAB_EXPERIMENT = 0
-    READ_DATA_COMMAND = (
-        "data"  # TODO: move the all available commands to a separate file
-    )
+    # TODO: move the all available commands to a separate file
+    READ_DATA_COMMAND = "data"
     PROCEDURE_START_COMMAND = "procedure"
     PROCEDURE_STOP_COMMAND = "stop_procedure"
     SERVICE_DATA_NAME = "Data"
+    PROCEDURE_PLOT_TIME = "procedure_time"
+    PROCEDURE_PLOT_VELOCITY = "velocity"
     SERVICE_DATA_COLUMNS = 4
 
     def __init__(self, protocol: QSerial) -> None:
@@ -191,15 +191,11 @@ class ExperimentWindow(QTabWidget):
         if not self._procedures.is_procedure_running():
             return False
 
-        # time = data.get("procedure_time", None)
-        # velocity = data.get("velocity", None)
-        time = data.get("load_cell", 0)
-        velocity = data.get("load_cell", 0)
+        time = data.get(self.PROCEDURE_PLOT_TIME, None)
+        velocity = data.get(self.PROCEDURE_PLOT_VELOCITY, None)
 
         if time and velocity:
             self._procedures.append_live_data(float(time), float(velocity))
-        else:
-            logger.error("Failed to update live velocity data")
 
     def _on_update_data_timer(self) -> None:
         """Routine to read the data from the device and update the widgets"""
@@ -229,6 +225,9 @@ class ExperimentWindow(QTabWidget):
         self._cameras.change_output_dir(self._data_logger.procedure_folder)
         procedure.to_csv(self._data_logger.procedure_profile_file)
 
+        self._cameras.start_cameras()
+        self._cameras.start_video_recording()
+
         args = procedure.procedure_profile_args()
         self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
 
@@ -236,5 +235,7 @@ class ExperimentWindow(QTabWidget):
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()
         self._procedures.clear_live_data()
+
+        self._cameras.stop_cameras()
 
         self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)
