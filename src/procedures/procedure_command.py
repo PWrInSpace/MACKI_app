@@ -53,10 +53,15 @@ class ProcedureCmd(QLockCmd):
             self._procedures_state = ProcedureCmdState.RUNNING
             self._send_button.setText(self.BUTTON_TXT_STOP)
             self._send_button.setStyleSheet(self.BUTTON_STOP_STYLE)
+            self._send_lock_widget.setEnabled(False)
             self.start_clicked.emit()
         else:
             self._procedures_state = ProcedureCmdState.IDLE
             self._send_button.setText(self.BUTTON_TXT_START)
             self._send_button.setStyleSheet(self.BUTTON_START_STYLE)
             self._send_lock_widget.setChecked(False)
+            self._send_lock_widget.setEnabled(True)
             self.stop_clicked.emit()
+
+    def is_running(self) -> bool:
+        return self._procedures_state == ProcedureCmdState.RUNNING

@@ -103,3 +103,16 @@ class ProcedurePlot(pg.LayoutWidget):
             plot.setXRange(0, params.press_time_ms + params.depr_time_ms)
 
         plot.setYRange(velocity_range[0], velocity_range[1], padding=0)
+
+    def append_live_velocity(self, velocity: float, time: float) -> None:
+        """Append the live velocity to the plot.
+
+        Args:
+            velocity (float): Velocity value.
+            time (float): Time value.
+        """
+        self._data_connectors[self.PLOT_LIVE_VELOCITY].cb_append_data_point(velocity, time)
+
+    def clear_live_velocity(self) -> None:
+        """Clear the live velocity."""
+        self._data_connectors[self.PLOT_LIVE_VELOCITY].clear()

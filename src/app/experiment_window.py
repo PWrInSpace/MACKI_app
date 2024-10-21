@@ -181,6 +181,26 @@ class ExperimentWindow(QTabWidget):
             msg_box.setWindowTitle("Error")
             msg_box.exec()
 
+    def _update_live_velocity(self, data: dict) -> None:
+        """Updates the live velocity data
+
+        Args:
+            time (float): Time
+            data (dict): Data dictionary
+        """
+        if not self._procedures.is_procedure_running():
+            return False
+
+        # time = data.get("procedure_time", None)
+        # velocity = data.get("velocity", None)
+        time = data.get("load_cell", 0)
+        velocity = data.get("load_cell", 0)
+
+        if time and velocity:
+            self._procedures.append_live_data(float(time), float(velocity))
+        else:
+            logger.error("Failed to update live velocity data")
+
     def _on_update_data_timer(self) -> None:
         """Routine to read the data from the device and update the widgets"""
         if self.isHidden():
@@ -191,6 +211,7 @@ class ExperimentWindow(QTabWidget):
             data_dict = self._parser.parse(data)
             self._update_widgets(data_dict)
             self._data_logger.add_data(data_dict)
+            self._update_live_velocity(data_dict)
 
             self._continous_nack_counter = 0
         else:
@@ -214,4 +235,6 @@ class ExperimentWindow(QTabWidget):
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()
+        self._procedures.clear_live_data()
+
         self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)

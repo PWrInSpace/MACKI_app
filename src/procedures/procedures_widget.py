@@ -26,11 +26,13 @@ class ProceduresWidget(QGroupBox):
         super().__init__("Procedure control")
 
         self._configurator = None
+        self._current_procedure = None
         self._procedures = {}
         self._procedure_config_file = procedure_config_file
 
         self._load_procedures()
         self._init_ui()
+        self._set_current_procedure()
 
     def _load_procedures(self):
         with open(self._procedure_config_file, "r") as file:
@@ -42,9 +44,6 @@ class ProceduresWidget(QGroupBox):
         for procedure_dict in json_dict:
             procedure = ProcedureParameters.from_dict(procedure_dict)
             self._procedures[procedure.name] = procedure
-
-        # set first procedure as current
-        self._current_procedure = next(iter(self._procedures.values()))
 
     def _save_procedures(self):
         with open(self._procedure_config_file, "w") as file:
@@ -58,7 +57,7 @@ class ProceduresWidget(QGroupBox):
         label = QLabel("Procedure name")
         self._procedure_type = QComboBox()
         self._procedure_type.addItems(list(self._procedures.keys()))
-        self._procedure_type.currentIndexChanged.connect(self._on_procedure_changed)
+        self._procedure_type.currentIndexChanged.connect(self._set_current_procedure)
 
         info_button = QPushButton("Procedure values")
         info_button.clicked.connect(self._on_procedure_values_clicked)
@@ -78,7 +77,6 @@ class ProceduresWidget(QGroupBox):
 
         # self.setFixedSize(500, 500)
         self._plot = ProcedurePlot()
-        self._plot.set_procedure_parameters(self._current_procedure)
         self.layout.addWidget(widget)
         self.layout.addWidget(self._plot)
         self.layout.addWidget(horizontal_bar)
@@ -92,7 +90,7 @@ class ProceduresWidget(QGroupBox):
 
         self._procedure_type.setEnabled(False)
 
-    def _on_procedure_changed(self, index: int):
+    def _set_current_procedure(self) -> None:
         procedure_name = self._procedure_type.currentText()
         self._current_procedure = self._procedures[procedure_name]
         self._plot.set_procedure_parameters(self._current_procedure)
@@ -108,6 +106,16 @@ class ProceduresWidget(QGroupBox):
 
     def get_procedure_parameters(self) -> ProcedureParameters:
         return self._current_procedure
+
+    def append_live_data(self, time: float, data: dict) -> None:
+        self._plot.append_live_velocity(time, data)
+
+    def clear_live_data(self) -> None:
+        self._plot.clear_live_velocity()
+        self._set_current_procedure()
+
+    def is_procedure_running(self) -> bool:
+        return self._procedure_cmd.is_running()
 
     @property
     def start_procedure_clicked(self) -> Signal:

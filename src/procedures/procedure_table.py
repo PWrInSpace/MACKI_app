@@ -70,8 +70,9 @@ class ProcedureTable(QTableWidget):
             time_text = time_item.text()
             velocity_text = velocity_item.text()
             if is_number(time_text) and is_number(velocity_text):
-                time = int(time_text)
-                velocity = int(velocity_text)
+                # table returns value with .0, and cast to int raises exception
+                time = int(float(time_text))    # don't even ask XDDDD
+                velocity = int(float(velocity_text))
                 velocity_profile.append((time, velocity))
             else:
                 return None

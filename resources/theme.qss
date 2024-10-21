@@ -247,7 +247,6 @@ QCheckBox {
 	padding: 2px;
 }
 QCheckBox:disabled {
-    background-color: #606060;
 	color: #505050;
 	padding: 2px;
 }
