@@ -24,13 +24,13 @@ class ProcedureConfigurator(QWidget):
         self.setWindowTitle(params.name)
 
         # Create and add pressurization time label and text box in grid layout
-        press_label = QLabel("Pressurization Time")
+        press_label = QLabel("Pressurization Time [ms]")
         self.press_input = QLineEdit()
         layout.addWidget(press_label, 0, 0)
         layout.addWidget(self.press_input, 0, 1)
 
         # Create and add depressurization time label and text box in grid layout
-        depr_label = QLabel("Depressurization Time")
+        depr_label = QLabel("Depressurization Time [ms]")
         self.depr_input = QLineEdit()
         layout.addWidget(depr_label, 1, 0)
         layout.addWidget(self.depr_input, 1, 1)

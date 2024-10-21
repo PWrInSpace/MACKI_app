@@ -15,10 +15,10 @@ from src.commands import QCmdGroup
 from src.com.serial import QSerial
 
 from src.app.cameras_app import QCameraApp
-from src.app.commands import ProcedureCommands
 from src.procedures.procedures_widget import ProceduresWidget
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
+from src.data_logger import DataLogger
 
 logger = logging.getLogger("experiment_window")
 
@@ -55,6 +55,9 @@ class ExperimentWindow(QTabWidget):
         self.addTab(experiment_tab, "Experiment")
         self.addTab(service_tab, "Service")
 
+        # Data logger
+        self._data_logger = DataLogger(self._parser)
+
         # Data update timer
         self._data_update_timer = QTimer()
         self._data_update_timer.timeout.connect(self._on_update_data_timer)
@@ -75,6 +78,9 @@ class ExperimentWindow(QTabWidget):
         """
         # self._cmd_group = ProcedureCommands(self._protocol)
         self._procedures = ProceduresWidget()
+        self._procedures.start_procedure_clicked.connect(self._on_start_procedure)
+        self._procedures.stop_procedure_clicked.connect(self._on_stop_procedure)
+
         self._cameras = QCameraApp(OCTOPUS_CAM_WIN)
         self._cameras.enable_cameras()
 
@@ -179,10 +185,20 @@ class ExperimentWindow(QTabWidget):
 
         data = self._read_data()
         if data:
-            self._continous_nack_counter = 0
             data_dict = self._parser.parse(data)
             self._update_widgets(data_dict)
+            self._data_logger.add_data(data_dict)
 
+            self._continous_nack_counter = 0
         else:
             self._continous_nack_counter += 1
             self._check_nack_counter()
+
+    def _on_start_procedure(self) -> None:
+        """Starts the procedure"""
+        procedure = self._procedures.get_procedure_parameters()
+        self._data_logger.create_procedure_logger(procedure.name)
+
+    def _on_stop_procedure(self) -> None:
+        """Stops the procedure"""
+        self._data_logger.remove_procedure_logger()

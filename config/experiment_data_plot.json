@@ -8,7 +8,7 @@
       "title": "Load cell measurements",
       "color": "cyan",
       "max_points": 50,
-      "x_label": "Time (s)",
+      "x_label": "Time (ms)",
       "y_label": "Force (N)"
     }
   ]

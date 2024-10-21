@@ -1,14 +1,7 @@
 {
-    "format": "<qffffHhhh",
+    "format": "<qH",
     "data_names": [
         "time",
-        "load_cell",
-        "temperature",
-        "pressure_1",
-        "pressure_2",
-        "distance",
-        "acc_x",
-        "acc_y",
-        "acc_z"
+        "load_cell"
     ]
 }

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 logger = logging.getLogger("procedure_parameters")
 
+
 @dataclass
 class ProcedureParameters:
     """

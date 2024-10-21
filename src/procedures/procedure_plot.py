@@ -15,7 +15,7 @@ from src.procedures.procedure_parameters import ProcedureParameters
 
 class ProcedurePlot(pg.LayoutWidget):
     TITLE = "Procedure"
-    X_LABEL = "Time [s]"
+    X_LABEL = "Time [ms]"
     Y_LABEL = "Velocity "
     PLOT_VELOCITY = "Velocity"
     PLOT_PRESSURIZATION = "Pressurization"
