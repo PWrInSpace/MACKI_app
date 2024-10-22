@@ -33,19 +33,23 @@ class CameraHandler(QThread):
         self._handlers: list[BasicFrameHandler] = []
         self._handler_mutex = QMutex()
         self._stop_signal = ThreadEvent()
+        self._streaming = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
 
     @Slot()
     def on_handler_started(self):
         """Handler started slot"""
-        if not self.isRunning():
-            self.start()
+        # if not self.isRunning():
+        print("Starting camera handler thread")
+        # self.start()
+        self.start_streaming()
 
     @Slot()
     def on_handler_stopped(self):
         """Handler stopped slot"""
-        if all(not handler.is_running for handler in self._handlers):
-            self.quit()
+        # if all(not handler.is_running for handler in self._handlers):
+            # self.quit()
+        self.stop_streaming()
 
     def register_frame_handler(self, handler: BasicFrameHandler) -> bool:
         """Register a frame handler to the camera
@@ -196,7 +200,6 @@ class CameraHandler(QThread):
         if self._config_file:
             self._camera.stop_streaming()
 
-            self._camera.load_settings(self._config_file, PersistType.NoLUT)
             self._config_file = None
 
             self._camera.start_streaming(self._on_frame)
@@ -224,6 +227,16 @@ class CameraHandler(QThread):
 
         logger.info(f"Frame handler thread stopped for camera {self._id}")
 
+    def start_streaming(self):
+        """Start the camera streaming"""
+        self._streaming.set()
+        print("Streaming signal set")
+        # self._camera.start_streaming(self._on_frame)
+
+    def stop_streaming(self):
+        """Stop the camera streaming"""
+        self._streaming.clear()
+
     @override
     def run(self) -> None:
         """Thread main loop"""
@@ -231,17 +244,37 @@ class CameraHandler(QThread):
         self._stop_signal.clear()
 
         with self._camera:
-            try:
-                self._camera.start_streaming(self._on_frame)
-                self._thread_loop()
+            # self._handle_config_file()
+            print("Starting load settings")
+            self._camera.load_settings(self._config_file, PersistType.NoLUT)
+            print(f"Camera {self._id} settings loaded")
 
-            except Exception as e:
-                self._handle_exception(e)
+            while not self._stop_signal.occurs():
+                try:
+                    if self._streaming.occurs() and not self._camera.is_streaming():
+                        print("Starting streaming")
+                        self._camera.start_streaming(self._on_frame)
 
-            finally:
-                self._camera.stop_streaming()
+                    if not self._streaming.occurs() and self._camera.is_streaming():
+                        print("Stopping streaming")
+                        self._camera.stop_streaming()
 
+                    self._handle_frames()
+                except Exception as e:
+                    self._handle_exception(e)
+
+        print(">>>>>>>>>>>>>>>>.Exiting thread")
         self._clean_up()
+        # with self._camera:
+        #     try:
+        #         self._camera.start_streaming(self._on_frame)
+        #         self._thread_loop()
+
+        #     except Exception as e:
+        #         self._handle_exception(e)
+
+        #     finally:
+        #         self._camera.stop_streaming()
 
     @override
     def quit(self) -> None:

@@ -108,7 +108,7 @@ class CamerasManager(QThread):
         else:
             logger.warning(f"Camera {camera_id} is already in the list")
 
-        print(self._cameras_handlers)
+        # print(self._cameras_handlers)
 
     def _on_camera_missing(self, camera: Camera) -> None:
         """Handles the camera missing event.
@@ -159,6 +159,10 @@ class CamerasManager(QThread):
     def stop_cameras(self) -> None:
         for camera_handler in self._cameras_handlers.values():
             camera_handler.quit()
+
+    def stop_streaming(self) -> None:
+        for camera_handler in self._cameras_handlers.values():
+            camera_handler.stop_streaming()
 
     def _register_vmb_callbacks(self, vmb: VmbSystem) -> None:
         """Registers the VmbSystem callbacks.

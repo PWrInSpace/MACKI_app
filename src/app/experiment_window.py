@@ -1,6 +1,7 @@
 import logging
 from typing import Any
 from PySide6.QtWidgets import QTabWidget, QWidget, QGridLayout, QVBoxLayout, QMessageBox
+from PySide6.QtCore import QThread
 from src.app.config import (
     COMMANDS_CONFIG_FILE,
     DATA_PLOT_CONFIG_FILE,
@@ -30,7 +31,7 @@ class ExperimentWindow(QTabWidget):
     # TODO: move the all available commands to a separate file
     READ_DATA_COMMAND = "data"
     PROCEDURE_START_COMMAND = "procedure"
-    PROCEDURE_STOP_COMMAND = "stop_procedure"
+    PROCEDURE_STOP_COMMAND = "procedure_stop"
     SERVICE_DATA_NAME = "Data"
     PROCEDURE_PLOT_TIME = "procedure_time"
     PROCEDURE_PLOT_VELOCITY = "velocity"
@@ -86,6 +87,8 @@ class ExperimentWindow(QTabWidget):
 
         self._cameras = QCameraApp()
         self._cameras.enable_cameras()
+        QThread.sleep(3)
+        self._cameras.start_cameras()
 
         self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
         self._data_texts = DataDisplayText.from_JSON(DATA_TEXT_CONFIG_FILE)
@@ -237,6 +240,6 @@ class ExperimentWindow(QTabWidget):
         self._procedures.clear_live_data()
 
         self._cameras.stop_video_recording()
-        self._cameras.stop_cameras()
+        self._cameras.stop_cameras_streaming()
 
         self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)
