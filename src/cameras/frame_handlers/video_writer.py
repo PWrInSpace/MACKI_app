@@ -5,9 +5,12 @@ import numpy.typing as npt
 from datetime import datetime
 from typing import override
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler, logger
+from PySide6.QtCore import QMutex
 
 
 class VideoWriter(BasicFrameHandler):
+    LOCK_TIMEOUT = 1000
+
     def __init__(
         self, name: str, fps: int, frame_size: tuple[int, int], out_folder: str = None
     ) -> None:
@@ -24,6 +27,7 @@ class VideoWriter(BasicFrameHandler):
         self._fps = fps
         self._frame_size = frame_size
         self._out_folder = out_folder
+        self._writer_mutex = QMutex()
 
         self._check_out_folder()
         super().__init__()
@@ -64,14 +68,14 @@ class VideoWriter(BasicFrameHandler):
     @override
     def start(self) -> None:
         """Start the video writer, this method creates a new video"""
-
         file_name = self._generate_file_path()
-        self._writer = cv2.VideoWriter(
-            file_name, self._fourcc, self._fps, self._frame_size, True
-        )
+
+        if self._writer_mutex.tryLock(1000) is False:
+            return
+        self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size, True)
+        self._writer_mutex.unlock()
 
         logger.info(f"Starting video writer for {self._name}, file: {file_name}")
-
         super().start()
 
     @override
@@ -82,9 +86,12 @@ class VideoWriter(BasicFrameHandler):
             return
 
         logger.info(f"Stopping video writer for {self._name}")
+        if self._writer_mutex.tryLock(self.LOCK_TIMEOUT) is False:
+            return
 
         self._writer.release()
         self._writer = None
+        self._writer_mutex.unlock()
 
         super().stop()
 
@@ -100,10 +107,7 @@ class VideoWriter(BasicFrameHandler):
 
         frame_width = frame.shape[1]
         frame_height = frame.shape[0]
-
-        if (frame_width != self._frame_size[0]) or (
-            frame_height != self._frame_size[1]
-        ):
+        if (frame_width != self._frame_size[0]) or (frame_height != self._frame_size[1]):
             self.stop()
             raise RuntimeError(
                 f"Frame size ({frame.shape[1]}, {frame.shape[0]})"
@@ -111,7 +115,10 @@ class VideoWriter(BasicFrameHandler):
             )
 
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        self._writer.write(frame)
+        if self._writer_mutex.tryLock(self.LOCK_TIMEOUT):
+            if self._writer:
+                self._writer.write(frame)
+                self._writer_mutex.unlock()
 
     @override
     @property
@@ -119,7 +126,7 @@ class VideoWriter(BasicFrameHandler):
         """Check if the video writer is running."""
         return self._writer is not None
 
-    def change_output_dir(self, out_dir_paht: str) -> bool:
+    def change_output_dir(self, out_dir_path: str) -> bool:
         """Change the output directory of the video writer.
 
         Args:
@@ -131,7 +138,7 @@ class VideoWriter(BasicFrameHandler):
         if self.is_running:
             return False
 
-        self._out_folder = out_dir_paht
+        self._out_folder = out_dir_path
         self._check_out_folder()
 
         return True

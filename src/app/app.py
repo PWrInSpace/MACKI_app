@@ -52,5 +52,5 @@ class App(QMainWindow):
 
     def closeEvent(self, event):
         self._macus_widget.quit()
-        self._experiment_window.hide()
+        self._experiment_window.close()
         event.accept()

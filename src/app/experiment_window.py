@@ -234,6 +234,12 @@ class ExperimentWindow(QTabWidget):
         args = procedure.procedure_profile_args()
         self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
 
+    def close(self):
+        self._cameras.stop_cameras_streaming()
+        self._cameras.stop_cameras()
+        self._cameras.quit()
+        self.hide()
+
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()

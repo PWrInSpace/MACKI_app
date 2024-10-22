@@ -74,5 +74,11 @@ class QCamerasManager(QGroupBox):
     def start_cameras(self):
         self._cameras_menager._start_cameras()
 
+    def stop_cameras(self):
+        self._cameras_menager.stop_cameras()
+
     def stop_cameras_streaming(self):
         self._cameras_menager.stop_streaming()
+
+    def quit(self):
+        self._cameras_menager.quit()
