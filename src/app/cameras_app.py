@@ -60,3 +60,7 @@ class QCameraApp(QCamerasManager):
     def start_video_recording(self) -> None:
         for writer in self._video_writers:
             writer.start()
+
+    def stop_video_recording(self) -> None:
+        for writer in self._video_writers:
+            writer.stop()

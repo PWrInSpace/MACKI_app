@@ -225,7 +225,7 @@ class ExperimentWindow(QTabWidget):
         self._cameras.change_output_dir(self._data_logger.procedure_folder)
         procedure.to_csv(self._data_logger.procedure_profile_file)
 
-        self._cameras.start_cameras()
+        # self._cameras.start_cameras()
         self._cameras.start_video_recording()
 
         args = procedure.procedure_profile_args()
@@ -236,6 +236,7 @@ class ExperimentWindow(QTabWidget):
         self._data_logger.remove_procedure_logger()
         self._procedures.clear_live_data()
 
+        self._cameras.stop_video_recording()
         self._cameras.stop_cameras()
 
         self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)
