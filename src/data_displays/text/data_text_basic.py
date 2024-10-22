@@ -42,7 +42,12 @@ class DataTextBasic(QWidget):
             It can be any type of data, but it has to
             be able to be converted to a string.
         """
-        self._value_label.setText(str(value))
+        if isinstance(value, float):
+            value_str = f"{value:.2f}"
+        else:
+            value_str = str(value)
+
+        self._value_label.setText(value_str)
 
     @property
     def name(self) -> str:
