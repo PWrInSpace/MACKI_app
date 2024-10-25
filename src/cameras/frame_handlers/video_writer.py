@@ -71,7 +71,9 @@ class VideoWriter(BasicFrameHandler):
         file_name = self._generate_file_path()
 
         if self._writer_mutex.tryLock(1000) is False:
+            logger.error("Unable to lock writer mutex")
             return
+
         self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size, True)
         self._writer_mutex.unlock()
 
@@ -116,8 +118,12 @@ class VideoWriter(BasicFrameHandler):
 
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         if self._writer_mutex.tryLock(self.LOCK_TIMEOUT):
-            if self._writer:
-                self._writer.write(frame)
+            try:
+                if self._writer:
+                    self._writer.write(frame)
+            except Exception:
+                logger.error("Exception in writer write")
+            finally:
                 self._writer_mutex.unlock()
 
     @override

@@ -229,7 +229,7 @@ class CameraHandler(QThread):
 
     def stop_streaming(self):
         """Stop the camera streaming"""
-        if all(handler.is_running for handler in self._handlers):
+        if all(handler.is_running is False for handler in self._handlers):
             self._streaming.clear()
 
     @override
@@ -239,14 +239,19 @@ class CameraHandler(QThread):
         self._stop_signal.clear()
 
         with self._camera:
+            QThread.sleep(5)
+            print("Loading camera config file")
             self._camera.load_settings(self._config_file, PersistType.NoLUT)
+            print("Loaded")
 
             while not self._stop_signal.occurs():
                 try:
                     if self._streaming.occurs() and not self._camera.is_streaming():
+                        logger.info("Streaming started")
                         self._camera.start_streaming(self._on_frame)
 
                     if not self._streaming.occurs() and self._camera.is_streaming():
+                        logger.info("Streaming stopped")
                         self._camera.stop_streaming()
 
                     self._handle_frames()

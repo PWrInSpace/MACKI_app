@@ -118,6 +118,17 @@ class ProcedureParameters:
 
         return True
 
+    def _add_end_of_procedure(self):
+        """ Add the end of the procedure to the velocity profile, which is
+        a velocity of 0 at the end of the procedure.
+        If the procedure is already at 0 velocity at the end, do nothing.
+        """
+        if not self.velocity_profile:
+            return
+
+        if self.velocity_profile[-1][self.VELOCITY_IDX] != 0:
+            self.velocity_profile.append((self.velocity_profile[-1][self.TIME_IDX], 0))
+
     def __post_init__(self):
         """
         Post initialization method.
@@ -134,6 +145,7 @@ class ProcedureParameters:
         # Check if the pressurization time is valid.
         self._check_time_param(self.press_time_ms)
         self._check_time_param(self.depr_time_ms)
+        self._add_end_of_procedure()
 
     def get_time_list(self) -> list[float]:
         """

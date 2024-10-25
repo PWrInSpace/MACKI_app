@@ -111,7 +111,15 @@ class ProcedurePlot(pg.LayoutWidget):
             velocity (float): Velocity value.
             time (float): Time value.
         """
-        self._data_connectors[self.PLOT_LIVE_VELOCITY].cb_append_data_point(velocity, time)
+        if time <= 0:
+            return
+
+        velocity_connector = self._data_connectors[self.PLOT_LIVE_VELOCITY]
+
+        if velocity_connector.x and (velocity_connector.x[-1] > time):
+            velocity_connector.clear()
+
+        velocity_connector.cb_append_data_point(velocity, time)
 
     def clear_live_velocity(self) -> None:
         """Clear the live velocity."""

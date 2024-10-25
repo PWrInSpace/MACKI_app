@@ -107,12 +107,8 @@ class ProceduresWidget(QGroupBox):
     def get_procedure_parameters(self) -> ProcedureParameters:
         return self._current_procedure
 
-    def append_live_data(self, time: float, data: dict) -> None:
-        self._plot.append_live_velocity(time, data)
-
-    def clear_live_data(self) -> None:
-        self._plot.clear_live_velocity()
-        self._set_current_procedure()
+    def append_live_data(self, velocity: float, time: dict) -> None:
+        self._plot.append_live_velocity(velocity, time)
 
     def is_procedure_running(self) -> bool:
         return self._procedure_cmd.is_running()

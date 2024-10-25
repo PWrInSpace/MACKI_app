@@ -34,7 +34,7 @@ class ExperimentWindow(QTabWidget):
     PROCEDURE_STOP_COMMAND = "procedure_stop"
     SERVICE_DATA_NAME = "Data"
     PROCEDURE_PLOT_TIME = "procedure_time"
-    PROCEDURE_PLOT_VELOCITY = "velocity"
+    PROCEDURE_PLOT_VELOCITY = "procedure_velocity"
     SERVICE_DATA_COLUMNS = 4
 
     def __init__(self, protocol: QSerial) -> None:
@@ -68,7 +68,8 @@ class ExperimentWindow(QTabWidget):
 
     def start_data_update(self) -> None:
         """Starts the data update timer"""
-        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+        # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+        pass
 
     def stop_data_update(self) -> None:
         """Stops the data update timer"""
@@ -197,8 +198,8 @@ class ExperimentWindow(QTabWidget):
         time = data.get(self.PROCEDURE_PLOT_TIME, None)
         velocity = data.get(self.PROCEDURE_PLOT_VELOCITY, None)
 
-        if time and velocity:
-            self._procedures.append_live_data(float(time), float(velocity))
+        if time is not None and velocity is not None:
+            self._procedures.append_live_data(float(velocity), float(time))
 
     def _on_update_data_timer(self) -> None:
         """Routine to read the data from the device and update the widgets"""
@@ -243,7 +244,6 @@ class ExperimentWindow(QTabWidget):
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
         self._data_logger.remove_procedure_logger()
-        self._procedures.clear_live_data()
 
         self._cameras.stop_video_recording()
         self._cameras.stop_cameras_streaming()
