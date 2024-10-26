@@ -44,7 +44,7 @@ class QCameraApp(QCamerasManager):
             DEFAULT_FRAME_SIZE,
             MINI_FRAME_SIZE,
             FRAME_FORMAT,
-            OCTOPUS_CAM_WIN,
+            OCTOPUS_CAM_WIN
         )
         camera = QCameraWidget(name, camera_id, [frame_display, video_writer], CAMERA_CONFIG)
 

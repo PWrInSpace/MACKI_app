@@ -36,6 +36,7 @@ class CameraHandler(QThread):
         self._stop_signal = ThreadEvent()
         self._streaming = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
+        self._initialized = False
 
     @Slot()
     def on_handler_started(self):
@@ -191,14 +192,15 @@ class CameraHandler(QThread):
         finally:
             self._handler_mutex.unlock()
 
-    def _handle_config_file(self) -> None:
+    def _load_config_file(self) -> None:
         """Handle the camera config file update"""
-        if self._config_file:
-            self._camera.stop_streaming()
+        if not self._config_file:
+            logger.warning("Config file was not provided")
 
-            self._config_file = None
-
-            self._camera.start_streaming(self._on_frame)
+        logger.info(f"Loading camera config file for {self._id}")
+        self._camera.load_settings(self._config_file, PersistType.NoLUT)
+        logger.info(f"Config loaded {self._id}")
+        self._initialized = True
 
     def _handle_exception(self, e: Exception) -> None:
         """Handle the exception
@@ -206,7 +208,7 @@ class CameraHandler(QThread):
         Args:
             e (Exception): The exception to be handled
         """
-        message = f"Error in camera {self._id}: {e}"
+        message = f"Error in camera {self._id}: {e}\n{traceback.print_exc()}"
         logger.error(message)
         self.error.emit(message)
 
@@ -237,15 +239,14 @@ class CameraHandler(QThread):
         """Thread main loop"""
         logger.info(f"Frame handler thread started for camera {self._id}")
         self._stop_signal.clear()
+        self._initialized = False
+        QThread.sleep(0.5)  # TODO: check if it is needed
 
         with self._camera:
-            QThread.sleep(5)
-            print("Loading camera config file")
-            self._camera.load_settings(self._config_file, PersistType.NoLUT)
-            print("Loaded")
+            try:
+                self._load_config_file()
 
-            while not self._stop_signal.occurs():
-                try:
+                while not self._stop_signal.occurs():
                     if self._streaming.occurs() and not self._camera.is_streaming():
                         logger.info("Streaming started")
                         self._camera.start_streaming(self._on_frame)
@@ -255,9 +256,9 @@ class CameraHandler(QThread):
                         self._camera.stop_streaming()
 
                     self._handle_frames()
-                except Exception as e:
-                    print(traceback.print_exc())
-                    self._handle_exception(e)
+
+            except Exception as e:
+                self._handle_exception(e)
 
         self._clean_up()
 
