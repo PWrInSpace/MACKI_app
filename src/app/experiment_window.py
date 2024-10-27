@@ -20,6 +20,7 @@ from src.procedures.procedures_widget import ProceduresWidget
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
 from src.data_logger import DataLogger
+from src.data_parser.data_parser_string import DataParserString
 
 logger = logging.getLogger("experiment_window")
 
@@ -49,9 +50,9 @@ class ExperimentWindow(QTabWidget):
         self._protocol = protocol
 
         # Parser
-        self._parser = DataParser.from_JSON(PARSER_CONFIG_FILE)
-        self._parser.set_prefix(self._protocol.ack_bytes)
-        self._parser.set_postfix(self._protocol.eol_bytes)
+        self._parser = DataParserString.from_JSON(PARSER_CONFIG_FILE)
+        # self._parser.set_prefix(self._protocol.ack_bytes)
+        # self._parser.set_postfix(self._protocol.eol_bytes)
         self._continous_nack_counter = 0
 
         # Tabs
@@ -144,16 +145,15 @@ class ExperimentWindow(QTabWidget):
             str | None: Data read from the device
         """
         self._protocol.write(self.READ_DATA_COMMAND)
-        response = self._protocol.read_bytes(self._parser.frame_size + 6)
+        # response = self._protocol.read_bytes(self._parser.frame_size + 6)
+        response = self._protocol.read_until_response()
         print(response)
-        # response = response[6:]
-        # response = self._protocol.read_raw_until_response()
 
-        if self._protocol.ack_bytes in response:
-            response = response[10:-2]
-            # print(response)
+        if response.startswith(self._protocol.ACK):
+            response = response.replace(self._protocol.ACK, "")
+            response = response.replace(self._protocol.EOL, "")
             return_response = response
-        elif self._protocol.nack_bytes in response:
+        elif response.startswith(self._protocol.NACK):
             logger.error("Failed to read data - NACK received")
             return_response = None
         elif not response:
