@@ -1,5 +1,5 @@
 {
-    "format": "<qffffHhhhBIi",
+    "format": "<qffffHhhh",
     "data_names": [
         "time",
         "load_cell",
@@ -9,9 +9,6 @@
         "distance",
         "acc_x",
         "acc_y",
-        "acc_z",
-        "procedure_state",
-        "procedure_time",
-        "procedure_velocity"
+        "acc_z"
     ]
 }

@@ -24,6 +24,7 @@ class QCamera(QWidget):
 
         self._detected = False
         self._running = False
+        self._initialzed = False
 
         self._create_qui_elements()
 
@@ -59,6 +60,11 @@ class QCamera(QWidget):
     @Slot()
     def on_camera_thread_finished(self) -> None:
         self._running = False
+        self._initialzed = False
+
+    @Slot()
+    def on_camera_initialized(self) -> None:
+        self._initialzed = True
 
     @property
     def name(self) -> str:
@@ -75,3 +81,7 @@ class QCamera(QWidget):
     @property
     def config_file(self) -> str:
         return self._config_file
+
+    @property
+    def initialized(self) -> bool:
+        return self._initialzed

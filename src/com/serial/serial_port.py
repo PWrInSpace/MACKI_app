@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class SerialPort(ComProtoBasic):
-    EOF = "\r\n"
+    EOL = "\r\n"
     READ_TIMEOUT_S = 0.1
     WRITE_TIMEOUT_S = 0.01
     ITERATIONS = 10
@@ -46,6 +46,7 @@ class SerialPort(ComProtoBasic):
 
         self._ack_bytes = self.ACK.encode()
         self._nack_bytes = self.NACK.encode()
+        self._eol_bytes = self.EOL.encode()
 
     @override
     def connect(self, com_port: str = None) -> None:
@@ -93,8 +94,8 @@ class SerialPort(ComProtoBasic):
             raise PortNotOpenError()
 
         tx_data = data
-        if not data.endswith(self.EOF):
-            tx_data += self.EOF
+        if not data.endswith(self.EOL):
+            tx_data += self.EOL
 
         self._serial.reset_input_buffer()
         self._serial.reset_output_buffer()
@@ -120,7 +121,7 @@ class SerialPort(ComProtoBasic):
             raise PortNotOpenError()
 
         self._serial.timeout = read_timeout_s
-        raw_response = self._serial.read_until(self.EOF.encode())
+        raw_response = self._serial.read_until(self._eol_bytes)
         response = raw_response.decode().strip()
 
         if self._on_rx_callback:
@@ -132,12 +133,17 @@ class SerialPort(ComProtoBasic):
         iterations = 0
         while iterations < self.ITERATIONS:
             iterations += 1
-            line = self._serial.read_until(self.EOF.encode())
+            line = self._serial.read_until(self._eol_bytes)
 
             if self._ack_bytes in line or self._nack_bytes in line:
                 return line
 
         return b""
+
+    def read_bytes(self, number_of_bytes: int, timeout: float = 0.1) -> bytes:
+        self._serial.timeout = 0.5
+        read = self._serial.read(number_of_bytes)
+        return read
 
     @override
     def is_connected(self) -> bool:
@@ -255,3 +261,7 @@ class SerialPort(ComProtoBasic):
             bytes: The NACK bytes
         """
         return self._nack_bytes
+
+    @property
+    def eol_bytes(self) -> bytes:
+        return self._eol_bytes

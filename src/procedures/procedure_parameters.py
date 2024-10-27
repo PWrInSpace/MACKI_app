@@ -205,12 +205,14 @@ class ProcedureParameters:
         procedure_profile = [
             (time, velocity) for time, velocity in zip(time_profile, velocity_profile)
         ]
+        pressurization = dict.get(ProcedureParameters.KEY_PRESS, None)
+        depressurization = dict.get(ProcedureParameters.KEY_DEPR, None)
 
         return ProcedureParameters(
             dict[ProcedureParameters.KEY_NAME],
             procedure_profile,
-            dict[ProcedureParameters.KEY_PRESS],
-            dict[ProcedureParameters.KEY_DEPR],
+            pressurization,
+            depressurization
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -260,4 +262,7 @@ class ProcedureParameters:
         movement_profile += self._movement_step_from_tuple(self.velocity_profile[-1])
         movement_profile = movement_profile[:-1]
 
-        return [movement_profile, str(self.press_time_ms), str(self.depr_time_ms)]
+        press_time = self.press_time_ms if self.press_time_ms is not None else 0
+        depr_time = self.depr_time_ms if self.press_time_ms is not None else 0
+
+        return [movement_profile, str(press_time), str(depr_time)]

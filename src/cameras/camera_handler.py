@@ -16,6 +16,7 @@ logger = logging.getLogger("cameras")
 class CameraHandler(QThread):
     FRAME_QUEUE_SIZE = 1
     error = Signal(str)
+    initialized = Signal()
 
     def __init__(
         self,
@@ -197,7 +198,7 @@ class CameraHandler(QThread):
         if not self._config_file:
             logger.warning("Config file was not provided")
 
-        logger.info(f"Loading camera config file for {self._id}")
+        logger.info(f"Loading camera config file for {self._id} {self._config_file}")
         self._camera.load_settings(self._config_file, PersistType.NoLUT)
         logger.info(f"Config loaded {self._id}")
         self._initialized = True
@@ -245,6 +246,7 @@ class CameraHandler(QThread):
         with self._camera:
             try:
                 self._load_config_file()
+                self.initialized.emit()
 
                 while not self._stop_signal.occurs():
                     if self._streaming.occurs() and not self._camera.is_streaming():
@@ -279,3 +281,7 @@ class CameraHandler(QThread):
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def initialzed(self) -> bool:
+        return self._initialized

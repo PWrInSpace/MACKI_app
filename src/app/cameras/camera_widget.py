@@ -130,7 +130,7 @@ class QCameraWidget(QCamera):
 
     def _update_gui(self, status: CameraStatus):
         """Update the GUI elements"""
-        if status == CameraStatus.MISSING:
+        if (status == CameraStatus.MISSING) or (status == CameraStatus.NOT_INITIALIZED):
             self.display_button.setText(DISPLAY_BUTTON_OPEN)
             self.display_button.setEnabled(False)
             self.write_button.setEnabled(False)
@@ -169,10 +169,10 @@ class QCameraWidget(QCamera):
             status = CameraStatus.DISPLAYING
         elif handlers_states[self.HANDLER_WRITER]:
             status = CameraStatus.WRITING
-        elif self._running:
+        elif self._initialzed:
             status = CameraStatus.RUNNING
-        elif self._detected:
-            status = CameraStatus.DETECTED
+        elif not self._initialzed:
+            status = CameraStatus.NOT_INITIALIZED
         else:
             status = CameraStatus.UNKNOWN
 

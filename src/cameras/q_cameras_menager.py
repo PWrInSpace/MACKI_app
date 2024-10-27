@@ -57,6 +57,7 @@ class QCamerasManager(QGroupBox):
         camera.finished.connect(
             self._cameras_backend_dict[id].on_camera_thread_finished
         )
+        camera.initialized.connect(self._cameras_backend_dict[id].on_camera_initialized)
 
         self._cameras_backend_dict[id].set_detected_flag(True)
 

@@ -58,8 +58,9 @@ class QCameraApp(QCamerasManager):
                 raise RuntimeError(f"Failed to change output dir for {writer.name}")
 
     def start_video_recording(self) -> None:
-        for writer in self._video_writers:
-            writer.start()
+        for writer, camera in zip(self._video_writers, self._cameras):
+            if camera.initialized:
+                writer.start()
 
     def stop_video_recording(self) -> None:
         for writer in self._video_writers:

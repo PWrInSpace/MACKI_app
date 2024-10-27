@@ -8,7 +8,7 @@ from src.app.config import OCTOPUS_SERIAL_WIN
 from src.app.com.macus_widget import MacusWidget
 from src.com.serial import QSerialState
 from src.app.experiment_window import ExperimentWindow
-from src.procedures.procedures_widget import ProceduresWidget
+# from src.procedures.procedures_widget import ProceduresWidget
 
 
 class App(QMainWindow):

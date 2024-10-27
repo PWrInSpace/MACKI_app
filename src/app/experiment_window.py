@@ -50,6 +50,8 @@ class ExperimentWindow(QTabWidget):
 
         # Parser
         self._parser = DataParser.from_JSON(PARSER_CONFIG_FILE)
+        self._parser.set_prefix(self._protocol.ack_bytes)
+        self._parser.set_postfix(self._protocol.eol_bytes)
         self._continous_nack_counter = 0
 
         # Tabs
@@ -68,8 +70,7 @@ class ExperimentWindow(QTabWidget):
 
     def start_data_update(self) -> None:
         """Starts the data update timer"""
-        # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
-        pass
+        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
 
     def stop_data_update(self) -> None:
         """Stops the data update timer"""
@@ -143,12 +144,15 @@ class ExperimentWindow(QTabWidget):
             str | None: Data read from the device
         """
         self._protocol.write(self.READ_DATA_COMMAND)
-        response = self._protocol.read_raw_until_response()
+        response = self._protocol.read_bytes(self._parser.frame_size + 6)
+        print(response)
+        # response = response[6:]
+        # response = self._protocol.read_raw_until_response()
 
         if self._protocol.ack_bytes in response:
-            # Remove the ACK and EOF bytes
-            start_idx = len(self._protocol.ack_bytes)
-            return_response = response[start_idx:-2]
+            response = response[10:-2]
+            # print(response)
+            return_response = response
         elif self._protocol.nack_bytes in response:
             logger.error("Failed to read data - NACK received")
             return_response = None
@@ -229,7 +233,6 @@ class ExperimentWindow(QTabWidget):
         self._cameras.change_output_dir(self._data_logger.procedure_folder)
         procedure.to_csv(self._data_logger.procedure_profile_file)
 
-        # self._cameras.start_cameras()
         self._cameras.start_video_recording()
 
         args = procedure.procedure_profile_args()
