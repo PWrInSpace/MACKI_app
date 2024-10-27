@@ -15,7 +15,7 @@ from PySide6.QtGui import QIcon
 from src.commands import QCmdGroup
 from src.com.serial import QSerial
 
-from app.cameras_app import QCameraApp
+# from app.cameras_app import QCameraApp
 from src.procedures.procedures_widget import ProceduresWidget
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 from src.data_parser import DataParser
@@ -87,10 +87,10 @@ class ExperimentWindow(QTabWidget):
         self._procedures.start_procedure_clicked.connect(self._on_start_procedure)
         self._procedures.stop_procedure_clicked.connect(self._on_stop_procedure)
 
-        self._cameras = QCameraApp()
-        self._cameras.enable_cameras()
-        QThread.sleep(3)
-        self._cameras.start_cameras()
+        # self._cameras = QCameraApp()
+        # self._cameras.enable_cameras()
+        # QThread.sleep(3)
+        # self._cameras.start_cameras()
 
         self._data_plots = DataDisplayPlot.from_JSON(DATA_PLOT_CONFIG_FILE)
         self._data_texts = DataDisplayText.from_JSON(DATA_TEXT_CONFIG_FILE)
@@ -106,7 +106,7 @@ class ExperimentWindow(QTabWidget):
 
         layout = QGridLayout()
         layout.addWidget(self._procedures, 0, 0, 1, 1)
-        layout.addWidget(self._cameras, 1, 0, 1, 1)
+        # layout.addWidget(self._cameras, 1, 0, 1, 1)
         layout.addWidget(data_widget, 0, 1, 2, 1)
 
         widget = QWidget()
@@ -239,9 +239,9 @@ class ExperimentWindow(QTabWidget):
         self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
 
     def close(self):
-        self._cameras.stop_cameras_streaming()
-        self._cameras.stop_cameras()
-        self._cameras.quit()
+        # self._cameras.stop_cameras_streaming()
+        # self._cameras.stop_cameras()
+        # self._cameras.quit()
         self.hide()
 
     def _on_stop_procedure(self) -> None:
