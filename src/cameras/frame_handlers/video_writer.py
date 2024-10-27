@@ -74,7 +74,9 @@ class VideoWriter(BasicFrameHandler):
             logger.error("Unable to lock writer mutex")
             return
 
-        self._writer = cv2.VideoWriter(file_name, self._fourcc, self._fps, self._frame_size, True)
+        self._writer = cv2.VideoWriter(
+            file_name, self._fourcc, self._fps, self._frame_size, True
+        )
         self._writer_mutex.unlock()
 
         logger.info(f"Starting video writer for {self._name}, file: {file_name}")
@@ -109,7 +111,9 @@ class VideoWriter(BasicFrameHandler):
 
         frame_width = frame.shape[1]
         frame_height = frame.shape[0]
-        if (frame_width != self._frame_size[0]) or (frame_height != self._frame_size[1]):
+        if (frame_width != self._frame_size[0]) or (
+            frame_height != self._frame_size[1]
+        ):
             self.stop()
             raise RuntimeError(
                 f"Frame size ({frame.shape[1]}, {frame.shape[0]})"

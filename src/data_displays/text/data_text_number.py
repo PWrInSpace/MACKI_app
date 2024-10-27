@@ -5,7 +5,10 @@ from src.utils.colors import Colors
 
 class DataTextNumber(DataTextBasic):
     def __init__(
-        self, name: str, lower_bound: float = None, upper_bound: float = None,
+        self,
+        name: str,
+        lower_bound: float = None,
+        upper_bound: float = None,
         signal_color: Colors = Colors.RED,
     ) -> None:
         super().__init__(name)

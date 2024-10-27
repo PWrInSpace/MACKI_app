@@ -1,7 +1,4 @@
-from PySide6.QtWidgets import (
-    QTableWidget,
-    QTableWidgetItem,
-    QMenu)
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem, QMenu
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from src.utils.numbers import is_number
@@ -71,7 +68,7 @@ class ProcedureTable(QTableWidget):
             velocity_text = velocity_item.text()
             if is_number(time_text) and is_number(velocity_text):
                 # table returns value with .0, and cast to int raises exception
-                time = int(float(time_text))    # don't even ask XDDDD
+                time = int(float(time_text))  # don't even ask XDDDD
                 velocity = int(float(velocity_text))
                 velocity_profile.append((time, velocity))
             else:

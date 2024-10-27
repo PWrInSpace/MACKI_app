@@ -1,11 +1,12 @@
 """
-Plots should be moved to separate folder, to avoid redundancy and to make 
+Plots should be moved to separate folder, to avoid redundancy and to make
 the code more readable. Now the data display and procedure uses plots.
 But they are created differently. The plots should be created in the same way.
 
 Due to the lack of time, here is another implementation of the live plot but for
 the procedures.
 """
+
 import pyqtgraph as pg
 from pglive.sources.data_connector import DataConnector
 from pglive.sources.live_plot import LiveLinePlot
@@ -26,7 +27,7 @@ class ProcedurePlot(pg.LayoutWidget):
         PLOT_VELOCITY: "cyan",
         PLOT_PRESSURIZATION: "lime",
         PLOT_DEPRESSURIZATION: "magenta",
-        PLOT_LIVE_VELOCITY: "white"
+        PLOT_LIVE_VELOCITY: "white",
     }
 
     def __init__(

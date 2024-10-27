@@ -6,8 +6,8 @@ from src.commands.qt_cmd.q_lock_command import QLockCmd
 
 
 class ProcedureCmdState(Enum):
-    RUNNING = 0,
-    IDLE = 1,
+    RUNNING = (0,)
+    IDLE = (1,)
 
 
 class ProcedureCmd(QLockCmd):

@@ -94,7 +94,7 @@ class ProcedureConfigurator(QWidget):
             press_time_ms=press_time_ms,
             depr_time_ms=depr_time_ms,
             velocity_profile=velocity_profile,
-            skip_check=skip_check
+            skip_check=skip_check,
         )
 
     def _save_changes_window(self) -> bool:
@@ -108,8 +108,8 @@ class ProcedureConfigurator(QWidget):
 
         reply = QMessageBox.question(
             self,
-            'Save Changes',
-            'You have changed the parameters. Do you want to save them?',
+            "Save Changes",
+            "You have changed the parameters. Do you want to save them?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )

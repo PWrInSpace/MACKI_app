@@ -7,6 +7,8 @@ logger = logging.getLogger("parser")
 
 
 class ParserFormats(Enum):
+    """Enum with the available format characters for the DataParserString class"""
+
     INT = "i"
     FLOAT = "f"
 
@@ -15,19 +17,17 @@ class DataParserString:
     DELIMITER = ";"
 
     def __init__(self, format_string: str, data_names: list[str]):
-        """Initializes the DataParser object with the format string and data keys
+        """DataParserString constructor initializes the format string and data keys
+        Available format characters are specified in the ParserFormats enum
 
         Args:
-            format_string (str): format string for the struct.unpack method.
-            The first character of the format string must be the byte order.
-            To more information, see https://docs.python.org/3/library/struct.html#format-strings
-            data_names (list[str]): Data keys to be used in the dictionary returned by the parse
-            method
+            format_string (str): format string with the format characters
+            data_names (list[str]): data names to be used as keys in the parsed data
 
         Raises:
-            ValueError: If the length of the format string and data keys are different
-            struct.error: If the format string is invalid
+            ValueError: If the format string and data keys have different lengths
         """
+
         # Skip the first character, which is the byte order
         if len(format_string) != len(data_names):
             raise ValueError("Format string and data keys must have the same length")
@@ -35,7 +35,40 @@ class DataParserString:
         self._format = format_string
         self._data_keys = data_names
 
+        self._prefix = ""
+        self._postfix = ""
+
         self._check_format()
+
+    def set_prefix(self, prefix: str) -> None:
+        """Sets a prefix to the data keys
+
+        Args:
+            prefix (str): Prefix to be added to the data keys
+        """
+        self._prefix = prefix
+
+    def set_postfix(self, postfix: str) -> None:
+        """Sets a postfix to the data keys
+
+        Args:
+            postfix (str): Postfix to be added to the data keys
+        """
+        self._postfix = postfix
+
+    def _extract_data_string(self, data: str) -> str:
+        """Extracts the data string from the data bytes
+
+        Args:
+            data (str): Data bytes to be extracted
+
+        Returns:
+            str: Data string extracted from the data bytes
+        """
+        data_string = data.replace(self._prefix, "")
+        data_string = data_string.replace(self._postfix, "")
+
+        return data_string
 
     def _check_format(self) -> None:
         for format_char in self._format:
@@ -53,6 +86,7 @@ class DataParserString:
             if the length of the data does not match the format string,
             an empty dictionary is returned
         """
+        data = self._extract_data_string(data)
 
         data_list = data.split(self.DELIMITER)
         if len(data_list) != len(self._data_keys):
@@ -60,7 +94,9 @@ class DataParserString:
             return {}
 
         data_dict = {}
-        for single_data, key, format_char in zip(data_list, self._data_keys, self._format):
+        for single_data, key, format_char in zip(
+            data_list, self._data_keys, self._format
+        ):
             match format_char:
                 case ParserFormats.INT.value:
                     data_dict[key] = int(single_data)

@@ -6,12 +6,13 @@ from PySide6.QtWidgets import QLabel, QCheckBox, QPushButton
 
 from src.utils.qt import QSerialCmdLay
 from src.commands.qt_cmd.q_serial_command import QSerialCmd
+
 # TO DO: add args test and signal argument tests
 
 
 class ProcedureCmdState(Enum):
-    RUNNING = 0,
-    IDLE = 1,
+    RUNNING = (0,)
+    IDLE = (1,)
 
 
 class QLockCmd(QSerialCmd):

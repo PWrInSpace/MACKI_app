@@ -7,11 +7,12 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QComboBox,
     QPushButton,
-    QGridLayout
+    QGridLayout,
 )
 from PySide6.QtCore import Signal
 from src.com.abstract import ComProtoBasic
 from src.procedures.procedure_plot import ProcedurePlot
+
 # from src.commands.qt_cmd.q_lock_command import QLockCmd
 from src.procedures.procedure_command import ProcedureCmd
 from src.procedures.procedure_configurator import ProcedureConfigurator
@@ -22,7 +23,9 @@ class ProceduresWidget(QGroupBox):
     BUTTON_TXT_START = "Start"
     BUTTON_TXT_STOP = "Stop"
 
-    def __init__(self, procedure_config_file: str, protocol: ComProtoBasic | None = None) -> None:
+    def __init__(
+        self, procedure_config_file: str, protocol: ComProtoBasic | None = None
+    ) -> None:
         super().__init__("Procedure control")
 
         self._configurator = None

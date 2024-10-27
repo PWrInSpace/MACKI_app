@@ -44,7 +44,7 @@ class DataParser:
         self._frame_size += self._postfix_len
 
     def set_prefix(self, prefix: bytes) -> None:
-        """ Set prefix
+        """Set prefix
 
         Args:
             prefix (bytes): prefix in bytes
@@ -54,7 +54,7 @@ class DataParser:
         self._update_frame_size()
 
     def set_postfix(self, postfix: bytes) -> None:
-        """ Set postifx
+        """Set postifx
 
         Args:
             postfix (bytes): postfix in bytes
@@ -68,7 +68,7 @@ class DataParser:
             logger.error("Invalid data size")
             return b""
 
-        return data[self._prefix_len:-self._postfix_len]
+        return data[self._prefix_len : -self._postfix_len]
 
     def parse(self, data: bytes) -> dict:
         """Parses the data bytes using the format string and data keys

@@ -9,6 +9,7 @@ from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler
 from src.utils.qt.thread_event import ThreadEvent
 import traceback
+import cv2
 
 logger = logging.getLogger("cameras")
 
@@ -161,6 +162,7 @@ class CameraHandler(QThread):
         #     frame = self._frame_queue.get_nowait()
         #     frames_on_queue -= 1
         frame = self._frame_queue.get_nowait()
+        # print("New frame")
 
         return frame
 
@@ -188,6 +190,10 @@ class CameraHandler(QThread):
 
         try:
             frame = self._get_the_newest_frame()
+            # FIXME:
+            # to not call rotate for each handlers, this is a temporary solution
+            # and should be replaced with preprocessing function specified in constructor
+            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
             self._add_frame_to_handlers(frame)
         finally:

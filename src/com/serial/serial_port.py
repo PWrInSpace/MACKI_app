@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class SerialPort(ComProtoBasic):
-    EOL = "\r\n"
+    EOL = "\n"
     READ_TIMEOUT_S = 0.1
     WRITE_TIMEOUT_S = 0.01
     ITERATIONS = 10

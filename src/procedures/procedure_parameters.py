@@ -11,6 +11,7 @@ class ProcedureParameters:
     """
     Data class for procedure parameters.
     """
+
     KEY_NAME = "name"
     KEY_PRESS = "pressurization"
     KEY_DEPR = "depressurization"
@@ -40,30 +41,38 @@ class ProcedureParameters:
         if self.name is None:
             raise ValueError("The name of the procedure is None.")
 
-        if self.velocity_profile is not None and\
-           not isinstance(self.velocity_profile, list):
+        if self.velocity_profile is not None and not isinstance(
+            self.velocity_profile, list
+        ):
             raise ValueError("The velocity profile is not a list.")
 
-        if self.press_time_ms is not None and\
-           not isinstance(self.press_time_ms, (int, float)):
+        if self.press_time_ms is not None and not isinstance(
+            self.press_time_ms, (int, float)
+        ):
             raise ValueError("The pressurization time is not a number.")
 
-        if self.depr_time_ms is not None and\
-           not isinstance(self.depr_time_ms, (int, float)):
+        if self.depr_time_ms is not None and not isinstance(
+            self.depr_time_ms, (int, float)
+        ):
             raise ValueError("The depressurization time is not a number.")
 
     def _check_dependencies(self):
-        if self.velocity_profile is None and\
-           (self.press_time_ms is None or self.depr_time_ms is None):
+        if self.velocity_profile is None and (
+            self.press_time_ms is None or self.depr_time_ms is None
+        ):
             raise ValueError(
                 "The velocity profile is None and the press or depress time is None."
             )
 
         if self.press_time_ms is not None and self.depr_time_ms is None:
-            raise ValueError("The pressurization time is set but not the depressurization.")
+            raise ValueError(
+                "The pressurization time is set but not the depressurization."
+            )
 
         if self.press_time_ms is None and self.depr_time_ms is not None:
-            raise ValueError("The depressurization time is set but not the pressurization.")
+            raise ValueError(
+                "The depressurization time is set but not the pressurization."
+            )
 
         if self.press_time_ms is not None and self.depr_time_ms is not None:
             if self.press_time_ms < 0 or self.depr_time_ms < 0:
@@ -88,7 +97,10 @@ class ProcedureParameters:
 
         # Check if the velocity profile is sorted by time.
         for i in range(len(self.velocity_profile) - 1):
-            if self.velocity_profile[i][self.TIME_IDX] > self.velocity_profile[i + 1][self.TIME_IDX]:
+            if (
+                self.velocity_profile[i][self.TIME_IDX]
+                > self.velocity_profile[i + 1][self.TIME_IDX]
+            ):
                 raise ValueError("The velocity profile is not sorted by time.")
 
         # Check the velocity values
@@ -114,12 +126,14 @@ class ProcedureParameters:
             raise ValueError("Time param is negative.")
 
         if param > self.velocity_profile[-1][self.TIME_IDX]:
-            raise ValueError("Time param is greater than the total time of the procedure.")
+            raise ValueError(
+                "Time param is greater than the total time of the procedure."
+            )
 
         return True
 
     def _add_end_of_procedure(self):
-        """ Add the end of the procedure to the velocity profile, which is
+        """Add the end of the procedure to the velocity profile, which is
         a velocity of 0 at the end of the procedure.
         If the procedure is already at 0 velocity at the end, do nothing.
         """
@@ -212,7 +226,7 @@ class ProcedureParameters:
             dict[ProcedureParameters.KEY_NAME],
             procedure_profile,
             pressurization,
-            depressurization
+            depressurization,
         )
 
     def to_dict(self) -> dict[str, Any]:

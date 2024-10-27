@@ -22,7 +22,7 @@ STATUS_TO_COLOR = {
     CameraStatus.WRITING: "#AF47D2",
     CameraStatus.WRITING_AND_DISPLAYING: "#B8B5FF",
     CameraStatus.NOT_INITIALIZED: "#A3D8FF",
-    CameraStatus.UNKNOWN: "#F6FA70"
+    CameraStatus.UNKNOWN: "#F6FA70",
 }
 
 

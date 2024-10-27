@@ -41,8 +41,7 @@ class DataLogger:
         return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     def _write_header_to_file(self, file_path):
-        """Writes the header to the data file
-        """
+        """Writes the header to the data file"""
         with open(file_path, "w") as file:
             file.write("datetime;")
             file.write(";".join(self._data_names) + "\n")
@@ -84,12 +83,13 @@ class DataLogger:
         self._procedure_folder = os.path.join(self._data_folder, self._procedure_folder)
         os.makedirs(self._procedure_folder)
 
-        self._procedure_data_file = os.path.join(self._procedure_folder, self.DATA_FILE_NAME)
+        self._procedure_data_file = os.path.join(
+            self._procedure_folder, self.DATA_FILE_NAME
+        )
         self._write_header_to_file(self._procedure_data_file)
 
     def remove_procedure_logger(self) -> None:
-        """Removes the procedure logger
-        """
+        """Removes the procedure logger"""
         self._procedure_folder = None
         self._procedure_data_file = None
 

@@ -19,6 +19,7 @@ class QCameraApp(QCamerasManager):
     Camera app - main widget, handling all cameras and
     widgets for displaying and writing frames.
     """
+
     CAMERAS = {
         "CAM1": "DEV_000A4727B2BF",
         "CAM2": "DEV_000A472B9D47",
@@ -44,9 +45,11 @@ class QCameraApp(QCamerasManager):
             DEFAULT_FRAME_SIZE,
             MINI_FRAME_SIZE,
             FRAME_FORMAT,
-            OCTOPUS_CAM_WIN
+            OCTOPUS_CAM_WIN,
         )
-        camera = QCameraWidget(name, camera_id, [frame_display, video_writer], CAMERA_CONFIG)
+        camera = QCameraWidget(
+            name, camera_id, [frame_display, video_writer], CAMERA_CONFIG
+        )
 
         self._video_writers.append(video_writer)
         self._frame_displays.append(frame_display)

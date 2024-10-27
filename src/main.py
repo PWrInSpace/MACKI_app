@@ -17,7 +17,7 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
 
 def main():
-    # sys.excepthook = excepthook
+    sys.excepthook = excepthook
     logging.basicConfig(level=logging.INFO)
     app = QApplication(sys.argv)
 
