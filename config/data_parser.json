@@ -1,5 +1,5 @@
 {
-    "format": "ifffffiii",
+    "format": "iffffffffiii",
     "data_names": [
         "time",
         "load_cell",
@@ -9,6 +9,9 @@
         "distance",
         "acc_x",
         "acc_y",
-        "acc_z"
+        "acc_z",
+        "motor_speed1",
+        "motor_speed2",
+        "procedure_time"
     ]
 }

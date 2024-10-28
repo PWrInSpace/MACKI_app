@@ -36,7 +36,7 @@ class ExperimentWindow(QTabWidget):
     PROCEDURE_STOP_COMMAND = "procedure_stop"
     SERVICE_DATA_NAME = "Data"
     PROCEDURE_PLOT_TIME = "procedure_time"
-    PROCEDURE_PLOT_VELOCITY = "procedure_velocity"
+    PROCEDURE_PLOT_VELOCITY = "motor_speed1"
     SERVICE_DATA_COLUMNS = 4
 
     def __init__(self, protocol: QSerial) -> None:
@@ -72,8 +72,8 @@ class ExperimentWindow(QTabWidget):
 
     def start_data_update(self) -> None:
         """Starts the data update timer"""
-        # self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
-        pass
+        self._data_update_timer.start(self.DATA_UPDATE_INTERVAL)
+        # pass
 
     def stop_data_update(self) -> None:
         """Stops the data update timer"""
@@ -146,7 +146,11 @@ class ExperimentWindow(QTabWidget):
             str | None: Data read from the device
         """
         self._protocol.write(self.READ_DATA_COMMAND)
-        response = self._protocol.read_until_response() or ""
+        response = self.read_raw_until_response()
+        if response:
+            response = response.decode().strip()
+        else:
+            response = ""
 
         if response.startswith(self._protocol.ACK):
             return_response = response

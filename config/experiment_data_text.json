@@ -26,7 +26,7 @@
     },
     {
       "name": "acc_z",
-      "lower_bound": 10.5,
+      "lower_bound": 0.1,
       "signal_color": "mint"
     },
     {

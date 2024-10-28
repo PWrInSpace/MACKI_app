@@ -68,6 +68,9 @@ class DataParserString:
         data_string = data.replace(self._prefix, "")
         data_string = data_string.replace(self._postfix, "")
 
+        if data_string.endswith(";"):
+            data_string = data_string[:-1]
+
         return data_string
 
     def _check_format(self) -> None:

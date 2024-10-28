@@ -3,124 +3,56 @@
   "max_columns_nb": 4,
   "commands": [
     {
-        "cmd_type": "QSerialCmd",
-        "name": "move_valve",
-        "args": [
-            {
-                "arg_type": "QArgEnum",
-                "name": "valve",
-                "enum": {
-                    "valve1": 0
-                },
-                "default_name": "valve1",
-                "description": ""
-            },
-            {
-                "arg_type": "QArgEnum",
-                "name": "state",
-                "enum": {
-                    "CLOSE": 0,
-                    "OPEN": 1
-                },
-                "default_name": "CLOSE",
-                "description": "Valve state"
-            }
-        ]
-    },
-    {
       "cmd_type": "QSerialCmd",
       "name": "move_valve",
       "args": [
-          {
-              "arg_type": "QArgEnum",
-              "name": "valve",
-              "enum": {
-                  "valve2": 1
-              },
-              "default_name": "valve2",
-              "description": ""
+        {
+          "arg_type": "QArgEnum",
+          "name": "state",
+          "enum": {
+            "CLOSE": 0,
+            "OPEN": 1
           },
-          {
-              "arg_type": "QArgEnum",
-              "name": "state",
-              "enum": {
-                  "CLOSE": 0,
-                  "OPEN": 1
-              },
-              "default_name": "CLOSE",
-              "description": "Valve state"
-          }
+          "default_name": "CLOSE",
+          "description": "Valve state"
+        }
       ]
-  },
-  {
-    "cmd_type": "QSerialCmd",
-    "name": "move_valve",
-    "args": [
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "set_motor_speed",
+      "args": [
         {
-            "arg_type": "QArgEnum",
-            "name": "valve",
-            "enum": {
-                "valve3": 2
-            },
-            "default_name": "valve3",
-            "description": ""
+          "arg_type": "QArgEnum",
+          "name": "motor",
+          "enum": {
+            "MOTOR_RIGHT": 0,
+            "MOTOR_LEFT": 1
+          },
+          "default_name": "MOTOR_RIGHT",
+          "description": "Motor number"
         },
         {
-            "arg_type": "QArgEnum",
-            "name": "state",
-            "enum": {
-                "CLOSE": 0,
-                "OPEN": 1
-            },
-            "default_name": "CLOSE",
-            "description": "Valve state"
+          "arg_type": "QArgInt",
+          "name": "speed",
+          "description": "Motor speed",
+          "min_value": -200000,
+          "max_value": 200000
         }
-    ]
-  },
-  {
-    "cmd_type": "QSerialCmd",
-    "name": "move_valve",
-    "args": [
+      ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "set_both_motors_speed",
+      "args": [
         {
-            "arg_type": "QArgEnum",
-            "name": "valve",
-            "enum": {
-                "valve4": 3
-            },
-            "default_name": "valve4",
-            "description": ""
-        },
-        {
-            "arg_type": "QArgEnum",
-            "name": "state",
-            "enum": {
-                "CLOSE": 0,
-                "OPEN": 1
-            },
-            "default_name": "CLOSE",
-            "description": "Valve state"
+          "arg_type": "QArgInt",
+          "name": "speed",
+          "description": "Motor speed",
+          "min_value": -200000,
+          "max_value": 200000
         }
-    ]
-  },
-  {
-    "cmd_type": "QSerialCmd",
-    "name": "move_motors",
-    "args": [
-        {
-            "arg_type": "QArgEnum",
-            "name": "direction",
-            "enum": {
-                "up": 1,
-                "down": 2
-            },
-            "default_name": "up",
-            "description": ""
-        },
-        {
-            "arg_type": "QArgFloat",
-            "name": "velocity"
-        }
-    ]
-  }
+      ]
+    }
   ]
 }

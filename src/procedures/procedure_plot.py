@@ -82,6 +82,8 @@ class ProcedurePlot(pg.LayoutWidget):
             v_max = max(velocity_list)
             v_max = v_max * 1.1 if v_max > 0 else v_max * 0.9
             velocity_range = [v_min, v_max]
+            if v_min == v_max:
+                velocity_range = [v_min - 10, v_max + 10]
 
             self._data_connectors[self.PLOT_VELOCITY].cb_append_data_array(
                 velocity_list, time_list
