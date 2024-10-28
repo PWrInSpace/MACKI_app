@@ -53,6 +53,12 @@
           "max_value": 200000
         }
       ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "procedure_stop",
+      "args": [
+      ]
     }
   ]
 }

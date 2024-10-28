@@ -146,7 +146,7 @@ class ExperimentWindow(QTabWidget):
             str | None: Data read from the device
         """
         self._protocol.write(self.READ_DATA_COMMAND)
-        response = self.read_raw_until_response()
+        response = self._protocol.read_raw_until_response()
         if response:
             response = response.decode().strip()
         else:

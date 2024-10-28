@@ -41,6 +41,9 @@ class ProcedurePlot(pg.LayoutWidget):
         """
         super().__init__()
 
+        self._y_range = self.VELOCITY_RANGE
+        self._x_range = [0, 1000]
+
         self._plot_widget = LivePlotWidget(title=self.TITLE)
         self._plot_widget.showGrid(x=True, y=True)
 
@@ -101,11 +104,13 @@ class ProcedurePlot(pg.LayoutWidget):
 
         plot = self._plot_widget.getPlotItem()
         if len(time_list) > 1:
-            plot.setXRange(min(time_list), max(time_list))
+            self._x_range = [min(time_list), max(time_list)]
         else:
-            plot.setXRange(0, params.press_time_ms + params.depr_time_ms)
+            self._x_range = [0, params.press_time_ms + params.depr_time_ms]
 
-        plot.setYRange(velocity_range[0], velocity_range[1], padding=0)
+        self._y_range = velocity_range
+        plot.setXRange(self._x_range[0], self._x_range[1])
+        plot.setYRange(self._y_range[0], self._y_range[1], padding=0)
 
     def append_live_velocity(self, velocity: float, time: float) -> None:
         """Append the live velocity to the plot.
@@ -117,12 +122,19 @@ class ProcedurePlot(pg.LayoutWidget):
         if time <= 0:
             return
 
+        if time > self._data_connectors[self.PLOT_VELOCITY].x[-1]:
+            return
+
         velocity_connector = self._data_connectors[self.PLOT_LIVE_VELOCITY]
 
         if velocity_connector.x and (velocity_connector.x[-1] > time):
             velocity_connector.clear()
 
         velocity_connector.cb_append_data_point(velocity, time)
+
+        plot = self._plot_widget.getPlotItem()
+        plot.setXRange(self._x_range[0], self._x_range[1])
+        plot.setYRange(self._y_range[0], self._y_range[1], padding=0)
 
     def clear_live_velocity(self) -> None:
         """Clear the live velocity."""

@@ -108,8 +108,6 @@ class DataParserString:
                 case ParserFormats.FLOAT.value:
                     raise RuntimeError("Invalid data format")
 
-        print(data_dict)
-
         return data_dict
 
     @staticmethod

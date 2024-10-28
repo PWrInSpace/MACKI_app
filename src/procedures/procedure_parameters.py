@@ -23,6 +23,8 @@ class ProcedureParameters:
     TIME_IDX = 0
     VELOCITY_IDX = 1
 
+    SLOPE_ELEMENTS = 7
+
     # The name of the procedure.
     name: str
     # The velocity profile of the procedure., list of tuples (time, velocity)
@@ -251,7 +253,7 @@ class ProcedureParameters:
         Returns:
             str: String with the step
         """
-        return f"{int(step[self.TIME_IDX])}:{int(step[self.VELOCITY_IDX])};"
+        return f"{int(step[self.TIME_IDX])};{int(step[self.VELOCITY_IDX])} "
 
     def procedure_profile_args(self) -> list[str]:
         """Get the procedure profile arguments.
@@ -267,16 +269,23 @@ class ProcedureParameters:
                 if t_0 == t_1:
                     movement_profile += self._movement_step_from_tuple(step)
                 else:
-                    for t in np.linspace(t_0, t_1, 6)[1:]:
+                    for i, t in enumerate(np.linspace(t_0, t_1, self.SLOPE_ELEMENTS)):
                         # equation v = v_0 + a * t, where a = (v_1 - v_0) / (t_1 - t_0),
                         # t = (t - t_0)
                         v = v_0 + (v_1 - v_0) * (t - t_0) / (t_1 - t_0)
+
+                        # quick fix for concurency issue
+                        if i == 0:
+                            t = t + 1
+                        elif i == self.SLOPE_ELEMENTS - 1:
+                            t = t - 1
+
                         movement_profile += self._movement_step_from_tuple((t, v))
 
         movement_profile += self._movement_step_from_tuple(self.velocity_profile[-1])
         movement_profile = movement_profile[:-1]
 
-        press_time = self.press_time_ms if self.press_time_ms is not None else 0
-        depr_time = self.depr_time_ms if self.press_time_ms is not None else 0
+        press_time = int(self.press_time_ms) if self.press_time_ms is not None else 0
+        depr_time = int(self.depr_time_ms) if self.press_time_ms is not None else 0
 
         return [movement_profile, str(press_time), str(depr_time)]

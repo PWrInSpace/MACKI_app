@@ -1,14 +1,28 @@
 [
   {
     "name": "tree",
-    "pressurization": 2000.0,
-    "depressurization": 4000.0,
+    "pressurization": 4000.0,
+    "depressurization": 8000.0,
     "time_profile": [
       0,
+      2000,
+      2000,
+      5000,
+      5000,
+      7000,
+      7000,
+      10000,
       10000
     ],
     "velocity_profile": [
       0,
+      0,
+      50000,
+      50000,
+      0,
+      0,
+      -50000,
+      -50000,
       0
     ]
   },
@@ -18,18 +32,16 @@
     "depressurization": 2500.0,
     "time_profile": [
       0,
-      2000,
-      2000,
-      4000,
+      1000,
       5000,
-      5000
+      5000,
+      6000
     ],
     "velocity_profile": [
       0,
       0,
-      10,
+      50000,
       0,
-      5,
       0
     ]
   }
