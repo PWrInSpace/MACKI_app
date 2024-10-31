@@ -51,7 +51,7 @@ class VideoWriter(BasicFrameHandler):
             str: _description_
         """
         now = datetime.now()
-        name = f"{self._name}_{now.strftime('%Y-%m-%d_%H-%M-%S')}.mp4"
+        name = f"{self._name}_{now.strftime('%Y-%m-%d_%H-%M-%S.%f')}.mp4"
 
         if self._out_folder:
             path = os.path.join(self._out_folder, name)

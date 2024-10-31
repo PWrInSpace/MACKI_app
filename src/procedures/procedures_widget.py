@@ -26,7 +26,7 @@ class ProceduresWidget(QGroupBox):
     def __init__(
         self, procedure_config_file: str, protocol: ComProtoBasic | None = None
     ) -> None:
-        super().__init__("Procedure control")
+        super().__init__("Method control")
 
         self._configurator = None
         self._current_procedure = None
@@ -42,7 +42,7 @@ class ProceduresWidget(QGroupBox):
             json_dict = json.load(file)
 
         if len(json_dict) == 0:
-            raise ValueError("No procedures loaded")
+            raise ValueError("No method loaded")
 
         for procedure_dict in json_dict:
             procedure = ProcedureParameters.from_dict(procedure_dict)
@@ -57,12 +57,12 @@ class ProceduresWidget(QGroupBox):
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
 
-        label = QLabel("Procedure name")
+        label = QLabel("Method name")
         self._procedure_type = QComboBox()
         self._procedure_type.addItems(list(self._procedures.keys()))
         self._procedure_type.currentIndexChanged.connect(self._set_current_procedure)
 
-        info_button = QPushButton("Procedure values")
+        info_button = QPushButton("Method values")
         info_button.clicked.connect(self._on_procedure_values_clicked)
 
         layout = QGridLayout()
@@ -76,7 +76,7 @@ class ProceduresWidget(QGroupBox):
         horizontal_bar.setFrameShape(QFrame.HLine)
         horizontal_bar.setFrameShadow(QFrame.Sunken)
 
-        self._procedure_cmd = ProcedureCmd("Procedure", 3)
+        self._procedure_cmd = ProcedureCmd("Method", 3)
 
         # self.setFixedSize(500, 500)
         self._plot = ProcedurePlot()

@@ -38,7 +38,7 @@ class DataLogger:
         Returns:
             str: Current time
         """
-        return datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        return datetime.now().strftime("%Y-%m-%d_%H-%M-%S.%f")
 
     def _write_header_to_file(self, file_path):
         """Writes the header to the data file"""

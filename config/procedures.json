@@ -1,33 +1,29 @@
 [
   {
-    "name": "procedure_1",
-    "pressurization": 4000.0,
-    "depressurization": 7000.0,
+    "name": "method_1",
+    "pressurization": 1000.0,
+    "depressurization": 3000.0,
     "time_profile": [
       0,
+      1000,
+      1000,
       2000,
       2000,
       3000,
-      3000,
-      6000,
-      6000,
-      7000,
-      7000
+      3000
     ],
     "velocity_profile": [
+      80000,
+      80000,
       0,
       0,
-      100000,
-      100000,
-      0,
-      0,
-      -100000,
-      -100000,
+      -80000,
+      -80000,
       0
     ]
   },
   {
-    "name": "procedure_2",
+    "name": "method_2",
     "pressurization": 1000.066,
     "depressurization": 2500.0,
     "time_profile": [
@@ -44,8 +40,8 @@
     ]
   },
   {
-    "name": "procedure_3",
-    "pressurization": 3000.0,
+    "name": "method_3",
+    "pressurization": 1500.0,
     "depressurization": 4000.0,
     "time_profile": [
       0,
@@ -71,7 +67,7 @@
     ]
   },
   {
-    "name": "procedure_4",
+    "name": "method_4",
     "pressurization": 2500.0,
     "depressurization": 3000.0,
     "time_profile": [
@@ -96,7 +92,7 @@
     ]
   },
   {
-    "name": "procedure_5",
+    "name": "method_5",
     "pressurization": 3000.0,
     "depressurization": 4000.0,
     "time_profile": [
@@ -139,7 +135,7 @@
     ]
   },
   {
-    "name": "procedure_6",
+    "name": "method_6",
     "pressurization": null,
     "depressurization": null,
     "time_profile": [
@@ -158,7 +154,7 @@
     ]
   },
   {
-    "name": "procedure_7",
+    "name": "method_7",
     "pressurization": 3000.0,
     "depressurization": 4000.0,
     "time_profile": [
@@ -189,7 +185,7 @@
     ]
   },
   {
-    "name": "procedure_8",
+    "name": "method_8",
     "pressurization": 500.0,
     "depressurization": 4500.0,
     "time_profile": [
