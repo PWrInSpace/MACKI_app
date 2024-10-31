@@ -1,9 +1,10 @@
 import sys
-import logging
+import logging.config
 
 from PySide6.QtWidgets import QApplication
 from src.app.app import App
 from PySide6.QtWidgets import QMessageBox
+from src.app.config import LOGGING_CONFIG
 
 
 def excepthook(exc_type, exc_value, exc_traceback):
@@ -17,9 +18,9 @@ def excepthook(exc_type, exc_value, exc_traceback):
 
 
 def main():
-    sys.excepthook = excepthook
-    logging.basicConfig(level=logging.INFO)
+    logging.config.dictConfig(LOGGING_CONFIG)
     app = QApplication(sys.argv)
+    sys.excepthook = excepthook
 
     with open("resources/theme.qss") as f:
         app.setStyleSheet(f.read())

@@ -1,6 +1,6 @@
 {
   "name": "Experiment data",
-  "col_num": 4,
+  "col_num": 3,
   "data": [
     {
       "name": "time"
@@ -12,12 +12,12 @@
       "name": "temperature"
     },
     {
-      "name": "pressure_2",
+      "name": "pressure_tank",
       "lower_bound": 0,
       "upper_bound": 5
     },
     {
-      "name": "pressure_1",
+      "name": "pressure_macki",
       "lower_bound": 0,
       "upper_bound": 1.5
     },
@@ -30,60 +30,11 @@
       "signal_color": "mint"
     },
     {
-      "name": "fill valve",
-      "enum": {
-        "1": "OPEN",
-        "2": "CLOSE",
-        "3": "UNKNOWN"
-      },
-      "enum_colors": {
-        "1": "blue",
-        "2": "white",
-        "3": "red"
-      }
+      "name": "motor_speed1"
     },
     {
-      "name": "vent valve",
-      "enum": {
-        "1": "OPEN",
-        "2": "CLOSE",
-        "3": "UNKNOWN"
-      },
-      "enum_colors": {
-        "1": "blue",
-        "2": "white",
-        "3": "red"
-      }
-    },
-    {
-      "name": "motor 1",
-      "enum": {
-        "1": "IDLE",
-        "2": "CW",
-        "3": "CCW",
-        "4": "UNKNOWN"
-      },
-      "enum_colors": {
-        "1": "white",
-        "2": "mint",
-        "3": "purple",
-        "4": "red"
-      }
-    },
-    {
-      "name": "motor 2",
-      "enum": {
-        "1": "IDLE",
-        "2": "CW",
-        "3": "CCW",
-        "4": "UNKNOWN"
-      },
-      "enum_colors": {
-        "1": "white",
-        "2": "mint",
-        "3": "purple",
-        "4": "red"
-      }
+      "name": "procedure_time"
     }
+
   ]
 }

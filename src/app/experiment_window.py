@@ -17,6 +17,7 @@ from src.com.serial import QSerial
 
 from app.cameras_app import QCameraApp
 from src.procedures.procedures_widget import ProceduresWidget
+from src.procedures.procedure_parameters import ProcedureParameters
 from src.data_displays import DataDisplayText, DataDisplayPlot, DataTextBasic
 
 # from src.data_parser import DataParser
@@ -223,9 +224,8 @@ class ExperimentWindow(QTabWidget):
             self._continous_nack_counter += 1
             self._check_nack_counter()
 
-    def _on_start_procedure(self) -> None:
-        """Starts the procedure"""
-        procedure = self._procedures.get_procedure_parameters()
+    def _start_procedure_data_logging(self, procedure: ProcedureParameters) -> None:
+        """Starts the data logging"""
         self._data_logger.create_procedure_logger(procedure.name)
 
         if not self._data_logger.procedure_folder:
@@ -236,20 +236,32 @@ class ExperimentWindow(QTabWidget):
 
         self._cameras.start_video_recording()
 
-        args = procedure.procedure_profile_args()
-        self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
+    def _stop_procedure_data_logging(self) -> None:
+        """Stops the data logging"""
+        self._data_logger.remove_procedure_logger()
+        self._cameras.stop_video_recording()
+        self._cameras.stop_cameras_streaming()
+
+    def _on_start_procedure(self) -> None:
+        """Starts the procedure"""
+        procedure = self._procedures.get_procedure_parameters()
+        self._start_procedure_data_logging(procedure)
+
+        try:
+            args = procedure.procedure_profile_args()
+            self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
+        except Exception as e:
+            self._stop_procedure_data_logging()
+            self._procedures.toggle_procedure_button()
+            raise e
+
+    def _on_stop_procedure(self) -> None:
+        """Stops the procedure"""
+        self._stop_procedure_data_logging()
+        self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)
 
     def close(self):
         self._cameras.stop_cameras_streaming()
         self._cameras.stop_cameras()
         self._cameras.quit()
         self.hide()
-
-    def _on_stop_procedure(self) -> None:
-        """Stops the procedure"""
-        self._data_logger.remove_procedure_logger()
-
-        self._cameras.stop_video_recording()
-        self._cameras.stop_cameras_streaming()
-
-        self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)

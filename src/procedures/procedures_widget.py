@@ -116,6 +116,12 @@ class ProceduresWidget(QGroupBox):
     def is_procedure_running(self) -> bool:
         return self._procedure_cmd.is_running()
 
+    def toggle_procedure_button(self):
+        if self._procedure_cmd.is_running():
+            self._procedure_cmd.set_stop_procedure()
+        else:
+            self._procedure_cmd.set_start_procedure()
+
     @property
     def start_procedure_clicked(self) -> Signal:
         return self._procedure_cmd.start_clicked

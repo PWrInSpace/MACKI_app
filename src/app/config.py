@@ -1,5 +1,6 @@
 import os
 from src.cameras.frame_handlers import FrameDisplayFormats
+import logging
 
 
 CONFIG_DIR = os.path.join(os.getcwd(), "config")
@@ -32,3 +33,40 @@ FRAME_FORMAT = FrameDisplayFormats.RGB
 VIDEO_FPS = 10
 VIDEO_RESOLUTION = (1216, 1936)
 VIDEO_DIR = "data"
+
+
+LOG_DIR = os.path.join(os.getcwd(), "logs")
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+LOG_FILE = os.path.join(LOG_DIR, "app.log")
+
+LOGGING_CONFIG = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': LOG_FILE,
+            'formatter': 'standard',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'standard',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['file', 'console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

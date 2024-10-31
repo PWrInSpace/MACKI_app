@@ -2,27 +2,27 @@
   {
     "name": "procedure_1",
     "pressurization": 4000.0,
-    "depressurization": 8000.0,
+    "depressurization": 7000.0,
     "time_profile": [
       0,
       2000,
       2000,
-      5000,
-      5000,
+      3000,
+      3000,
+      6000,
+      6000,
       7000,
-      7000,
-      10000,
-      10000
+      7000
     ],
     "velocity_profile": [
       0,
       0,
-      50000,
-      50000,
+      100000,
+      100000,
       0,
       0,
-      -50000,
-      -50000,
+      -100000,
+      -100000,
       0
     ]
   },
@@ -45,35 +45,35 @@
   },
   {
     "name": "procedure_3",
-    "pressurization": 1000.0,
-    "depressurization": 2000.0,
+    "pressurization": 3000.0,
+    "depressurization": 4000.0,
     "time_profile": [
       0,
       1000,
-      1000,
-      1200,
-      1400,
-      1600,
-      1800,
+      1500,
       2000,
-      3000
+      2500,
+      3000,
+      3500,
+      4000,
+      4000
     ],
     "velocity_profile": [
       0,
       50000,
       100000,
-      50000,
+      -100000,
       100000,
-      50000,
+      -100000,
       100000,
-      50000,
+      -100000,
       0
     ]
   },
   {
     "name": "procedure_4",
-    "pressurization": null,
-    "depressurization": null,
+    "pressurization": 2500.0,
+    "depressurization": 3000.0,
     "time_profile": [
       0,
       1000,
@@ -97,22 +97,26 @@
   },
   {
     "name": "procedure_5",
-    "pressurization": null,
-    "depressurization": null,
+    "pressurization": 3000.0,
+    "depressurization": 4000.0,
     "time_profile": [
       0,
-      800,
-      800,
+      1000,
       1000,
       1200,
-      1500,
-      1500,
-      1800,
+      1200,
+      1400,
+      1400,
+      1600,
       2200,
-      2500,
-      2500,
+      2400,
+      2400,
+      2600,
       2800,
-      3000
+      3000,
+      3000,
+      4000,
+      4000
     ],
     "velocity_profile": [
       100000,
@@ -127,6 +131,10 @@
       80000,
       -80000,
       -80000,
+      0,
+      0,
+      -100000,
+      -100000,
       0
     ]
   },
@@ -151,8 +159,8 @@
   },
   {
     "name": "procedure_7",
-    "pressurization": null,
-    "depressurization": null,
+    "pressurization": 3000.0,
+    "depressurization": 4000.0,
     "time_profile": [
       0,
       500,
@@ -161,7 +169,10 @@
       2000,
       2500,
       3000,
-      3000
+      3500,
+      3500,
+      4500,
+      4500
     ],
     "velocity_profile": [
       1000,
@@ -171,16 +182,19 @@
       16000,
       32000,
       64000,
+      64000,
+      -50000,
+      -50000,
       0
     ]
   },
   {
     "name": "procedure_8",
-    "pressurization": null,
-    "depressurization": null,
+    "pressurization": 500.0,
+    "depressurization": 4500.0,
     "time_profile": [
       0,
-      1000
+      5000
     ],
     "velocity_profile": [
       0,

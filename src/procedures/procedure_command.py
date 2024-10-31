@@ -48,19 +48,25 @@ class ProcedureCmd(QLockCmd):
         else:
             self._send_button.setStyleSheet(self.BUTTON_DISABLED_STYLE)
 
+    def set_start_procedure(self):
+        self._procedures_state = ProcedureCmdState.RUNNING
+        self._send_button.setText(self.BUTTON_TXT_STOP)
+        self._send_button.setStyleSheet(self.BUTTON_STOP_STYLE)
+        self._send_lock_widget.setEnabled(False)
+
+    def set_stop_procedure(self):
+        self._procedures_state = ProcedureCmdState.IDLE
+        self._send_button.setText(self.BUTTON_TXT_START)
+        self._send_button.setStyleSheet(self.BUTTON_START_STYLE)
+        self._send_lock_widget.setChecked(False)
+        self._send_lock_widget.setEnabled(True)
+
     def _on_procedure_button_clicked(self):
         if self._procedures_state == ProcedureCmdState.IDLE:
-            self._procedures_state = ProcedureCmdState.RUNNING
-            self._send_button.setText(self.BUTTON_TXT_STOP)
-            self._send_button.setStyleSheet(self.BUTTON_STOP_STYLE)
-            self._send_lock_widget.setEnabled(False)
+            self.set_start_procedure()
             self.start_clicked.emit()
         else:
-            self._procedures_state = ProcedureCmdState.IDLE
-            self._send_button.setText(self.BUTTON_TXT_START)
-            self._send_button.setStyleSheet(self.BUTTON_START_STYLE)
-            self._send_lock_widget.setChecked(False)
-            self._send_lock_widget.setEnabled(True)
+            self.set_stop_procedure()
             self.stop_clicked.emit()
 
     def is_running(self) -> bool:

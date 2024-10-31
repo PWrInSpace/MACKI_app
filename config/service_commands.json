@@ -59,6 +59,12 @@
       "name": "procedure_stop",
       "args": [
       ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "reset_esp",
+      "args": [
+      ]
     }
   ]
 }
