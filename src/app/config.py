@@ -35,7 +35,7 @@ VIDEO_RESOLUTION = (1216, 1936)
 VIDEO_DIR = "data"
 
 
-LOG_DIR = os.path.join(os.getcwd(), "logs")
+LOG_DIR = os.path.join(os.getcwd(), "data", "logs")
 if not os.path.exists(LOG_DIR):
     os.makedirs(LOG_DIR)
 
