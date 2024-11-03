@@ -65,6 +65,12 @@
       "name": "reset_esp",
       "args": [
       ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "tare_load_cell",
+      "args": [
+      ]
     }
   ]
 }

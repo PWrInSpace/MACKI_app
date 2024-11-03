@@ -28,7 +28,7 @@ logger = logging.getLogger("experiment_window")
 
 
 class ExperimentWindow(QTabWidget):
-    NACK_COUNTER_LIMIT = 20
+    NACK_COUNTER_LIMIT = 3
     DATA_UPDATE_INTERVAL = 150
     IDX_TAB_EXPERIMENT = 0
     # TODO: move the all available commands to a separate file
@@ -37,7 +37,7 @@ class ExperimentWindow(QTabWidget):
     PROCEDURE_STOP_COMMAND = "procedure_stop"
     SERVICE_DATA_NAME = "Data"
     PROCEDURE_PLOT_TIME = "procedure_time"
-    PROCEDURE_PLOT_VELOCITY = "motor_speed1"
+    PROCEDURE_PLOT_VELOCITY = "motor1_speed"
     SERVICE_DATA_COLUMNS = 4
 
     def __init__(self, protocol: QSerial) -> None:

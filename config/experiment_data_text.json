@@ -1,15 +1,9 @@
 {
   "name": "Experiment data",
-  "col_num": 3,
+  "col_num": 4,
   "data": [
     {
       "name": "time"
-    },
-    {
-      "name": "load_cell"
-    },
-    {
-      "name": "temperature"
     },
     {
       "name": "pressure_tank",
@@ -22,19 +16,60 @@
       "upper_bound": 1.5
     },
     {
-      "name": "distance"
-    },
-    {
       "name": "acc_z",
       "lower_bound": 0.1,
       "signal_color": "mint"
     },
     {
-      "name": "motor_speed1"
+      "name": "procedure_time"
     },
     {
-      "name": "procedure_time"
+      "name": "motor1_speed"
+    },
+    {
+      "name": "motor2_speed"
+    },
+    {
+      "name": "mechanical_state",
+      "enum": {
+        "0": "OK",
+        "1": "BLOCKED"
+      },
+      "enum_colors": {
+        "0": "green",
+        "1": "red"
+      }
+    },
+    {
+      "name": "board_temperature",
+      "upper_bound": 40,
+      "signal_color": "yellow"
+    },
+    {
+      "name": "motor1_temperature",
+      "enum": {
+        "0": "OK",
+        "1": "OVERHEATED",
+        "2": "SHUTDOWN"
+      },
+      "enum_colors": {
+        "0": "green",
+        "1": "yellow",
+        "2": "red"
+      }
+    },
+    {
+      "name": "motor2_temperature",
+      "enum": {
+        "0": "OK",
+        "1": "OVERHEATED",
+        "2": "SHUTDOWN"
+      },
+      "enum_colors": {
+        "0": "green",
+        "1": "yellow",
+        "2": "red"
+      }
     }
-
   ]
 }

@@ -1,24 +1,24 @@
 [
   {
     "name": "method_1",
-    "pressurization": 1000.0,
-    "depressurization": 3000.0,
+    "pressurization": 3000.0,
+    "depressurization": 7000.0,
     "time_profile": [
       0,
-      1000,
-      1000,
-      2000,
-      2000,
       3000,
-      3000
+      3000,
+      4000,
+      4000,
+      7000,
+      7000
     ],
     "velocity_profile": [
-      80000,
-      80000,
+      40000,
+      40000,
       0,
       0,
-      -80000,
-      -80000,
+      -40000,
+      -40000,
       0
     ]
   },
@@ -185,12 +185,12 @@
     ]
   },
   {
-    "name": "method_8",
+    "name": "pressurization_test",
     "pressurization": 500.0,
-    "depressurization": 4500.0,
+    "depressurization": 3500.0,
     "time_profile": [
       0,
-      5000
+      4000
     ],
     "velocity_profile": [
       0,
