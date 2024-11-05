@@ -250,13 +250,16 @@ class ExperimentWindow(QTabWidget):
         try:
             args = procedure.procedure_profile_args()
             self._protocol.write_command(self.PROCEDURE_START_COMMAND, *args)
+            self._procedures.disable_config()
         except Exception as e:
             self._stop_procedure_data_logging()
             self._procedures.toggle_procedure_button()
+            self._procedures.enable_config()
             raise e
 
     def _on_stop_procedure(self) -> None:
         """Stops the procedure"""
+        self._procedures.enable_config()
         self._stop_procedure_data_logging()
         self._protocol.write_command(self.PROCEDURE_STOP_COMMAND)
 

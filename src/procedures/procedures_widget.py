@@ -62,13 +62,13 @@ class ProceduresWidget(QGroupBox):
         self._procedure_type.addItems(list(self._procedures.keys()))
         self._procedure_type.currentIndexChanged.connect(self._set_current_procedure)
 
-        info_button = QPushButton("Method values")
-        info_button.clicked.connect(self._on_procedure_values_clicked)
+        self._method_values = QPushButton("Method values")
+        self._method_values.clicked.connect(self._on_procedure_values_clicked)
 
         layout = QGridLayout()
         layout.addWidget(label, 0, 0)
         layout.addWidget(self._procedure_type, 0, 1)
-        layout.addWidget(info_button, 0, 2)
+        layout.addWidget(self._method_values, 0, 2)
         widget = QWidget()
         widget.setLayout(layout)
 
@@ -121,6 +121,14 @@ class ProceduresWidget(QGroupBox):
             self._procedure_cmd.set_stop_procedure()
         else:
             self._procedure_cmd.set_start_procedure()
+
+    def disable_config(self):
+        self._procedure_type.setEnabled(False)
+        self._method_values.setEnabled(False)
+
+    def enable_config(self):
+        self._procedure_type.setEnabled(True)
+        self._method_values.setEnabled(True)
 
     @property
     def start_procedure_clicked(self) -> Signal:

@@ -585,7 +585,7 @@
             <Feature Name="ExposureAutoMax" Value="8999999" Type="Float" />
             <Feature Name="ExposureAutoMin" Value="34.586" Type="Float" />
             <Feature Name="ExposureMode" Value="Timed" Type="Enum" />
-            <Feature Name="ExposureTime" Value="25004.121" Type="Float" />
+            <Feature Name="ExposureTime" Value="69995.152" Type="Float" />
             <Feature Name="FileProcessStatus" Value="None" Type="Enum" />
             <SelectorGroup Name="FileSelector" Type="Enum" Value="Firmware">
                 <SelectorGroup Name="FileOperationSelector" Type="Enum" Value="Open">
