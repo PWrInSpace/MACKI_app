@@ -1,6 +1,6 @@
 [
   {
-    "name": "method_1",
+    "name": "baseline",
     "pressurization": 1800.0,
     "depressurization": 3500.0,
     "time_profile": [
@@ -21,7 +21,7 @@
     ]
   },
   {
-    "name": "method_2",
+    "name": "method_1",
     "pressurization": 2500.0,
     "depressurization": 4000.0,
     "time_profile": [
@@ -42,110 +42,9 @@
     ]
   },
   {
-    "name": "method_3",
-    "pressurization": 1500.0,
-    "depressurization": 4000.0,
-    "time_profile": [
-      0,
-      1000,
-      1500,
-      2000,
-      2500,
-      3000,
-      3500,
-      4000,
-      4000
-    ],
-    "velocity_profile": [
-      0,
-      50000,
-      100000,
-      -100000,
-      100000,
-      -100000,
-      100000,
-      -100000,
-      0
-    ]
-  },
-  {
-    "name": "method_4",
-    "pressurization": 2000.0,
-    "depressurization": 3000.0,
-    "time_profile": [
-      0,
-      1000,
-      1000,
-      1400,
-      1400,
-      1700,
-      2100,
-      2400,
-      2400,
-      2800,
-      2800,
-      3800,
-      3800
-    ],
-    "velocity_profile": [
-      70000,
-      70000,
-      0,
-      0,
-      80000,
-      80000,
-      -80000,
-      -80000,
-      0,
-      0,
-      -70000,
-      -70000,
-      0
-    ]
-  },
-  {
-    "name": "method_5",
+    "name": "method_2",
     "pressurization": 3000.0,
-    "depressurization": 4000.0,
-    "time_profile": [
-      0,
-      1000,
-      1200,
-      1400,
-      1400,
-      1600,
-      2200,
-      2400,
-      2400,
-      2600,
-      2800,
-      3000,
-      3000,
-      4000,
-      4000
-    ],
-    "velocity_profile": [
-      100000,
-      100000,
-      80000,
-      80000,
-      -80000,
-      -80000,
-      80000,
-      80000,
-      -80000,
-      -80000,
-      10000,
-      10000,
-      -100000,
-      -100000,
-      0
-    ]
-  },
-  {
-    "name": "method_6",
-    "pressurization": 2000.0,
-    "depressurization": 4000.0,
+    "depressurization": 5000.0,
     "time_profile": [
       0,
       1000,
@@ -157,10 +56,13 @@
       2400,
       2800,
       3000,
-      3400,
-      3400,
+      3200,
+      3600,
+      3900,
       4200,
-      4200
+      4200,
+      5200,
+      5200
     ],
     "velocity_profile": [
       80000,
@@ -173,6 +75,9 @@
       -70000,
       -70000,
       0,
+      70000,
+      70000,
+      0,
       0,
       -80000,
       -80000,
@@ -180,7 +85,7 @@
     ]
   },
   {
-    "name": "method_7",
+    "name": "method_3",
     "pressurization": 3200.0,
     "depressurization": 5500.0,
     "time_profile": [
@@ -211,6 +116,46 @@
       -50000,
       -50000,
       -50000,
+      0
+    ]
+  },
+  {
+    "name": "procedure_mock",
+    "pressurization": 1800.0,
+    "depressurization": 3500.0,
+    "time_profile": [
+      0,
+      1500,
+      2000,
+      2500,
+      3500,
+      3500
+    ],
+    "velocity_profile": [
+      60000,
+      60000,
+      0,
+      -60000,
+      -60000,
+      0
+    ]
+  },
+  {
+    "name": "motion_test",
+    "pressurization": null,
+    "depressurization": null,
+    "time_profile": [
+      0,
+      1500,
+      2500,
+      3500,
+      3500
+    ],
+    "velocity_profile": [
+      60000,
+      60000,
+      -60000,
+      -60000,
       0
     ]
   },
