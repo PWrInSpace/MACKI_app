@@ -4,11 +4,11 @@ from typing import Self
 from PySide6.QtCore import Slot
 from PySide6.QtWidgets import QGroupBox, QVBoxLayout
 
-from src.communication import CommunicationProtocolBasic
+from src.com.abstract import ComProtoBasic
 from src.commands.qt_cmd import (
     QCmdBasic,
     QSerialCmd,
-    QProcedureCmd,
+    QLockCmd,
 )
 from src.commands.qt_args import QArgInt, QArgFloat, QArgEnum, QArgBasic
 
@@ -20,14 +20,14 @@ class QCmdGroup(QGroupBox):
         self,
         name: str,
         commands: QCmdBasic,
-        protocol: CommunicationProtocolBasic | None = None,
+        protocol: ComProtoBasic | None = None,
     ) -> None:
         """Create a new QCmdGroup
 
         Args:
             name (str): group name
             commands (QCmdBasic): commands
-            protocol (CommunicationProtocolBasic | None, optional): communication protocol.
+            protocol (ComProtoBasic | None, optional): communication protocol.
             Defaults to None.
         """
         super().__init__(name)
@@ -37,11 +37,11 @@ class QCmdGroup(QGroupBox):
 
         self._init_ui()
 
-    def set_protocol(self, protocol: CommunicationProtocolBasic) -> None:
+    def set_protocol(self, protocol: ComProtoBasic) -> None:
         """Set the communication protocol
 
         Args:
-            protocol (CommunicationProtocolBasic): communication protocol
+            protocol (ComProtoBasic): communication protocol
         """
         self._protocol = protocol
 
@@ -63,17 +63,15 @@ class QCmdGroup(QGroupBox):
             message (str): message to be sent
         """
         if self._protocol is not None:
-            self._protocol.write(message)
-        else:
-            logger.fatal("No protocol set for command group")
+            self._protocol.write_and_check(message)
 
     @staticmethod
-    def from_JSON(file: str, protocol: CommunicationProtocolBasic) -> Self:
+    def from_JSON(file: str, protocol: ComProtoBasic) -> Self:
         """Create a QCmdGroup from a JSON file
 
         Args:
             file (str): path to JSON file
-            protocol (CommunicationProtocolBasic): communication protocol
+            protocol (ComProtoBasic): communication protocol
 
         Returns:
             Self: QCmdGroup
@@ -134,8 +132,8 @@ class _JSON_decoder(json.JSONDecoder):
         cmd_type = d.pop("cmd_type")
         if cmd_type == "QSerialCmd":
             return QSerialCmd(**d)
-        elif cmd_type == "QProcedureCmd":
-            return QProcedureCmd(**d)
+        elif cmd_type == "QLockCmd":
+            return QLockCmd(**d)
         else:
             raise ValueError(f"Invalid command type: {cmd_type}")
 

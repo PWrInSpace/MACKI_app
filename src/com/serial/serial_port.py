@@ -11,12 +11,13 @@ logger = logging.getLogger(__name__)
 
 
 class SerialPort(ComProtoBasic):
-    EOF = "\r\n"
+    EOL = "\n"
     READ_TIMEOUT_S = 0.1
-    WRITE_TIMEOUT_S = 0.1
+    WRITE_TIMEOUT_S = 0.01
+    ITERATIONS = 10
 
-    ACK = "ACK"
-    NACK = "NACK"
+    ACK = "OK: "
+    NACK = "ERR: "
 
     def __init__(
         self,
@@ -42,6 +43,10 @@ class SerialPort(ComProtoBasic):
 
         self._on_rx_callback = on_rx_callback
         self._on_tx_callback = on_tx_callback
+
+        self._ack_bytes = self.ACK.encode()
+        self._nack_bytes = self.NACK.encode()
+        self._eol_bytes = self.EOL.encode()
 
     @override
     def connect(self, com_port: str = None) -> None:
@@ -89,9 +94,11 @@ class SerialPort(ComProtoBasic):
             raise PortNotOpenError()
 
         tx_data = data
-        if not data.endswith(self.EOF):
-            tx_data += self.EOF
+        if not data.endswith(self.EOL):
+            tx_data += self.EOL
 
+        self._serial.reset_input_buffer()
+        self._serial.reset_output_buffer()
         self._serial.write(tx_data.encode())
 
         if self._on_tx_callback:
@@ -114,13 +121,29 @@ class SerialPort(ComProtoBasic):
             raise PortNotOpenError()
 
         self._serial.timeout = read_timeout_s
-        raw_response = self._serial.read_until(self.EOF.encode())
+        raw_response = self._serial.read_until(self._eol_bytes)
         response = raw_response.decode().strip()
 
         if self._on_rx_callback:
             self._on_rx_callback(response)
 
         return response
+
+    def read_raw_until_response(self) -> bytes:
+        iterations = 0
+        while iterations < self.ITERATIONS:
+            iterations += 1
+            line = self._serial.read_until(self._eol_bytes)
+
+            if self._ack_bytes in line or self._nack_bytes in line:
+                return line
+
+        return b""
+
+    def read_bytes(self, number_of_bytes: int, timeout: float = 0.1) -> bytes:
+        self._serial.timeout = 0.5
+        read = self._serial.read(number_of_bytes)
+        return read
 
     @override
     def is_connected(self) -> bool:
@@ -156,22 +179,45 @@ class SerialPort(ComProtoBasic):
         """
         self._on_tx_callback = callback
 
-    # def read_response(self) -> str:
-    #     """ This method reads the response from the device
+    def read_until_response(self) -> str:
+        """This method reads the response from the device
 
-    #     Returns:
-    #         str: The response from the device
-    #     """
-    #     response = self.read()
+        Returns:
+            str: The response from the device
+        """
+        response = self.read_raw_until_response()
 
-    #     if self.ACK in response:
-    #         response = response.replace(self.ACK, "")
-    #     elif self.NACK in response:
-    #         raise SerialException(f"NACK received: {response}")
-    #     else:
-    #         raise SerialException(f"Invalid response: {response}")
+        if not response:
+            return None
 
-    #     return response
+        decoded_response = response.decode().strip()
+        self._on_rx_callback(decoded_response)
+
+        return decoded_response
+
+    def write_and_check(self, message: str) -> None:
+        """This method writes a command to the serial port and checks the response
+           Will raise an exception if the response is NACK or no response is received
+
+        Args:
+            message (str): The message to write
+
+        Raises:
+            ValueError: No response received
+            ValueError: NACK received
+
+        Returns:
+            bool: True if the response is ACK, False otherwise
+        """
+        self.write(message)
+        ret = self.read_until_response()
+
+        if not ret:
+            raise ValueError("No response received")
+        elif ret.startswith(self.NACK):
+            raise ValueError(f"NACK received {ret}")
+        else:
+            logger.info(f"ACK received {ret}")
 
     def write_command(self, command_name: str, *argv) -> str:
         """This method writes a command to the serial port and reads the response
@@ -187,7 +233,7 @@ class SerialPort(ComProtoBasic):
         for arg in argv:
             command += f" {arg}"
 
-        self.write(command)
+        self.write_and_check(command)
 
     @property
     def port(self) -> str:
@@ -197,3 +243,25 @@ class SerialPort(ComProtoBasic):
             str: The COM port
         """
         return self._serial.port
+
+    @property
+    def ack_bytes(self) -> bytes:
+        """This method returns the ACK bytes
+
+        Returns:
+            bytes: The ACK bytes
+        """
+        return self._ack_bytes
+
+    @property
+    def nack_bytes(self) -> bytes:
+        """This method returns the NACK bytes
+
+        Returns:
+            bytes: The NACK bytes
+        """
+        return self._nack_bytes
+
+    @property
+    def eol_bytes(self) -> bytes:
+        return self._eol_bytes

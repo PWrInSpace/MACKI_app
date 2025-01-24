@@ -1,0 +1,15 @@
+{
+  "name": "Plots",
+  "col_num": 2,
+  "plots": [
+    {
+      "x_name": "time",
+      "y_name": "load_cell",
+      "title": "Load cell measurements",
+      "color": "cyan",
+      "max_points": 50,
+      "x_label": "Time (ms)",
+      "y_label": "Force (g)"
+    }
+  ]
+}

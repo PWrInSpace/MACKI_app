@@ -5,6 +5,7 @@ import numpy.typing as npt
 from typing import override
 
 from PySide6.QtCore import Signal, Slot
+from PySide6.QtGui import QIcon
 
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler, logger
 from src.utils.qt.image_display_window import ImageDisplayWindow
@@ -20,6 +21,7 @@ class FrameDisplay(BasicFrameHandler):
         default_frame_size: tuple[int, int] = (600, 600),
         minimum_frame_size: tuple[int, int] = (200, 200),
         image_format: FrameDisplayFormats = FrameDisplayFormats.GRAY,
+        icon_path: str = "",
     ) -> None:
         self.window = ImageDisplayWindow(
             name, default_frame_size, minimum_frame_size, image_format.value
@@ -28,6 +30,9 @@ class FrameDisplay(BasicFrameHandler):
 
         self._image_format = image_format
         self._default_image_path = default_image_path
+
+        if icon_path:
+            self.window.setWindowIcon(QIcon(icon_path))
 
         super().__init__()
 

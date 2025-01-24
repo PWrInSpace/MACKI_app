@@ -1,0 +1,47 @@
+{
+  "group_name": "Commands",
+  "max_columns_nb": 4,
+  "commands": [
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "move_valve",
+      "args": [
+        {
+          "arg_type": "QArgEnum",
+          "name": "state",
+          "enum": {
+            "CLOSE": 0,
+            "OPEN": 1
+          },
+          "default_name": "CLOSE",
+          "description": "Valve state"
+        }
+      ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "set_both_motors_speed",
+      "args": [
+        {
+          "arg_type": "QArgInt",
+          "name": "speed",
+          "description": "Motor speed",
+          "min_value": -200000,
+          "max_value": 200000
+        }
+      ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "reset_esp",
+      "args": [
+      ]
+    },
+    {
+      "cmd_type": "QSerialCmd",
+      "name": "tare_load_cell",
+      "args": [
+      ]
+    }
+  ]
+}

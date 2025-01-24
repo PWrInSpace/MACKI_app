@@ -4,10 +4,12 @@ import numpy as np
 import numpy.typing as npt
 from typing import override
 from queue import Queue
-from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType
+from vmbpy import Camera, Frame, Stream, FrameStatus, PersistType, PixelFormat
 from PySide6.QtCore import QThread, QMutex, Slot, Qt, Signal
 from src.cameras.frame_handlers.basic_frame_handler import BasicFrameHandler
 from src.utils.qt.thread_event import ThreadEvent
+import traceback
+import cv2
 
 logger = logging.getLogger("cameras")
 
@@ -15,6 +17,7 @@ logger = logging.getLogger("cameras")
 class CameraHandler(QThread):
     FRAME_QUEUE_SIZE = 1
     error = Signal(str)
+    initialized = Signal()
 
     def __init__(
         self,
@@ -33,19 +36,19 @@ class CameraHandler(QThread):
         self._handlers: list[BasicFrameHandler] = []
         self._handler_mutex = QMutex()
         self._stop_signal = ThreadEvent()
+        self._streaming = ThreadEvent()
         self._config_file = None  # camera config file, None means no config file
+        self._initialized = False
 
     @Slot()
     def on_handler_started(self):
         """Handler started slot"""
-        if not self.isRunning():
-            self.start()
+        self.start_streaming()
 
     @Slot()
     def on_handler_stopped(self):
         """Handler stopped slot"""
-        if all(not handler.is_running for handler in self._handlers):
-            self.quit()
+        self.stop_streaming()
 
     def register_frame_handler(self, handler: BasicFrameHandler) -> bool:
         """Register a frame handler to the camera
@@ -127,7 +130,8 @@ class CameraHandler(QThread):
                 self._frame_queue.get_nowait()
                 logger.warning(f"Camera {self._id} lost one frame")
 
-            self._frame_queue.put_nowait(frame_cpy.as_numpy_ndarray())
+            debayered_frame = frame_cpy.convert_pixel_format(PixelFormat.Rgb8)
+            self._frame_queue.put_nowait(debayered_frame.as_numpy_ndarray())
 
         camera.queue_frame(frame)
 
@@ -158,6 +162,7 @@ class CameraHandler(QThread):
         #     frame = self._frame_queue.get_nowait()
         #     frames_on_queue -= 1
         frame = self._frame_queue.get_nowait()
+        # print("New frame")
 
         return frame
 
@@ -168,7 +173,7 @@ class CameraHandler(QThread):
             frame (npt.ArrayLike): The frame to be added
         """
         if frame is None:
-            logger.warn(f"Camera {self._id}, frame is None :C")
+            logger.warning(f"Camera {self._id}, frame is None :C")
             return
 
         for handler in self._handlers:
@@ -185,19 +190,24 @@ class CameraHandler(QThread):
 
         try:
             frame = self._get_the_newest_frame()
+            # FIXME:
+            # to not call rotate for each handlers, this is a temporary solution
+            # and should be replaced with preprocessing function specified in constructor
+            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+
             self._add_frame_to_handlers(frame)
         finally:
             self._handler_mutex.unlock()
 
-    def _handle_config_file(self) -> None:
+    def _load_config_file(self) -> None:
         """Handle the camera config file update"""
-        if self._config_file:
-            self._camera.stop_streaming()
+        if not self._config_file:
+            logger.warning("Config file was not provided")
 
-            self._camera.load_settings(self._config_file, PersistType.NoLUT)
-            self._config_file = None
-
-            self._camera.start_streaming(self._on_frame)
+        logger.info(f"Loading camera config file for {self._id} {self._config_file}")
+        self._camera.load_settings(self._config_file, PersistType.NoLUT)
+        logger.info(f"Config loaded {self._id}")
+        self._initialized = True
 
     def _handle_exception(self, e: Exception) -> None:
         """Handle the exception
@@ -205,7 +215,7 @@ class CameraHandler(QThread):
         Args:
             e (Exception): The exception to be handled
         """
-        message = f"Error in camera {self._id}: {e}"
+        message = f"Error in camera {self._id}: {e}\n{traceback.print_exc()}"
         logger.error(message)
         self.error.emit(message)
 
@@ -222,22 +232,41 @@ class CameraHandler(QThread):
 
         logger.info(f"Frame handler thread stopped for camera {self._id}")
 
+    def start_streaming(self):
+        """Start the camera streaming"""
+        self._streaming.set()
+
+    def stop_streaming(self):
+        """Stop the camera streaming"""
+        if all(handler.is_running is False for handler in self._handlers):
+            self._streaming.clear()
+
     @override
     def run(self) -> None:
         """Thread main loop"""
         logger.info(f"Frame handler thread started for camera {self._id}")
         self._stop_signal.clear()
+        self._initialized = False
+        QThread.sleep(0.5)  # TODO: check if it is needed
 
         with self._camera:
             try:
-                self._camera.start_streaming(self._on_frame)
-                self._thread_loop()
+                self._load_config_file()
+                self.initialized.emit()
+
+                while not self._stop_signal.occurs():
+                    if self._streaming.occurs() and not self._camera.is_streaming():
+                        logger.info("Streaming started")
+                        self._camera.start_streaming(self._on_frame)
+
+                    if not self._streaming.occurs() and self._camera.is_streaming():
+                        logger.info("Streaming stopped")
+                        self._camera.stop_streaming()
+
+                    self._handle_frames()
 
             except Exception as e:
                 self._handle_exception(e)
-
-            finally:
-                self._camera.stop_streaming()
 
         self._clean_up()
 
@@ -252,6 +281,13 @@ class CameraHandler(QThread):
         self._stop_signal.set()
         super().wait()
 
+        for handler in self._handlers:
+            handler.stop()
+
     @property
     def id(self) -> str:
         return self._id
+
+    @property
+    def initialzed(self) -> bool:
+        return self._initialized

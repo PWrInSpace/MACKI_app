@@ -3,7 +3,7 @@ from PySide6.QtTest import QTest
 from PySide6.QtCore import Qt
 
 from src.commands import QCmdGroup
-from src.commands.qt_cmd import QSerialCmd, QProcedureCmd
+from src.commands.qt_cmd import QSerialCmd, QLockCmd
 from src.commands.qt_args import QArgInt, QArgFloat, QArgEnum
 from tests.communication.com_mock import ComMock
 
@@ -106,7 +106,7 @@ def test_from_JSON(protocol):
     assert isinstance(second_command, QSerialCmd)
     assert second_command._name == "test_cmd_2"
 
-    assert isinstance(third_command, QProcedureCmd)
+    assert isinstance(third_command, QLockCmd)
     assert third_command._name == "test_cmd_3"
 
     first_command_args = first_command._args

@@ -1,6 +1,9 @@
 # private
 *.mp4
 videos
+data
+*.exe
+_internal
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

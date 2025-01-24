@@ -43,3 +43,12 @@ class QCmdBasic(QWidget):
             NotImplementedError: Method not implemented
         """
         raise NotImplementedError("Method not implemented")
+
+    @property
+    def name(self) -> str:
+        """Get the command name
+
+        Returns:
+            str: command name
+        """
+        return self._name

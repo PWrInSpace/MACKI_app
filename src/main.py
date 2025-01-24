@@ -1,68 +1,34 @@
 import sys
-import logging
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QVBoxLayout,
-    QWidget,
-)
-from src.app.cameras_app import QCameraApp
-from src.data_displays import (
-    DataDisplayText,
-    DataDisplayPlot,
-)
+import logging.config
+
+from PySide6.QtWidgets import QApplication
+from src.app.app import App
+from PySide6.QtWidgets import QMessageBox
+from src.app.config import LOGGING_CONFIG
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-
-        self.setWindowTitle("My App")
-        self.setContentsMargins(0, 0, 0, 0)
-
-        layout = QVBoxLayout()
-        self.cameras = QCameraApp()
-
-        self.data_display_text = DataDisplayText.from_JSON("config/data_text.json")
-        data = {
-            "title": 32,
-            "pressure": 0,
-            "valve_state": "1",
-        }
-        self.data_display_text.update_data(data)
-
-        self.data_display_plot = DataDisplayPlot.from_JSON("config/data_plot.json")
-
-        data = {"pressure": 0, "temperature": 0, "time": 0}
-        self.data_display_plot.update_data(data)
-
-        data = {"pressure": 1, "temperature": 1, "time": 1}
-        self.data_display_plot.update_data(data)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.data_display_plot)
-        layout.addWidget(self.data_display_text)
-
-        widget = QWidget()
-        widget.setContentsMargins(0, 0, 0, 0)
-        widget.setLayout(layout)
-
-        # self.setFixedSize(self.sizeHint())
-        # self.setFixedSize(self.sizeHint())
-        self.setCentralWidget(widget)
-        # self.cameras.enable_cameras()
-
-    def closeEvent(self, event):
-        self.cameras.terminate_threads()
-        # self.macus_widget.quit()
-        event.accept()
+def excepthook(exc_type, exc_value, exc_traceback):
+    error_message = f"Exception type: {exc_type.__name__}\nException value: {exc_value}"
+    msg_box = QMessageBox()
+    msg_box.setIcon(QMessageBox.Critical)
+    msg_box.setText("An unexpected error occurred")
+    msg_box.setInformativeText(error_message)
+    msg_box.setWindowTitle("Error")
+    msg_box.exec()
 
 
-logging.basicConfig(level=logging.INFO)
+def main():
+    logging.config.dictConfig(LOGGING_CONFIG)
+    app = QApplication(sys.argv)
+    sys.excepthook = excepthook
+
+    with open("resources/theme.qss") as f:
+        app.setStyleSheet(f.read())
+
+    window = App()
+    window.show()
+    app.exec()
 
 
-app = QApplication(sys.argv)
-
-window = MainWindow()
-window.show()
-app.exec()
+if __name__ == "__main__":
+    main()

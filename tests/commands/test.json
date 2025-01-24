@@ -53,7 +53,7 @@
             ]
         },
         {
-            "cmd_type": "QProcedureCmd",
+            "cmd_type": "QLockCmd",
             "name": "test_cmd_3"
         }
         ]

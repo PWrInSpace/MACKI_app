@@ -1,7 +1,20 @@
 {
-    "format": ">if",
+    "format": "iffffffffiiiiii",
     "data_names": [
         "time",
-        "value"
+        "load_cell",
+        "board_temperature",
+        "pressure_macki",
+        "pressure_tank",
+        "distance",
+        "acc_x",
+        "acc_y",
+        "acc_z",
+        "motor1_speed",
+        "motor2_speed",
+        "procedure_time",
+        "mechanical_state",
+        "motor1_temperature",
+        "motor2_temperature"
     ]
 }

@@ -1,24 +1,17 @@
-import os
-from src.app.camera_widget import QCameraWidget
+from src.app.cameras.camera_widget import QCameraWidget
 from src.cameras.q_cameras_menager import QCamerasManager
 from src.cameras.frame_handlers import FrameDisplay, VideoWriter
-from src.cameras.frame_handlers import FrameDisplayFormats
-
-# TEMPORARY
-MAKO_CONFIG_FILE = os.path.join("config", "mako.xml")
-ALVIUM_CONFIG_FILE = os.path.join("config", "alvium2.xml")
-
-# MAKO_CONFIG_FILE = None
-# ALVIUM_CONFIG_FILE = None
-
-MACKI_LOGO_PATH = os.path.join("resources", "MACKI_patch.png")
-DEFAULT_FRAME_SIZE = (500, 500)
-MINI_FRAME_SIZE = (300, 300)
-FRAME_FORMAT = FrameDisplayFormats.GRAY
-
-VIDEO_FPS = 11
-VIDEO_RESOLUTION = (1936, 1216)
-VIDEO_DIR = "videos"
+from src.app.config import (
+    OCTOPUS_CAM_WIN,
+    MACKI_LOGO_PATH,
+    DEFAULT_FRAME_SIZE,
+    MINI_FRAME_SIZE,
+    FRAME_FORMAT,
+    VIDEO_FPS,
+    VIDEO_RESOLUTION,
+    VIDEO_DIR,
+    CAMERA_CONFIG,
+)
 
 
 class QCameraApp(QCamerasManager):
@@ -27,68 +20,51 @@ class QCameraApp(QCamerasManager):
     widgets for displaying and writing frames.
     """
 
-    def __init__(self):
-        cameras = [
-            QCameraWidget(
-                name="CAM1",
-                id="DEV_000F315DEEA8",
-                handlers=[
-                    FrameDisplay(
-                        "CAM1",
-                        MACKI_LOGO_PATH,
-                        DEFAULT_FRAME_SIZE,
-                        MINI_FRAME_SIZE,
-                        FRAME_FORMAT,
-                    ),
-                    VideoWriter("CAM1", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
-                ],
-                camera_config_file=MAKO_CONFIG_FILE,
-            ),
-            QCameraWidget(
-                name="CAM2",
-                id="DEV_000F315DEEAA",
-                handlers=[
-                    FrameDisplay(
-                        "CAM2",
-                        MACKI_LOGO_PATH,
-                        DEFAULT_FRAME_SIZE,
-                        MINI_FRAME_SIZE,
-                        FRAME_FORMAT,
-                    ),
-                    VideoWriter("CAM2", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
-                ],
-                camera_config_file=MAKO_CONFIG_FILE,
-            ),
-            QCameraWidget(
-                name="CAM3",
-                id="DEV_000F315DF005",
-                handlers=[
-                    FrameDisplay(
-                        "CAM3",
-                        MACKI_LOGO_PATH,
-                        DEFAULT_FRAME_SIZE,
-                        MINI_FRAME_SIZE,
-                        FRAME_FORMAT,
-                    ),
-                    VideoWriter("CAM3", VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR),
-                ],
-                camera_config_file=MAKO_CONFIG_FILE,
-            ),
-            QCameraWidget(
-                name="Alvium",
-                id="DEV_000A471F21DB",
-                handlers=[
-                    FrameDisplay(
-                        "Alvium",
-                        MACKI_LOGO_PATH,
-                        DEFAULT_FRAME_SIZE,
-                        MINI_FRAME_SIZE,
-                        FRAME_FORMAT,
-                    ),
-                    VideoWriter("Alvium", 9, (1216, 1936), VIDEO_DIR),
-                ],
-                camera_config_file=ALVIUM_CONFIG_FILE,
-            ),
-        ]
+    CAMERAS = {
+        "CAM1": "DEV_000A4727B2BF",
+        "CAM2": "DEV_000A472B9D47",
+        "CAM3": "DEV_000A4722822F",
+        "CAM4": "DEV_000A4715D9F0",
+    }
 
-        super().__init__(cameras)
+    def __init__(self):
+        self._video_writers = []
+        self._frame_displays = []
+        self._cameras = []
+
+        for name, camera_id in self.CAMERAS.items():
+            self._create_camera_widget(name, camera_id)
+
+        super().__init__(self._cameras)
+
+    def _create_camera_widget(self, name: str, camera_id: str) -> None:
+        video_writer = VideoWriter(name, VIDEO_FPS, VIDEO_RESOLUTION, VIDEO_DIR)
+        frame_display = FrameDisplay(
+            name,
+            MACKI_LOGO_PATH,
+            DEFAULT_FRAME_SIZE,
+            MINI_FRAME_SIZE,
+            FRAME_FORMAT,
+            OCTOPUS_CAM_WIN,
+        )
+        camera = QCameraWidget(
+            name, camera_id, [frame_display, video_writer], CAMERA_CONFIG
+        )
+
+        self._video_writers.append(video_writer)
+        self._frame_displays.append(frame_display)
+        self._cameras.append(camera)
+
+    def change_output_dir(self, new_dir: str) -> None:
+        for writer in self._video_writers:
+            if not writer.change_output_dir(new_dir):
+                raise RuntimeError(f"Failed to change output dir for {writer.name}")
+
+    def start_video_recording(self) -> None:
+        for writer, camera in zip(self._video_writers, self._cameras):
+            if camera.initialized:
+                writer.start()
+
+    def stop_video_recording(self) -> None:
+        for writer in self._video_writers:
+            writer.stop()
