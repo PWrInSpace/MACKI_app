@@ -1,6 +1,6 @@
 from typing import override
 
-from PySide6.QtCore import QTimer, Signal
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QLabel, QCheckBox, QPushButton
 
 from src.utils.qt import QSerialCmdLay
