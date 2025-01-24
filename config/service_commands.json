@@ -20,29 +20,6 @@
     },
     {
       "cmd_type": "QSerialCmd",
-      "name": "set_motor_speed",
-      "args": [
-        {
-          "arg_type": "QArgEnum",
-          "name": "motor",
-          "enum": {
-            "MOTOR_RIGHT": 0,
-            "MOTOR_LEFT": 1
-          },
-          "default_name": "MOTOR_RIGHT",
-          "description": "Motor number"
-        },
-        {
-          "arg_type": "QArgInt",
-          "name": "speed",
-          "description": "Motor speed",
-          "min_value": -200000,
-          "max_value": 200000
-        }
-      ]
-    },
-    {
-      "cmd_type": "QSerialCmd",
       "name": "set_both_motors_speed",
       "args": [
         {
@@ -52,12 +29,6 @@
           "min_value": -200000,
           "max_value": 200000
         }
-      ]
-    },
-    {
-      "cmd_type": "QSerialCmd",
-      "name": "procedure_stop",
-      "args": [
       ]
     },
     {

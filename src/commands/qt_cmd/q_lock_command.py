@@ -12,7 +12,7 @@ from src.commands.qt_cmd.q_serial_command import QSerialCmd
 class QLockCmd(QSerialCmd):
     ADDITIONAL_COLUMNS_NB = 3
     LABEL_STRETCH = 1
-    UNLOCK_TIMER_TIMEOUT = 5000
+    UNLOCK_TIMER_TIMEOUT = 1800000
     LOCK_UNCHECKED = "Locked"
     LOCK_CHECKED = "Unlocked"
 
@@ -29,9 +29,9 @@ class QLockCmd(QSerialCmd):
         """
         super().__init__(name, None, columns_nb)
         self._args_list = []
-        self._unlocked_timer = QTimer()
-        self._unlocked_timer.setSingleShot(True)
-        self._unlocked_timer.timeout.connect(self._on_unlock_timer_timeout)
+        # self._unlocked_timer = QTimer()
+        # self._unlocked_timer.setSingleShot(True)
+        # self._unlocked_timer.timeout.connect(self._on_unlock_timer_timeout)
 
     @override
     def _create_gui(self, columns_nb) -> None:
@@ -66,12 +66,12 @@ class QLockCmd(QSerialCmd):
         if self._send_lock_widget.isChecked():
             self._send_lock_widget.setText(self.LOCK_CHECKED)
             self._send_button.setDisabled(False)
-            self._unlocked_timer.start(self.UNLOCK_TIMER_TIMEOUT)
+            # self._unlocked_timer.start(self.UNLOCK_TIMER_TIMEOUT)
             self.unlocked.emit(self._name)
         else:
             self._send_lock_widget.setText(self.LOCK_UNCHECKED)
             self._send_button.setDisabled(True)
-            self._unlocked_timer.stop()
+            # self._unlocked_timer.stop()
             self.locked.emit(self._name)
 
     def set_locked(self) -> None:

@@ -13,7 +13,20 @@ class ProcedureCmdState(Enum):
 class ProcedureCmd(QLockCmd):
     BUTTON_TXT_START = "Start"
     BUTTON_TXT_STOP = "Stop"
-    BUTTON_START_STYLE = "background-color: lime; color: black"
+    BUTTON_START_STYLE = """
+        QPushButton {
+            background-color: #00FF00; /* Normal color */
+            color: black;
+        }
+        QPushButton:hover {
+            background-color: #00DD00; /* Hover color */
+        }
+        QPushButton:pressed {
+            background-color: #558B2F; /* Pressed color */
+            color: white;
+        }
+    """
+
     BUTTON_STOP_STYLE = "background-color: red; color: black"
     BUTTON_DISABLED_STYLE = "background-color: grey"
     start_clicked = Signal()
@@ -29,7 +42,7 @@ class ProcedureCmd(QLockCmd):
         super()._create_gui(columns_nb)
         self._send_button.setText(self.BUTTON_TXT_START)
         self._send_button.setStyleSheet(self.BUTTON_DISABLED_STYLE)
-
+        self._send_button.setFixedHeight(50)
         # disconnect the previous connection
         self._send_button.clicked.disconnect(self._send_button_clicked)
         self._send_button.clicked.connect(self._on_procedure_button_clicked)
